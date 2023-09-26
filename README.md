@@ -4,6 +4,8 @@
 
 The idea behind this collection of nodes to democratise the development of Node-RED nodes. Normally the development of your [own nodes](https://nodered.org/docs/creating-nodes/) will require the use of a third-party editor. Something like VSCode or Vim or Atom or god forbid, [Emacs](https://discourse.nodered.org/t/node-red-node-development-in-node-red/81525/2). This requirement makes creating nodes that much harder. So why not create nodes for Node-RED in Node-RED? After all, if you are using Node-RED, you probably understand how to use Node-RED.
 
+So this package tries to provide some supporting nodes for making node development in Node-RED possible and simpler. I have created a set of nodes that fulfill my needs, everything else is bound my imagination. 
+
 *What do these nodes provide?*
 
 - A presentation a nodes package collection in the form of nodes. The nodes that represent a file in the package are called `PkgFile` and are a template representation of the files content. Template as they parsed by mustache so that `{{ replaceme }}` will be replaced. But this can also be deactivated using the syntax specification.
@@ -16,6 +18,8 @@ The idea behind this collection of nodes to democratise the development of Node-
 Of course, all this is very meta and it gets worse since these nodes are maintained by this [flow](https://flowhub.org/f/b92be5062203ff69). These nodes are creating in Node-RED in a kind of a bootstrapping for further node development in Node-RED.
 
 This is not an inbuilt extension of Node-RED and obviously a more integrated workflow would be simpler. This is a attempt to find a better solution to node development, one by which testing and fixing nodes becomes faster.
+
+It also gets more confusing since these nodes will open the Node-RED import dialog with pre-defined nodes. These are generally safe to import since that's how this package creates an initial set of nodes for representing a node package. Also importing nodes for an unknown node package is not recommended unless it happens to be your own package!
 
 ### Examples 
 
@@ -41,3 +45,6 @@ Normally when developing nodes for Node-RED, a restart is necessary to flush old
 
 Since all this happens in the browser, there is no leaving Node-RED, making it more efficient to test and modify nodes. Renaming of packages can be done automagically as demonstrated by the [flow](https://flowhub.org/f/b92be5062203ff69) that maintains these nodes.
 
+### Outlook
+
+Wherever the road shall lead, there it will go.
