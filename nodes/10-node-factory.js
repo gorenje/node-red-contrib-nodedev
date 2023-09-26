@@ -267,6 +267,7 @@ module.exports = function (RED) {
                             "jpeg": "base64",
                             "bin": "base64",
                             "bmp": "base64",
+                            "gif": "base64",
                         }[ext.toLowerCase()] || "text";
                     };
 
