@@ -1,0 +1,64 @@
+<script type="text/javascript">
+  RED.nodes.registerType('{{ node.name }}',{
+    color: '{{ node.color }}',
+    icon: "{{{ node.icon }}}",
+    category: '{{ node.category }}',
+    defaults: {
+      name: {
+        value:"",
+      },
+    },
+
+    inputs: 1,
+    outputs: 1,
+
+    label: function() {
+      return (this.name || this._def.paletteLabel);
+    },
+
+    labelStyle: function() {
+      return this.name?"node_label_italic":"";
+    },
+
+    onpaletteadd: function() {
+    },
+
+    oneditprepare: function() {
+    },
+
+    oneditcancel: function() {
+    },
+
+    oneditsave: function() {
+    },
+
+    {{#node.hasbutton}}
+    button: {
+      enabled: function() {
+        return !this.changed
+      },
+
+      onclick: function () {
+        if (this.changed) {
+          return RED.notify(RED._("notification.warning", {
+            message: RED._("notification.warnings.undeployedChanges")
+          }), "warning");
+        }
+      }
+    },
+    {{/node.hasbutton}}
+
+  });
+</script>
+
+<script type="text/html" data-template-name="{{ node.name }}">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="{{ node.name }}">
+  <p>{{ node.summary }}</p>
+  {{ node.description }}
+</script>
