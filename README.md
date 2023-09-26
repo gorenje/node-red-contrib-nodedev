@@ -15,15 +15,14 @@ The idea behind this collection of nodes to democratise the development of Node-
 
 Of course, all this is very meta and it gets worse since these nodes are maintained by this [flow](https://flowhub.org/f/b92be5062203ff69). These nodes are creating in Node-RED in a kind of a bootstrapping for further node development in Node-RED.
 
-This is not an inbuilt extension of Node-RED and obviously a more integrated workflow would be simpler. This is a attempt to find a better solution to node development, one in which testing and fixing nodes is faster.
+This is not an inbuilt extension of Node-RED and obviously a more integrated workflow would be simpler. This is a attempt to find a better solution to node development, one by which testing and fixing nodes becomes faster.
 
 ### Examples 
 
 Examples are included:
 
-- Converting an existing tar-gzip package file into a collection of PkgFiles for testing and maintaince and development
-- NodeFactory example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED
-
+- Converting an existing tar-gzip package file into a collection of `PkgFile` nodes for testing and maintaince and development
+- `NodeFactory` example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED
 
 ### Tips
 
@@ -33,9 +32,12 @@ Normally when developing nodes for Node-RED, a restart is necessary to flush old
 
 1. Create nodes
 2. Install nodes
-3. Using the palette manager to remove the package
+3. Using the palette manager to remove the node package
 4. Reload the browser since it too has a cache of node code
 5. Make modifications to the nodes
-6. Reinstall the nodes and repeat.
+6. Change the package name
+7. Reinstall the nodes
+8. Repeat from step 3
 
-Since all this happens in the browser, there is no leaving Node-RED, making it more efficient to test and modify nodes.
+Since all this happens in the browser, there is no leaving Node-RED, making it more efficient to test and modify nodes. Renaming of packages can be done automagically as demonstrated by the [flow](https://flowhub.org/f/b92be5062203ff69) that maintains these nodes.
+
