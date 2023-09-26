@@ -6,7 +6,7 @@ The idea behind this collection of nodes to democratise the development of Node-
 
 *What do these nodes provide?*
 
-- A presentation a nodes package collection in the form of nodes. The nodes that represent a file in the package are called `PkgFile` and are a template representation of the files content. Template as they parsed by mustache so that ``` will be replaced. But this can also be deactivated.
+- A presentation a nodes package collection in the form of nodes. The nodes that represent a file in the package are called `PkgFile` and are a template representation of the files content. Template as they parsed by mustache so that `{{ replaceme }}` will be replaced. But this can also be deactivated using the syntax specification.
 - A `NpmTarball` node will create a gzipped tarball for uploading to [npmjs.com](https://npmjs.com) where all nodes live. This does not need to have since nodes can be installed localling into the Node-RED instance.
 - A `NRInstall` node allows for installing the node package into the Node-RED instance in which the flow is running. This means that nodes can be created, tested and modified with Node-RED. There are a few tricks so that Node-RED does not need to be restarted upon updating the package, more below.
 - A `NodeFactory` node that can create templates for node development. It also converts existing `.tgz` packages to `PkgFile` nodes, meaning that existing packages can easily be ported to this style of development. 
