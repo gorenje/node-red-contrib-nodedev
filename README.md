@@ -4,7 +4,7 @@ These nodes support the development of nodes in Node-RED by providing a framewor
 
 But also these nodes allow for local installation of nodes to test within Node-RED. If done correnctly, no restart of Node-RED is required, only reloading of the editor.
 
-These nodes are maintained in this [flow](https://flowhub.org/f/b92be5062203ff69) and any pull requests here will be integrated there.
+These nodes are maintained by this [flow](https://flowhub.org/f/b92be5062203ff69) and any pull requests here will be integrated there.
 
 
 ### Examples 
