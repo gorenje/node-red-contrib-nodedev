@@ -7,6 +7,18 @@
       name: {
         value:"",
       },
+      otp: {
+        value: "",
+      },
+      action: {
+        value: "publish"
+      },
+      authToken: {
+        value: "NPM_AUTH_TOKEN",
+      },
+      authTokenType: {
+        value: "env",
+      },
     },
 
     inputs: 1,
@@ -24,6 +36,19 @@
     },
 
     oneditprepare: function() {
+      var sltObj = $('#node-input-action');
+      sltObj.html("");
+      
+      ["publish","unpublish"].forEach( function(v) {
+         sltObj.append($('<option></option>').val(v).html(v));
+      });
+      
+      sltObj.val(this.action || "publish");
+
+      $("#node-input-authToken").typedInput({
+          types:["env", "msg", "flow","global", "cred"],
+          typeField: "#node-input-authTokenType"
+      });
     },
 
     oneditcancel: function() {
@@ -40,6 +65,27 @@
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+      <label for="node-input-authToken">
+            <i class="fa fa-tag"></i>
+            NPM Auth Token
+       </label>
+      <input type="text" id="node-input-authToken">
+      <input type="hidden" id="node-input-authTokenType">
+    </div>
+
+    <div class="form-row">
+       <label for="node-input-otp"><i class="fa fa-tag"></i> OTP</label>
+       <input type="text" id="node-input-otp" placeholder="One Time Password">
+    </div>
+
+    <div class="form-row">
+      <label for="node-input-action">
+        <i class="fa fa-tag"></i> Action
+      </label>
+      <select id="node-input-action"></select>
     </div>
 </script>
 

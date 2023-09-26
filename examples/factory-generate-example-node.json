@@ -1,0 +1,118 @@
+[
+    {
+        "id": "c6b1fbf1d541eeb0",
+        "type": "group",
+        "z": "b92be5062203ff69",
+        "name": "Create template nodes as PkgFiles",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "dfaf263b42692e74",
+            "6c6fa33c901e2691",
+            "3ad75f7739f3fdee",
+            "a3ed407778163d07",
+            "327d9b2cfc746ef9"
+        ],
+        "x": 1517,
+        "y": 389.8572082519531,
+        "w": 1063.28564453125,
+        "h": 176
+    },
+    {
+        "id": "dfaf263b42692e74",
+        "type": "template",
+        "z": "b92be5062203ff69",
+        "g": "c6b1fbf1d541eeb0",
+        "name": "jsTemplate",
+        "field": "jsTemplate",
+        "fieldType": "msg",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "module.exports = function(RED) {\n  function Functionality(config) {\n    RED.nodes.createNode(this,config);\n\n    var node = this;\n    var cfg = config;\n\n    node.on('close', function() {\n      node.status({});\n    });\n\n    node.on(\"input\", function(msg, send, done) {\n        send(msg);\n        done();\n    });\n  }\n  RED.nodes.registerType(\"\", Functionality);\n}\n",
+        "output": "str",
+        "x": 1900.28564453125,
+        "y": 430.8572082519531,
+        "wires": [
+            [
+                "6c6fa33c901e2691"
+            ]
+        ]
+    },
+    {
+        "id": "6c6fa33c901e2691",
+        "type": "template",
+        "z": "b92be5062203ff69",
+        "g": "c6b1fbf1d541eeb0",
+        "name": "htmlTemplate",
+        "field": "htmlTemplate",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<script type=\"text/javascript\">\n  RED.nodes.registerType('',{\n    color: '',\n    icon: \"\",\n    category: '',\n    defaults: {\n      name: {\n        value:\"\",\n      },\n    },\n\n    inputs: 1,\n    outputs: 1,\n\n    label: function() {\n      return (this.name || this._def.paletteLabel);\n    },\n\n    labelStyle: function() {\n      return this.name?\"node_label_italic\":\"\";\n    },\n\n    onpaletteadd: function() {\n    },\n\n    oneditprepare: function() {\n    },\n\n    oneditcancel: function() {\n    },\n\n    oneditsave: function() {\n    },\n\n    \n\n  });\n</script>\n\n<script type=\"text/html\" data-template-name=\"\">\n    <div class=\"form-row\">\n        <label for=\"node-input-name\"><i class=\"fa fa-tag\"></i> Name</label>\n        <input type=\"text\" id=\"node-input-name\" placeholder=\"Name\">\n    </div>\n</script>\n\n<script type=\"text/html\" data-help-name=\"\">\n  <p></p>\n  \n</script>\n",
+        "output": "str",
+        "x": 1904.28564453125,
+        "y": 524.8572082519531,
+        "wires": [
+            [
+                "3ad75f7739f3fdee"
+            ]
+        ]
+    },
+    {
+        "id": "3ad75f7739f3fdee",
+        "type": "function",
+        "z": "b92be5062203ff69",
+        "g": "c6b1fbf1d541eeb0",
+        "name": "transform to PkgFile nodes",
+        "func": "var allFiles = [];\n\nvar secondId = RED.util.generateId();\n\nallFiles.push({\n    id: RED.util.generateId(),\n    type: \"PkgFile\",\n    name: msg.node.name + \".js\",\n    filename: \"nodes/\" + msg.node.name.toLowerCase() + \".js\",\n    template: msg.jsTemplate,\n    syntax: \"mustache\",\n    format: \"javascript\",\n    output: \"str\",\n    x: 100,\n    y: 50,\n    wires: [\n        [\n            secondId\n        ]\n    ]\n})\n\nallFiles.push({\n    id: secondId,\n    type: \"PkgFile\",\n    name: msg.node.name + \".html\",\n    filename: \"nodes/\" + msg.node.name.toLowerCase() + \".html\",\n    template: msg.htmlTemplate,\n    syntax: \"mustache\",\n    format: \"html\",\n    output: \"str\",\n    x: 100,\n    y: 100,\n    wires: [\n        [\n        ]\n    ]\n})\n\nmsg.payload = JSON.stringify(allFiles);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2155.28564453125,
+        "y": 465.8572082519531,
+        "wires": [
+            [
+                "a3ed407778163d07"
+            ]
+        ]
+    },
+    {
+        "id": "a3ed407778163d07",
+        "type": "ClientCode",
+        "z": "b92be5062203ff69",
+        "g": "c6b1fbf1d541eeb0",
+        "name": "Open import with content",
+        "clientcode": "RED.clipboard.import();\n\nsetTimeout(() => {\n\n    $('#red-ui-clipboard-dialog-import-text').val(\n        payload\n    ).trigger(\"paste\");\n}, 300);",
+        "format": "javascript",
+        "x": 2444.28564453125,
+        "y": 465.8572082519531,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "327d9b2cfc746ef9",
+        "type": "NodeFactory",
+        "z": "b92be5062203ff69",
+        "g": "c6b1fbf1d541eeb0",
+        "name": "Test node",
+        "nodename": "HelloWorld",
+        "color": "#E2D96E",
+        "hasbutton": false,
+        "category": "nodedev",
+        "summary": "THis is a simple Hello World Node that does exactly nothing.",
+        "description": "Complexity of Hello should not be unestimated.",
+        "icon": "font-awesome/fa-smile-o",
+        "x": 1623,
+        "y": 486,
+        "wires": [
+            [
+                "dfaf263b42692e74"
+            ]
+        ]
+    }
+]
