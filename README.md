@@ -25,8 +25,8 @@ It also gets more confusing since these nodes will open the Node-RED import dial
 
 Examples are included:
 
-- Converting an existing tar-gzip package file into a collection of `PkgFile` nodes for testing and maintaince and development
-- `NodeFactory` example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED
+- Converting an existing tar-gzip package file into a collection of `PkgFile` nodes for testing and maintaince and development --> [flow](https://flowhub.org/f/eef4037a6d25a1e0)
+- `NodeFactory` example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED --> [flow](https://flowhub.org/f/7bece6814c033925)
 
 ### Tips
 
