@@ -1,9 +1,13 @@
 module.exports = function (RED) {
     "use strict";
-    
-    var mustache = require("mustache");
+
     var fs = require('fs');
     var path = require('path');
+    
+    var mustache = require("mustache");
+    var tarStream = require('tar-stream');
+    var streamx = require('streamx');
+    var pakoGzip = require('pako');
 
     function extractTokens(tokens, set) {
         set = set || new Set();
@@ -95,7 +99,7 @@ module.exports = function (RED) {
         return new NodeContext(view, this.nodeContext, this.msgContext, undefined, this.cachedContextTokens);
     };
 
-    function handleTemplate(msg,node,template) {
+    function handleTemplate(msg, node, template) {
         var promises = [];
         var tokens = extractTokens(mustache.parse(template));
         var resolvedTokens = {};
@@ -140,7 +144,7 @@ module.exports = function (RED) {
         });
     }
 
-    function convertToPkgFileNodes(msg,jsCtnt,htmlCtnt) {
+    function convertToPkgFileNodes(msg, jsCtnt, htmlCtnt) {
         var allNodes = [];
 
         var secondId = RED.util.generateId();
@@ -194,52 +198,154 @@ module.exports = function (RED) {
         });
 
         node.on("input", function (msg, send, done) {
-            try {
-                send({payload: msg})
-                send({payload: node.context()})
+            if (msg.node && msg.node.__task == "generate_from_templates") {
+                try {
+                    var htmlPath = path.join(__dirname, 'templates', 'tmpl.html');
+                    var jsPath = path.join(__dirname, 'templates', 'tmpl.js');
 
-                var htmlPath = path.join(__dirname, 'templates', 'tmpl.html');
-                var jsPath = path.join(__dirname, 'templates', 'tmpl.js');
+                    var jsonTmpl = fs.readFileSync(jsPath, 'utf8');
+                    var htmlTmpl = fs.readFileSync(htmlPath, 'utf8');
 
-                var jsonTmpl = fs.readFileSync(jsPath, 'utf8');
-                var htmlTmpl = fs.readFileSync(htmlPath, 'utf8');
+                    handleTemplate(msg, node, jsonTmpl).then(function (data) {
+                        var jsData = data;
+                        handleTemplate(msg, node, htmlTmpl).then(function (data) {
+                            var nodeImpStr = JSON.stringify(convertToPkgFileNodes(msg, jsData, data));
 
-                handleTemplate(msg, node, jsonTmpl).then(function(data){
-                    var jsData = data;
-                    handleTemplate(msg, node, htmlTmpl).then(function (data) {
-                        var nodeImpStr = JSON.stringify(convertToPkgFileNodes(msg, jsData, data));
-                        send({ payload: nodeImpStr })
+                            send({ payload: nodeImpStr })
 
-                        if ( cfg.autoimport ) {
+                            if (cfg.autoimport) {
+                                RED.comms.publish(
+                                    "nodedev:perform-autoimport-nodes",
+                                    RED.util.encodeObject({
+                                        msg: "autoimport",
+                                        payload: nodeImpStr,
+                                        topic: msg.topic,
+                                        nodeid: node.id,
+                                        _msg: msg
+                                    })
+                                );
+                            }
+
+                            done()
+                        }).catch((err) => {
+                            msg.error = err
+                            done(err.message, msg)
+                        })
+                    }).catch((err) => {
+                        msg.error = err
+                        done(err.message, msg)
+                    })
+                    //send({ payload: jsonString })
+                } catch (err) {
+                    msg.error = err
+                    done(err.message, msg)
+                }
+            } else {
+                /* assume that payload is a buffer with a .tgz if not, error out */
+                try {
+                    const extract = tarStream.extract()
+
+                    var allFiles = [];
+
+                    /* 
+                     * there is no indication in a tar file of whether a file is binary or textual.
+                     * we can only make a guess by the extension of the filename.
+                     ***/
+                    var computeFormat = (filename) => {
+                        var ext = filename.split(".").at(-1);
+
+                        return {
+                            "html": "html",
+                            "js": "javascript",
+                            "md": "markdown",
+                            "json": "json",
+                            /* binary formats are encoded in base64 */
+                            "png": "base64",
+                            "tiff": "base64",
+                            "tif": "base64",
+                            "jpg": "base64",
+                            "jpeg": "base64",
+                            "bin": "base64",
+                            "bmp": "base64",
+                        }[ext.toLowerCase()] || "text";
+                    };
+
+                    extract.on('entry', function (header, stream, next) {
+                        // header is the tar header
+                        // stream is the content body (might be an empty stream)
+                        // call next when you are done with this entry
+
+                        var buffer = [];
+
+                        stream.on('data', function (data) {
+                            buffer.push(data)
+                        });
+
+                        stream.on('end', function () {
+                            var frmt = computeFormat(header.name.split("/").at(-1));
+
+                            allFiles.push({
+                                id: RED.util.generateId(),
+                                type: "PkgFile",
+                                name: header.name.split("/").at(-1),
+                                filename: header.name.replace(/^package\//, ''),
+                                template: Buffer.concat(buffer).toString(frmt == "base64" ? 'base64' : 'utf8'),
+                                syntax: "mustache",
+                                format: frmt,
+                                output: "str",
+                                x: 100,
+                                y: 50 * (allFiles.length + 1),
+                                wires: [
+                                    []
+                                ]
+                            })
+
+                            next() // ready for next entry
+                        })
+
+                        stream.resume() // just auto drain the stream
+                    })
+
+                    extract.on('finish', function () {
+                        // all entries read, wire them together
+                        for (var idx = 0; idx < allFiles.length - 1; idx++) {
+                            allFiles[idx].wires = [[allFiles[idx + 1].id]];
+                        }
+
+                        msg.payload = JSON.stringify(allFiles);
+                        send(msg)
+
+                        if (cfg.autoimport) {
                             RED.comms.publish(
                                 "nodedev:perform-autoimport-nodes",
                                 RED.util.encodeObject({
                                     msg: "autoimport",
-                                    payload: nodeImpStr,
+                                    payload: msg.payload,
                                     topic: msg.topic,
                                     nodeid: node.id,
                                     _msg: msg
                                 })
                             );
                         }
-                                                
+
                         done()
-                    }).catch( (err) => {
-                        msg.error = err
-                        done(err.message, msg)
                     })
-                }).catch( (err) => {
+
+                    extract.on('error', function (err) {
+                        msg.error = err;
+                        done("extraction error", msg)
+                    });
+
+                    var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(msg.payload))))
+                    stream.pipe(extract);
+                } catch (err) {
                     msg.error = err
                     done(err.message, msg)
-                })
-                //send({ payload: jsonString })
-            } catch (err) {
-                msg.error = err
-                done(err.message,msg)
+                }
             }
         });
     }
-    
+
     RED.nodes.registerType("NodeFactory", NodeFactoryFunctionality);
 
     RED.httpAdmin.post("/NodeFactory/:id",

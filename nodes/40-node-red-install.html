@@ -106,6 +106,7 @@
     color: '#e5e4ef',
     icon: "icons/subflow.svg",
     category: 'nodedev',
+    paletteLabel: 'NRInstall',
     defaults: {
       name: {
         value:"",
@@ -132,16 +133,9 @@
       </label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
-
-    <div class="form-row">
-      <label for="node-input-fubar">
-              <i class="fa fa-tag"></i>
-              <span data-i18n="common.label.name">Name</span>
-          </label>
-      <input type="text" id="node-input-fubar" placeholder="Fubar">
-    </div>
 </script>
 
 <script type="text/html" data-help-name="NodeRedInstall">
-    <p>Install tarball into Node-RED as new node package.</p>
+    <p>Install NPM tarball into Node-RED as new node package.</p>
+    Pass in the results of the NpmTarball node into here and the nodes will be installed into Node-RED.
 </script>

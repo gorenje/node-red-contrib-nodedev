@@ -18,7 +18,7 @@
     </div> 
 
     <div class="form-row">
-        <label for="node-input-category"><i class="fa fa-tag"></i> Node Name</label>
+        <label for="node-input-category"><i class="fa fa-tag"></i> Node Category</label>
         <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-category" placeholder="Node Category">
         </div>
     </div>
@@ -93,7 +93,8 @@
             data[nam] = node[nam]
         })
         data["name"] = node.nodename;
-
+        data["__task"] = "generate_from_templates";
+        
         $.ajax({
             url: "NodeFactory/" + node.id,
             type: "POST",
@@ -155,7 +156,7 @@
             description: { value: ""},
             icon: { value: "font-awesome/fa-industry" }
         },
-        inputs: 0,
+        inputs: 1,
         outputs: 1,
         icon: "font-awesome/fa-industry",
         label: function () {

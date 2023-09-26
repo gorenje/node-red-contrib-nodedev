@@ -2,10 +2,11 @@
   "name" : "@gregoriusrippenstein/node-red-contrib-nodedev",
   "version": "0.0.1",
   "dependencies": {
-    "pako": "latest",
-    "tar-stream": "latest",
-    "mustache": "latest",
-    "libnpmpublish": "latest"
+    "pako":          "latest",
+    "tar-stream":    "latest",
+    "mustache":      "latest",
+    "libnpmpublish": "latest",
+    "streamx":       "latest"
   },
 
   "keywords": [

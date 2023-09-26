@@ -1,117 +1,379 @@
 [
     {
-        "id": "c6b1fbf1d541eeb0",
+        "id": "2b6bc676aaa603ad",
         "type": "group",
         "z": "b92be5062203ff69",
-        "name": "Create template nodes as PkgFiles",
         "style": {
-            "label": true
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
         },
         "nodes": [
-            "dfaf263b42692e74",
-            "6c6fa33c901e2691",
-            "3ad75f7739f3fdee",
-            "a3ed407778163d07",
-            "327d9b2cfc746ef9"
+            "d4c53464a044324a",
+            "fece8b2f1459b822",
+            "5dea66e11691c1f2",
+            "9f4584bc1aeabf43",
+            "8a667fa50ad9b9ee",
+            "42a101dda45403ee",
+            "a301a4a721a507d9",
+            "1fa5af4c7e44a739",
+            "b103106ae655b460",
+            "77bf2cb0aa2f60ff"
         ],
-        "x": 1517,
-        "y": 389.8572082519531,
-        "w": 1063.28564453125,
-        "h": 176
+        "x": 1872,
+        "y": 317,
+        "w": 1423,
+        "h": 860
     },
     {
-        "id": "dfaf263b42692e74",
-        "type": "template",
+        "id": "d4c53464a044324a",
+        "type": "PkgFile",
         "z": "b92be5062203ff69",
-        "g": "c6b1fbf1d541eeb0",
-        "name": "jsTemplate",
-        "field": "jsTemplate",
-        "fieldType": "msg",
-        "format": "javascript",
+        "g": "2b6bc676aaa603ad",
+        "name": "LICENSE",
+        "filename": "LICENSE",
+        "format": "text",
         "syntax": "mustache",
-        "template": "module.exports = function(RED) {\n  function Functionality(config) {\n    RED.nodes.createNode(this,config);\n\n    var node = this;\n    var cfg = config;\n\n    node.on('close', function() {\n      node.status({});\n    });\n\n    node.on(\"input\", function(msg, send, done) {\n        send(msg);\n        done();\n    });\n  }\n  RED.nodes.registerType(\"\", Functionality);\n}\n",
+        "template": "Nothing, nope, can't do a thing. ",
         "output": "str",
-        "x": 1900.28564453125,
-        "y": 430.8572082519531,
+        "x": 2215,
+        "y": 628,
         "wires": [
             [
-                "6c6fa33c901e2691"
+                "fece8b2f1459b822"
             ]
         ]
     },
     {
-        "id": "6c6fa33c901e2691",
-        "type": "template",
+        "id": "fece8b2f1459b822",
+        "type": "PkgFile",
         "z": "b92be5062203ff69",
-        "g": "c6b1fbf1d541eeb0",
-        "name": "htmlTemplate",
-        "field": "htmlTemplate",
-        "fieldType": "msg",
-        "format": "handlebars",
+        "g": "2b6bc676aaa603ad",
+        "name": "README",
+        "filename": "README.md",
+        "format": "markdown",
         "syntax": "mustache",
-        "template": "<script type=\"text/javascript\">\n  RED.nodes.registerType('',{\n    color: '',\n    icon: \"\",\n    category: '',\n    defaults: {\n      name: {\n        value:\"\",\n      },\n    },\n\n    inputs: 1,\n    outputs: 1,\n\n    label: function() {\n      return (this.name || this._def.paletteLabel);\n    },\n\n    labelStyle: function() {\n      return this.name?\"node_label_italic\":\"\";\n    },\n\n    onpaletteadd: function() {\n    },\n\n    oneditprepare: function() {\n    },\n\n    oneditcancel: function() {\n    },\n\n    oneditsave: function() {\n    },\n\n    \n\n  });\n</script>\n\n<script type=\"text/html\" data-template-name=\"\">\n    <div class=\"form-row\">\n        <label for=\"node-input-name\"><i class=\"fa fa-tag\"></i> Name</label>\n        <input type=\"text\" id=\"node-input-name\" placeholder=\"Name\">\n    </div>\n</script>\n\n<script type=\"text/html\" data-help-name=\"\">\n  <p></p>\n  \n</script>\n",
+        "template": "## What does this package do?\n\n## Why does it exist?\n\n## Where will it go?\n\n",
         "output": "str",
-        "x": 1904.28564453125,
-        "y": 524.8572082519531,
+        "x": 2217,
+        "y": 674,
         "wires": [
             [
-                "3ad75f7739f3fdee"
+                "0e9d26e2b43ca0f5"
             ]
         ]
     },
     {
-        "id": "3ad75f7739f3fdee",
-        "type": "function",
+        "id": "5dea66e11691c1f2",
+        "type": "NpmTarBall",
         "z": "b92be5062203ff69",
-        "g": "c6b1fbf1d541eeb0",
-        "name": "transform to PkgFile nodes",
-        "func": "var allFiles = [];\n\nvar secondId = RED.util.generateId();\n\nallFiles.push({\n    id: RED.util.generateId(),\n    type: \"PkgFile\",\n    name: msg.node.name + \".js\",\n    filename: \"nodes/\" + msg.node.name.toLowerCase() + \".js\",\n    template: msg.jsTemplate,\n    syntax: \"mustache\",\n    format: \"javascript\",\n    output: \"str\",\n    x: 100,\n    y: 50,\n    wires: [\n        [\n            secondId\n        ]\n    ]\n})\n\nallFiles.push({\n    id: secondId,\n    type: \"PkgFile\",\n    name: msg.node.name + \".html\",\n    filename: \"nodes/\" + msg.node.name.toLowerCase() + \".html\",\n    template: msg.htmlTemplate,\n    syntax: \"mustache\",\n    format: \"html\",\n    output: \"str\",\n    x: 100,\n    y: 100,\n    wires: [\n        [\n        ]\n    ]\n})\n\nmsg.payload = JSON.stringify(allFiles);\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 2155.28564453125,
-        "y": 465.8572082519531,
+        "g": "2b6bc676aaa603ad",
+        "name": "",
+        "x": 2930,
+        "y": 1109,
         "wires": [
             [
-                "a3ed407778163d07"
+                "9f4584bc1aeabf43",
+                "8a667fa50ad9b9ee",
+                "42a101dda45403ee"
             ]
         ]
     },
     {
-        "id": "a3ed407778163d07",
-        "type": "ClientCode",
+        "id": "9f4584bc1aeabf43",
+        "type": "NodeRedInstall",
         "z": "b92be5062203ff69",
-        "g": "c6b1fbf1d541eeb0",
-        "name": "Open import with content",
-        "clientcode": "RED.clipboard.import();\n\nsetTimeout(() => {\n\n    $('#red-ui-clipboard-dialog-import-text').val(\n        payload\n    ).trigger(\"paste\");\n}, 300);",
-        "format": "javascript",
-        "x": 2444.28564453125,
-        "y": 465.8572082519531,
+        "g": "2b6bc676aaa603ad",
+        "name": "",
+        "x": 3200,
+        "y": 821,
         "wires": [
             []
         ]
     },
     {
-        "id": "327d9b2cfc746ef9",
+        "id": "8a667fa50ad9b9ee",
         "type": "NodeFactory",
         "z": "b92be5062203ff69",
-        "g": "c6b1fbf1d541eeb0",
-        "name": "Test node",
-        "nodename": "HelloWorld",
-        "color": "#E2D96E",
+        "d": true,
+        "g": "2b6bc676aaa603ad",
+        "name": "",
+        "nodename": "",
+        "color": "#e5e4ef",
         "hasbutton": false,
-        "category": "nodedev",
-        "summary": "THis is a simple Hello World Node that does exactly nothing.",
-        "description": "Complexity of Hello should not be unestimated.",
-        "icon": "font-awesome/fa-smile-o",
-        "x": 1623,
-        "y": 486,
+        "hasinput": true,
+        "outputcount": 1,
+        "autoimport": true,
+        "category": "",
+        "summary": "",
+        "description": "",
+        "icon": "font-awesome/fa-industry",
+        "x": 3199,
+        "y": 670,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "42a101dda45403ee",
+        "type": "NpmPublish",
+        "z": "b92be5062203ff69",
+        "d": true,
+        "g": "2b6bc676aaa603ad",
+        "name": "",
+        "otp": "",
+        "action": "publish",
+        "authToken": "NPM_AUTH_TOKEN",
+        "authTokenType": "env",
+        "x": 3190,
+        "y": 529,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a301a4a721a507d9",
+        "type": "group",
+        "z": "b92be5062203ff69",
+        "g": "2b6bc676aaa603ad",
+        "name": "Step 1: create node templates",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "5798e7102230c00f",
+            "6ab6fc44537f08e4"
+        ],
+        "x": 2342,
+        "y": 343,
+        "w": 352,
+        "h": 144
+    },
+    {
+        "id": "5798e7102230c00f",
+        "type": "NodeFactory",
+        "z": "b92be5062203ff69",
+        "g": "a301a4a721a507d9",
+        "name": "Node with 4 outputs and a button",
+        "nodename": "NodeWithFour",
+        "color": "#87A980",
+        "hasbutton": true,
+        "hasinput": false,
+        "outputcount": "4",
+        "autoimport": true,
+        "category": "nodedev-background",
+        "summary": "This is the short summary of what this node does.",
+        "description": "This is a long and descriptive version of the summary. Rather boring and tedious to write but nonetheless, we try our best.",
+        "icon": "node-red/inject.svg",
+        "x": 2528,
+        "y": 384,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6ab6fc44537f08e4",
+        "type": "NodeFactory",
+        "z": "b92be5062203ff69",
+        "g": "a301a4a721a507d9",
+        "name": "Node with Input and Output",
+        "nodename": "NodeWithOne",
+        "color": "#F3B567",
+        "hasbutton": false,
+        "hasinput": true,
+        "outputcount": "1",
+        "autoimport": true,
+        "category": "nodedev-background",
+        "summary": "This node only has one input",
+        "description": "And does even less.",
+        "icon": "node-red/inject.svg",
+        "x": 2508,
+        "y": 446,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1fa5af4c7e44a739",
+        "type": "group",
+        "z": "b92be5062203ff69",
+        "g": "2b6bc676aaa603ad",
+        "name": "Step 2: include the node templates within a package structure",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "38d7ab2facd1efd0",
+            "29fc98b9e556085c",
+            "cd9766062675838b",
+            "392e75983c1c894d"
+        ],
+        "x": 2333,
+        "y": 903,
+        "w": 396,
+        "h": 248
+    },
+    {
+        "id": "38d7ab2facd1efd0",
+        "type": "PkgFile",
+        "z": "b92be5062203ff69",
+        "g": "1fa5af4c7e44a739",
+        "name": "NodeWithFour.js",
+        "filename": "nodes/nodewithfour.js",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "module.exports = function(RED) {\n  function NodeWithFourFunctionality(config) {\n    RED.nodes.createNode(this,config);\n\n    var node = this;\n    var cfg = config;\n\n    node.on('close', function() {\n      node.status({});\n    });\n\n    node.on(\"input\", function(msg, send, done) {\n        send(msg);\n        done();\n    });\n  }\n  RED.nodes.registerType(\"NodeWithFour\", NodeWithFourFunctionality);\n}\n",
+        "output": "str",
+        "x": 2449,
+        "y": 944,
         "wires": [
             [
-                "dfaf263b42692e74"
+                "29fc98b9e556085c"
+            ]
+        ]
+    },
+    {
+        "id": "29fc98b9e556085c",
+        "type": "PkgFile",
+        "z": "b92be5062203ff69",
+        "g": "1fa5af4c7e44a739",
+        "name": "NodeWithFour.html",
+        "filename": "nodes/nodewithfour.html",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<script type=\"text/javascript\">\n  RED.nodes.registerType('NodeWithFour',{\n    color: '#87A980',\n    icon: \"node-red/inject.svg\",\n    category: 'nodedev-background',\n    defaults: {\n      name: {\n        value:\"\",\n      },\n    },\n\n    inputs: 0,\n\n    outputs: 4,\n\n    label: function() {\n      return (this.name || this._def.paletteLabel);\n    },\n\n    labelStyle: function() {\n      return this.name?\"node_label_italic\":\"\";\n    },\n\n    onpaletteadd: function() {\n    },\n\n    oneditprepare: function() {\n    },\n\n    oneditcancel: function() {\n    },\n\n    oneditsave: function() {\n    },\n\n    button: {\n      enabled: function() {\n        return !this.changed\n      },\n\n      onclick: function () {\n        if (this.changed) {\n          return RED.notify(RED._(\"notification.warning\", {\n            message: RED._(\"notification.warnings.undeployedChanges\")\n          }), \"warning\");\n        }\n      }\n    },\n\n  });\n</script>\n\n<script type=\"text/html\" data-template-name=\"NodeWithFour\">\n    <div class=\"form-row\">\n        <label for=\"node-input-name\"><i class=\"fa fa-tag\"></i> Name</label>\n        <input type=\"text\" id=\"node-input-name\" placeholder=\"Name\">\n    </div>\n</script>\n\n<script type=\"text/html\" data-help-name=\"NodeWithFour\">\n  <p>This is the short summary of what this node does.</p>\n  This is a long and descriptive version of the summary. Rather boring and tedious to write but nonetheless, we try our best.\n</script>\n",
+        "output": "str",
+        "x": 2449,
+        "y": 994,
+        "wires": [
+            [
+                "cd9766062675838b"
+            ]
+        ]
+    },
+    {
+        "id": "cd9766062675838b",
+        "type": "PkgFile",
+        "z": "b92be5062203ff69",
+        "g": "1fa5af4c7e44a739",
+        "name": "NodeWithOne.js",
+        "filename": "nodes/nodewithone.js",
+        "format": "javascript",
+        "syntax": "mustache",
+        "template": "module.exports = function(RED) {\n  function NodeWithOneFunctionality(config) {\n    RED.nodes.createNode(this,config);\n\n    var node = this;\n    var cfg = config;\n\n    node.on('close', function() {\n      node.status({});\n    });\n\n    node.on(\"input\", function(msg, send, done) {\n        send(msg);\n        done();\n    });\n  }\n  RED.nodes.registerType(\"NodeWithOne\", NodeWithOneFunctionality);\n}\n",
+        "output": "str",
+        "x": 2454,
+        "y": 1060,
+        "wires": [
+            [
+                "392e75983c1c894d"
+            ]
+        ]
+    },
+    {
+        "id": "392e75983c1c894d",
+        "type": "PkgFile",
+        "z": "b92be5062203ff69",
+        "g": "1fa5af4c7e44a739",
+        "name": "NodeWithOne.html",
+        "filename": "nodes/nodewithone.html",
+        "format": "html",
+        "syntax": "mustache",
+        "template": "<script type=\"text/javascript\">\n  RED.nodes.registerType('NodeWithOne',{\n    color: '#F3B567',\n    icon: \"node-red/inject.svg\",\n    category: 'nodedev-background',\n    defaults: {\n      name: {\n        value:\"\",\n      },\n    },\n\n    inputs: 1,\n\n    outputs: 1,\n\n    label: function() {\n      return (this.name || this._def.paletteLabel);\n    },\n\n    labelStyle: function() {\n      return this.name?\"node_label_italic\":\"\";\n    },\n\n    onpaletteadd: function() {\n    },\n\n    oneditprepare: function() {\n    },\n\n    oneditcancel: function() {\n    },\n\n    oneditsave: function() {\n    },\n\n\n  });\n</script>\n\n<script type=\"text/html\" data-template-name=\"NodeWithOne\">\n    <div class=\"form-row\">\n        <label for=\"node-input-name\"><i class=\"fa fa-tag\"></i> Name</label>\n        <input type=\"text\" id=\"node-input-name\" placeholder=\"Name\">\n    </div>\n</script>\n\n<script type=\"text/html\" data-help-name=\"NodeWithOne\">\n  <p>This node only has one input</p>\n  And does even less.\n</script>\n",
+        "output": "str",
+        "x": 2454,
+        "y": 1110,
+        "wires": [
+            [
+                "5dea66e11691c1f2"
+            ]
+        ]
+    },
+    {
+        "id": "b103106ae655b460",
+        "type": "group",
+        "z": "b92be5062203ff69",
+        "g": "2b6bc676aaa603ad",
+        "name": "Step 3: ensure package.json includes the nodes - only the .js file",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "0e9d26e2b43ca0f5"
+        ],
+        "x": 2120,
+        "y": 777,
+        "w": 411,
+        "h": 82
+    },
+    {
+        "id": "0e9d26e2b43ca0f5",
+        "type": "PkgFile",
+        "z": "b92be5062203ff69",
+        "g": "b103106ae655b460",
+        "name": "package.json",
+        "filename": "package.json",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "{\n  \"name\" : \"\",\n  \"version\": \"\",\n  \"dependencies\": {\n  },\n\n  \"keywords\": [\n    \"node-red\"\n  ],\n\n  \"homepage\": \"https://github.com/username/node-red-contrib-test\",\n  \"license\": \"Don't do evil.\",\n  \"author\": \"Joe Blog <joe.blog@spreads-the.love>\",\n  \"engines\": {\n    \"node\": \">=16\"\n  },\n\n  \"node-red\" : {\n    \"version\": \">=3.0.0\",\n    \"nodes\": {\n      \"nodewithfour\": \"nodes/nodewithfour.js\",\n      \"nodewithone\":  \"nodes/nodewithone.js\"\n    }\n  },\n\n  \"description\": \"Description of what these nodes do.\",\n  \"repository\": {\n    \"type\": \"github\",\n    \"url\": \"git+https://github.com/username/node-red-contrib-test.git\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/username/node-red-contrib-test\"\n  }\n}\n",
+        "output": "str",
+        "x": 2216,
+        "y": 818,
+        "wires": [
+            [
+                "38d7ab2facd1efd0"
+            ]
+        ]
+    },
+    {
+        "id": "77bf2cb0aa2f60ff",
+        "type": "group",
+        "z": "b92be5062203ff69",
+        "g": "2b6bc676aaa603ad",
+        "name": "Step 4: install into Node-RED to test the nodes",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "af227f8a9f44c79d"
+        ],
+        "x": 1898,
+        "y": 434,
+        "w": 301,
+        "h": 82
+    },
+    {
+        "id": "af227f8a9f44c79d",
+        "type": "inject",
+        "z": "b92be5062203ff69",
+        "g": "77bf2cb0aa2f60ff",
+        "name": "",
+        "props": [
+            {
+                "p": "packagename",
+                "v": "@username/node-red-contrib-test",
+                "vt": "str"
+            },
+            {
+                "p": "packageversion",
+                "v": "0.0.1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 1994,
+        "y": 475,
+        "wires": [
+            [
+                "d4c53464a044324a"
             ]
         ]
     }
