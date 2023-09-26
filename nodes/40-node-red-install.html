@@ -1,0 +1,147 @@
+<script type="text/javascript">
+ RED.comms.subscribe('introspect:node-red-install-perform', (event,data) => {
+   if ( data.msg == "execfunc" ) {
+
+     var doSend = (data, nodeid, _msg) => {
+       if ( typeof data == "object" ) {
+         data = {
+           ..._msg,
+           ...data
+         };
+       }
+
+       $.ajax({
+         url:         "NodeRedInstall/" + nodeid,
+         type:        "POST",
+         contentType: "application/json; charset=utf-8",
+         data: JSON.stringify(data),
+
+         success: function (resp) {
+         },
+
+         error: function (jqXHR, textStatus, errorThrown) {
+           RED.notify("NodeRedInstall Communcation Failure: " +
+                      nodeid + ": " + textStatus, {
+             type: "error",
+             id: nodeid,
+             timeout: 3000
+           });
+         }
+       });
+     };
+
+     var doError = (msg, nodeid, _msg) => {
+       RED.notify("NodeRedInstall Failed: " + nodeid + ": " + msg, {
+         type: "error",
+         id: nodeid,
+         timeout: 3000
+       });
+
+       console.log( "NodeRedInstall: Error with node: " + nodeid + ": " + msg);
+     };
+
+     var nodeid = data.nodeid;
+     var _msg = data._msg;
+
+     var node = {
+       send: (dt) => {
+         doSend(dt, nodeid, _msg)
+       },
+       error: (mg) => {
+         doError(mg, nodeid, _msg)
+       },
+       id: data.nodeid
+     };
+
+     var payload = data.payload;
+     var topic = data.topic;
+
+
+      var f = new File([new Blob([new Uint8Array(payload.data)])], "tarball.tgz", { type: "application/x-gzip" });
+
+      var data = new FormData();
+      data.append("tarball", f);
+      var filename = f.name;
+
+      $.ajax({
+          url: 'nodes',
+          data: data,
+          cache: false,
+          contentType: false,
+          processData: false,
+          method: 'POST',
+      }).always(function (data, textStatus, xhr) {
+      }).success(function() {
+          RED.notify("Installed new package", { type: "success"})
+      }).fail(function (xhr, textStatus, err) {
+          var message = textStatus;
+          if (xhr.responseJSON) {
+              message = xhr.responseJSON.message;
+          }
+          var notification = RED.notify(RED._('palette.editor.errors.installFailed', { module: filename, message: message }), {
+              type: 'error',
+              modal: true,
+              fixed: true,
+              buttons: [
+                  {
+                      text: RED._("common.label.close"),
+                      click: function () {
+                          notification.close();
+                      }
+                  }, {
+                      text: RED._("eventLog.view"),
+                      click: function () {
+                          notification.close();
+                          RED.actions.invoke("core:show-event-log");
+                      }
+                  }
+              ]
+          });
+      })
+
+   }
+ });
+
+  RED.nodes.registerType('NodeRedInstall',{
+    color: '#e5e4ef',
+    icon: "icons/subflow.svg",
+    category: 'nodedev',
+    defaults: {
+      name: {
+        value:"",
+      },
+    },
+    inputs:1,
+    outputs:1,
+
+    label: function() {
+      return (this.name || this._def.paletteLabel);
+    },
+
+    labelStyle: function() {
+      return this.name?"node_label_italic":"";
+    },
+  });
+</script>
+
+<script type="text/html" data-template-name="NodeRedInstall">
+    <div class="form-row">
+        <label for="node-input-name">
+          <i class="fa fa-tag"></i>
+          <span data-i18n="common.label.name">Name</span>
+      </label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+      <label for="node-input-fubar">
+              <i class="fa fa-tag"></i>
+              <span data-i18n="common.label.name">Name</span>
+          </label>
+      <input type="text" id="node-input-fubar" placeholder="Fubar">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="NodeRedInstall">
+    <p>Install tarball into Node-RED as new node package.</p>
+</script>

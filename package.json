@@ -1,0 +1,41 @@
+{
+  "name" : "@gregoriusrippenstein/node-red-contrib-nodedev971521769186244",
+  "version": "0.0.1",
+  "dependencies": {
+    "pako": "latest",
+    "tar-stream": "latest",
+    "mustache": "latest",
+    "libnpmpublish": "latest"
+  },
+
+  "keywords": [
+    "node-red", "node development", "introspection", "bootstrapping", "recursion"
+  ],
+
+  "homepage": "https://github.com/gorenje/node-red-contrib-nodedev",
+  "license": "Don't do evil.",
+  "author": "Gerrit Riessen <does.anyone@spread-the.love> (https://spread-the.love)",
+  "engines": {
+    "node": ">=16"
+  },
+
+  "node-red" : {
+    "version": ">=3.0.0",
+    "nodes": {
+      "nodefactory":    "nodes/10-node-factory.js",
+      "pkgfile":        "nodes/20-pkg-file.js",
+      "npmtarball":     "nodes/30-npm-tarball.js",
+      "noderedinstall": "nodes/40-node-red-install.js",
+      "npmpublish":     "nodes/50-npm-publish.js"
+    }
+  },
+
+  "description": "Support the development of Node-RED nodes within Node-RED.",
+  "repository": {
+    "type": "github",
+    "url": "git+https://github.com/gorenje/node-red-contrib-nodedev.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gorenje/node-red-contrib-nodedev"
+  }
+}
