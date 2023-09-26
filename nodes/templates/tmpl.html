@@ -9,8 +9,14 @@
       },
     },
 
+    {{#node.hasinput}}
     inputs: 1,
-    outputs: 1,
+    {{/node.hasinput}}
+    {{^node.hasinput}}
+    inputs: 0,
+    {{/node.hasinput}}
+
+    outputs: {{ node.outputcount }},
 
     label: function() {
       return (this.name || this._def.paletteLabel);

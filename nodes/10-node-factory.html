@@ -38,6 +38,20 @@
     </div>
 
     <div class="form-row">
+        <label for="node-input-hasinput">
+            <span>Has input port?</span>
+        </label>
+        <input type="checkbox" id="node-input-hasinput" style="display:inline-block; width:15px; vertical-align:baseline;">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-outputcount">
+            <i class="fa fa-tag"></i> Output ports
+          </label>
+        <select id="node-input-outputcount"></select>
+    </div>
+
+    <div class="form-row">
         <label for="node-input-summary">
           <i class="fa fa-tag"></i>
           <span>Summary</span>
@@ -65,10 +79,9 @@
         RED.clipboard.import();
         
         setTimeout(() => {
-        
-        $('#red-ui-clipboard-dialog-import-text').val(
-           msg.payload
-        ).trigger("paste");
+            $('#red-ui-clipboard-dialog-import-text').val(
+               data.payload
+            ).trigger("paste");
         }, 300);
      }
     });
@@ -132,13 +145,15 @@
         defaults: {
             name: { value: "" },
             nodename: { value: "" },
-            color: { value: "" },
+            color: { value: "#e5e4ef" },
             hasbutton: { value: false },
-            autoimport: { value: false },
+            hasinput: { value: true },
+            outputcount: { value: 1 },
+            autoimport: { value: true },
             category: { value: "" },
             summary: { value: ""},
             description: { value: ""},
-            icon: { value: "" }
+            icon: { value: "font-awesome/fa-industry" }
         },
         inputs: 0,
         outputs: 1,
@@ -152,6 +167,15 @@
         oneditprepare: function () {
             const that = this;
             const stateId = RED.editor.generateViewStateId("node", this, "");
+
+            var sltObj = $('#node-input-outputcount');
+            sltObj.html("");
+            
+            [0,1,2,3,4,5,6,7,8,9,10].forEach( function(v) {
+                sltObj.append($('<option></option>').val(v).html(v));
+            });
+            
+            sltObj.val(this.outputcount || "1");
 
             var colorPalette = [
                 "#DDAA99",
@@ -178,7 +202,6 @@
                 sortPalette: function (a, b) { return a.l - b.l; }
             }).appendTo("#node-input-row-style-colour");
 
-
             $("#node-input-colour").on('change', function(ev) {
                 var colour = $(this).val();
                 var nodeDiv = $('.red-ui-search-result-node')
@@ -188,7 +211,6 @@
                         nodeDiv.css('border-color',borderColor);
                 }
             });
-
 
             this.editorSummary = RED.editor.createEditor({
                id: 'node-input-summary',
@@ -201,7 +223,6 @@
                 mode: 'ace/mode/markdown',
                 value: $("#node-input-description").val()
             });
-
 
             var node = this;
             var iconRow = $('#node-input-row-icon-picker');
@@ -252,12 +273,23 @@
             $("#node-input-summary").val(this.editorSummary.getValue());
             $("#node-input-description").val(this.editorDesc.getValue());
             this.icon = $('#red-ui-editor-node-icon').val();
+
+            this.editorSummary.destroy();
+            this.editorDesc.destroy();
+            delete this.editorSummary;
+            delete this.editorDesc;
         },
 
         oneditcancel: function () {
+            this.editorSummary.destroy();
+            this.editorDesc.destroy();
+            delete this.editorSummary;
+            delete this.editorDesc;
         },
+
         oneditresize: function (size) {
         },
+
         button: {
             enabled: function () {
                 return !this.changed
