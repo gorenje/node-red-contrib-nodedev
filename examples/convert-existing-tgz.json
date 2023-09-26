@@ -2,47 +2,29 @@
     {
         "id": "b84864b2ff870a45",
         "type": "group",
-        "z": "b92be5062203ff69",
+        "z": "eef4037a6d25a1e0",
         "name": "automatically creating nodes that represent package files",
         "style": {
             "label": true
         },
         "nodes": [
-            "7f69502a67b8c689",
             "ea7b1b985ba6ac70",
-            "aeb3094ecf54b2b2",
             "24b26f5122abf1bb",
-            "ab37a3f877541c5b"
+            "ab37a3f877541c5b",
+            "11289b70b58c767b",
+            "96278268709caba6",
+            "fc620efcbaf77846",
+            "d981181116ccfb16"
         ],
-        "x": 2018.142822265625,
-        "y": 735.7142333984375,
-        "w": 865.857177734375,
-        "h": 311.2857666015625
-    },
-    {
-        "id": "7f69502a67b8c689",
-        "type": "inject",
-        "z": "b92be5062203ff69",
-        "g": "b84864b2ff870a45",
-        "name": "Trigger",
-        "props": [],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": 0.1,
-        "topic": "",
-        "x": 2114.142822265625,
-        "y": 776.7142333984375,
-        "wires": [
-            [
-                "aeb3094ecf54b2b2"
-            ]
-        ]
+        "x": 504,
+        "y": 489.2857666015625,
+        "w": 1037.857177734375,
+        "h": 363.7142333984375
     },
     {
         "id": "ea7b1b985ba6ac70",
         "type": "NodeFactory",
-        "z": "b92be5062203ff69",
+        "z": "eef4037a6d25a1e0",
         "g": "b84864b2ff870a45",
         "name": "",
         "nodename": "",
@@ -55,41 +37,16 @@
         "summary": "",
         "description": "",
         "icon": "font-awesome/fa-industry",
-        "x": 2788,
-        "y": 948,
+        "x": 1445.857177734375,
+        "y": 532.2857666015625,
         "wires": [
             []
         ]
     },
     {
-        "id": "aeb3094ecf54b2b2",
-        "type": "http request",
-        "z": "b92be5062203ff69",
-        "g": "b84864b2ff870a45",
-        "name": "http request to npmjs",
-        "method": "GET",
-        "ret": "bin",
-        "paytoqs": "ignore",
-        "url": "https://registry.npmjs.org/@gregoriusrippenstein/node-red-contrib-introspection/-/node-red-contrib-introspection-0.4.3.tgz",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 2394,
-        "y": 865,
-        "wires": [
-            [
-                "ea7b1b985ba6ac70"
-            ]
-        ]
-    },
-    {
         "id": "24b26f5122abf1bb",
         "type": "file in",
-        "z": "b92be5062203ff69",
+        "z": "eef4037a6d25a1e0",
         "g": "b84864b2ff870a45",
         "name": "",
         "filename": "/some/path/to/local/package.tgz",
@@ -99,8 +56,8 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 2443,
-        "y": 1006,
+        "x": 1100.857177734375,
+        "y": 590.2857666015625,
         "wires": [
             [
                 "ea7b1b985ba6ac70"
@@ -110,7 +67,7 @@
     {
         "id": "ab37a3f877541c5b",
         "type": "inject",
-        "z": "b92be5062203ff69",
+        "z": "eef4037a6d25a1e0",
         "g": "b84864b2ff870a45",
         "name": "Trigger",
         "props": [],
@@ -119,11 +76,121 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 2123,
-        "y": 946,
+        "x": 780.857177734375,
+        "y": 530.2857666015625,
         "wires": [
             [
                 "24b26f5122abf1bb"
+            ]
+        ]
+    },
+    {
+        "id": "11289b70b58c767b",
+        "type": "inject",
+        "z": "eef4037a6d25a1e0",
+        "g": "b84864b2ff870a45",
+        "name": "inject package details",
+        "props": [
+            {
+                "p": "packagename",
+                "v": "@gregoriusrippenstein/node-red-contrib-introspection",
+                "vt": "str"
+            },
+            {
+                "p": "packageversion",
+                "v": "0.4.3",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 650,
+        "y": 647,
+        "wires": [
+            [
+                "96278268709caba6"
+            ]
+        ]
+    },
+    {
+        "id": "96278268709caba6",
+        "type": "function",
+        "z": "eef4037a6d25a1e0",
+        "g": "b84864b2ff870a45",
+        "name": "retrieve tgz URL for package",
+        "func": "pacote.manifest(\n    msg.packagename + \"@\" + msg.packageversion\n).then(manifest => {\n    msg.payload = manifest._resolved\n    node.send(msg)\n}).catch( err => {\n    msg.error = err\n    node.error(\"failed to get url\", msg)\n})\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "pacote",
+                "module": "pacote"
+            }
+        ],
+        "x": 822,
+        "y": 812,
+        "wires": [
+            [
+                "fc620efcbaf77846"
+            ]
+        ]
+    },
+    {
+        "id": "fc620efcbaf77846",
+        "type": "change",
+        "z": "eef4037a6d25a1e0",
+        "g": "b84864b2ff870a45",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "url",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1128,
+        "y": 770,
+        "wires": [
+            [
+                "d981181116ccfb16"
+            ]
+        ]
+    },
+    {
+        "id": "d981181116ccfb16",
+        "type": "http request",
+        "z": "eef4037a6d25a1e0",
+        "g": "b84864b2ff870a45",
+        "name": "",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1316,
+        "y": 689,
+        "wires": [
+            [
+                "ea7b1b985ba6ac70"
             ]
         ]
     }
