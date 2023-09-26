@@ -140,6 +140,49 @@ module.exports = function (RED) {
         });
     }
 
+    function convertToPkgFileNodes(msg,jsCtnt,htmlCtnt) {
+        var allNodes = [];
+
+        var secondId = RED.util.generateId();
+
+        allNodes.push({
+            id: RED.util.generateId(),
+            type: "PkgFile",
+            name: msg.node.name + ".js",
+            filename: "nodes/" + msg.node.name.toLowerCase() + ".js",
+            template: jsCtnt,
+            syntax: "mustache",
+            format: "javascript",
+            output: "str",
+            x: 100,
+            y: 50,
+            wires: [
+                [
+                    secondId
+                ]
+            ]
+        })
+
+        allNodes.push({
+            id: secondId,
+            type: "PkgFile",
+            name: msg.node.name + ".html",
+            filename: "nodes/" + msg.node.name.toLowerCase() + ".html",
+            template: htmlCtnt,
+            syntax: "mustache",
+            format: "html",
+            output: "str",
+            x: 100,
+            y: 100,
+            wires: [
+                [
+                ]
+            ]
+        })
+
+        return allNodes;
+    }
+
     function NodeFactoryFunctionality(config) {
         RED.nodes.createNode(this, config);
 
@@ -164,7 +207,22 @@ module.exports = function (RED) {
                 handleTemplate(msg, node, jsonTmpl).then(function(data){
                     var jsData = data;
                     handleTemplate(msg, node, htmlTmpl).then(function (data) {
-                        send({payload: [jsData,data]})
+                        var nodeImpStr = JSON.stringify(convertToPkgFileNodes(msg, jsData, data));
+                        send({ payload: nodeImpStr })
+
+                        if ( cfg.autoimport ) {
+                            RED.comms.publish(
+                                "nodedev:perform-autoimport-nodes",
+                                RED.util.encodeObject({
+                                    msg: "autoimport",
+                                    payload: nodeImpStr,
+                                    topic: msg.topic,
+                                    nodeid: node.id,
+                                    _msg: msg
+                                })
+                            );
+                        }
+                                                
                         done()
                     }).catch( (err) => {
                         msg.error = err

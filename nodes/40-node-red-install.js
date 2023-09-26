@@ -11,7 +11,7 @@ module.exports = function (RED) {
 
         node.on("input", function (msg, send, done) {
             RED.comms.publish(
-                "introspect:node-red-install-perform",
+                "nodedev:node-red-install-perform",
                 RED.util.encodeObject({
                     msg: "execfunc",
                     payload: msg.payload,

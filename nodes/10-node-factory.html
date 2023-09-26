@@ -5,6 +5,13 @@
     </div>
 
     <div class="form-row">
+        <label for="node-input-autoimport">
+                <span>Auto Import of Nodes?</span>
+            </label>
+        <input type="checkbox" id="node-input-autoimport" style="display:inline-block; width:15px; vertical-align:baseline;">
+    </div>
+
+    <div class="form-row">
         <label for="node-input-nodename"><i class="fa fa-tag"></i> Node Name</label>
         <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-nodename" placeholder="Node Name">
         </div>
@@ -52,6 +59,20 @@
 
 <script type="text/javascript">
 (function () {
+
+   RED.comms.subscribe("nodedev:perform-autoimport-nodes", (event,data) => {
+     if ( data.msg == "autoimport" ) {
+        RED.clipboard.import();
+        
+        setTimeout(() => {
+        
+        $('#red-ui-clipboard-dialog-import-text').val(
+           msg.payload
+        ).trigger("paste");
+        }, 300);
+     }
+    });
+
     function doSubmission(node) {
 
         var data = {};
@@ -113,6 +134,7 @@
             nodename: { value: "" },
             color: { value: "" },
             hasbutton: { value: false },
+            autoimport: { value: false },
             category: { value: "" },
             summary: { value: ""},
             description: { value: ""},

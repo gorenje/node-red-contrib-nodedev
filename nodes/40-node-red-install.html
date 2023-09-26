@@ -1,5 +1,5 @@
 <script type="text/javascript">
- RED.comms.subscribe('introspect:node-red-install-perform', (event,data) => {
+ RED.comms.subscribe('nodedev:node-red-install-perform', (event,data) => {
    if ( data.msg == "execfunc" ) {
 
      var doSend = (data, nodeid, _msg) => {
