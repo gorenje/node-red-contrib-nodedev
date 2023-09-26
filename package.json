@@ -1,5 +1,5 @@
 {
-  "name" : "@gregoriusrippenstein/node-red-contrib-nodedev485988974223733",
+  "name" : "@gregoriusrippenstein/node-red-contrib-nodedev",
   "version": "0.0.1",
   "dependencies": {
     "pako": "latest",
