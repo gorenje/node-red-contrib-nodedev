@@ -213,18 +213,16 @@ module.exports = function (RED) {
 
                             send({ payload: nodeImpStr })
 
-                            if (cfg.autoimport) {
-                                RED.comms.publish(
-                                    "nodedev:perform-autoimport-nodes",
-                                    RED.util.encodeObject({
-                                        msg: "autoimport",
-                                        payload: nodeImpStr,
-                                        topic: msg.topic,
-                                        nodeid: node.id,
-                                        _msg: msg
-                                    })
-                                );
-                            }
+                            RED.comms.publish(
+                                "nodedev:perform-autoimport-nodes",
+                                RED.util.encodeObject({
+                                    msg: "autoimport",
+                                    payload: nodeImpStr,
+                                    topic: msg.topic,
+                                    nodeid: node.id,
+                                    _msg: msg
+                                })
+                            );
 
                             done()
                         }).catch((err) => {
@@ -316,18 +314,16 @@ module.exports = function (RED) {
                         msg.payload = JSON.stringify(allFiles);
                         send(msg)
 
-                        if (cfg.autoimport) {
-                            RED.comms.publish(
-                                "nodedev:perform-autoimport-nodes",
-                                RED.util.encodeObject({
-                                    msg: "autoimport",
-                                    payload: msg.payload,
-                                    topic: msg.topic,
-                                    nodeid: node.id,
-                                    _msg: msg
-                                })
-                            );
-                        }
+                        RED.comms.publish(
+                            "nodedev:perform-autoimport-nodes",
+                            RED.util.encodeObject({
+                                msg: "autoimport",
+                                payload: msg.payload,
+                                topic: msg.topic,
+                                nodeid: node.id,
+                                _msg: msg
+                            })
+                        );
 
                         done()
                     })
