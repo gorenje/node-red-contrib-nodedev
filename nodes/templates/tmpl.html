@@ -1,4 +1,13 @@
 <script type="text/javascript">
+(function(){
+
+  function frontendSupportFunction() {
+  }
+
+  var functTwo = (arg) => {
+
+  };
+  
   RED.nodes.registerType('{{ node.name }}',{
     color: '{{ node.color }}',
     icon: "{{{ node.icon }}}",
@@ -55,6 +64,7 @@
     {{/node.hasbutton}}
 
   });
+})();
 </script>
 
 <script type="text/html" data-template-name="{{ node.name }}">
