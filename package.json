@@ -17,7 +17,7 @@
   "license": "Don't do evil.",
   "author": "Gerrit Riessen <does.anyone@spread-the.love> (https://spread-the.love)",
   "engines": {
-    "node": ">=16"
+    "node": ">=8"
   },
 
   "node-red" : {
