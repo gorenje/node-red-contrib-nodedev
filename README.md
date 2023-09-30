@@ -45,6 +45,14 @@ Normally when developing nodes for Node-RED, a restart is necessary to flush old
 
 Since all this happens in the browser, there is no leaving Node-RED, making it more efficient to test and modify nodes. Renaming of packages can be done automagically as demonstrated by the [flow](https://flowhub.org/f/b92be5062203ff69) that maintains these nodes.
 
+### Artifacts
+
+- [Flow that maintains](https://flowhub.org/f/b92be5062203ff69) this codebase
+- [GitHub repo](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev)
+- [NPMjs node package](https://www.npmjs.com/package/@gregoriusrippenstein/node-red-contrib-nodedev)
+- [Node-RED node package](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev)
+
 ### Outlook
 
 Wherever the road shall lead, there it will go.
+
