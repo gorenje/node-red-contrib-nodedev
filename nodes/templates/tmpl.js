@@ -9,10 +9,12 @@ module.exports = function(RED) {
       node.status({});
     });
 
+    /* msg handler, in this case pass the message on unchanged */
     node.on("input", function(msg, send, done) {
         send(msg);
         done();
     });
   }
+
   RED.nodes.registerType("{{ node.name }}", {{ node.name }}Functionality);
 }
