@@ -13,7 +13,7 @@
     "node-red", "node development", "introspection", "bootstrapping", "recursion"
   ],
 
-  "homepage": "https://github.com/gorenje/node-red-contrib-nodedev",
+  "homepage": "https://github.com/gorenje/node-red-contrib-nodedev#README.md",
   "license": "Don't do evil.",
   "author": "Gerrit Riessen <does.anyone@spread-the.love> (https://spread-the.love)",
   "engines": {
