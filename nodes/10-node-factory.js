@@ -9,6 +9,13 @@ module.exports = function (RED) {
     var streamx = require('streamx');
     var pakoGzip = require('pako');
 
+    var spcRepDict = {
+        "ocb2": "{{",
+        "ocb3": "{{{",
+        "ccb3": "}}}",
+        "ccb2": "}}"
+    };
+
     function extractTokens(tokens, set) {
         set = set || new Set();
         tokens.forEach(function (token) {
@@ -36,6 +43,14 @@ module.exports = function (RED) {
 
     function parseEnv(key) {
         var match = /^env\.(.+)/.exec(key);
+        if (match) {
+            return match[1];
+        }
+        return undefined;
+    }
+
+    function parseIntern(key) {
+        var match = /^__\.(.+)$/.exec(key);
         if (match) {
             return match[1];
         }
@@ -72,6 +87,11 @@ module.exports = function (RED) {
                 return value;
             }
 
+            var spcRep = parseIntern(name)
+            if ( spcRep ) {
+                return spcRepDict[spcRep] || ("UNFOUND - " + spcRep);
+            }
+
             // try env
             if (parseEnv(name)) {
                 return this.cachedContextTokens[name];
@@ -88,6 +108,7 @@ module.exports = function (RED) {
                     return this.cachedContextTokens[name];
                 }
             }
+            
             return '';
         }
         catch (err) {
@@ -160,11 +181,7 @@ module.exports = function (RED) {
             output: "str",
             x: 100,
             y: 50,
-            wires: [
-                [
-                    secondId
-                ]
-            ]
+            wires: [[secondId]]
         })
 
         allNodes.push({
@@ -178,13 +195,82 @@ module.exports = function (RED) {
             output: "str",
             x: 100,
             y: 100,
-            wires: [
-                [
-                ]
-            ]
+            wires: [[]]
         })
 
         return allNodes;
+    }
+
+    function createManifestFiles(msg, node, nodeDefinitions) {
+        /* ASSUMPTION: assume the .js file is defined first and 
+        then the .html file in the node definitions */
+
+        var packageJsonPath = path.join(__dirname, 'templates', 'tmplpackage.json');
+        var readmePath = path.join(__dirname, 'templates', 'tmplreadme.md');
+        var licensePath = path.join(__dirname, 'templates', 'tmpllicense');
+
+        var pkjsTmpl = fs.readFileSync(packageJsonPath, 'utf8');
+        var rdmeTmpl = fs.readFileSync(readmePath, 'utf8');
+        var lcnsTmpl = fs.readFileSync(licensePath, 'utf8');
+
+        spcRepDict["nodestanza"] = " \"" + msg.node.name.toLowerCase() + "\": \"" + nodeDefinitions[0].filename + "\""
+
+        var content = {};
+
+        var promises = [
+            handleTemplate(msg, node, pkjsTmpl).then((c) => { content["pkjs"] = c }),
+            handleTemplate(msg, node, rdmeTmpl).then((c) => { content["rdme"] = c }),
+            handleTemplate(msg, node, lcnsTmpl).then((c) => { content["lcns"] = c }),
+        ];
+
+        return Promise.all(promises).then( () => {
+            var secondId = RED.util.generateId();
+            var thirdId = RED.util.generateId();
+
+            nodeDefinitions.push({
+                id: RED.util.generateId(),
+                type: "PkgFile",
+                name: "LICENSE",
+                filename: "LICENSE",
+                template: content["lcns"],
+                syntax: "mustache",
+                format: "text",
+                output: "str",
+                x: 100,
+                y: -100,
+                wires: [[ secondId ]]
+            })
+
+            nodeDefinitions.push({
+                id: secondId,
+                type: "PkgFile",
+                name: "README.md",
+                filename: "README.md",
+                template: content["rdme"],
+                syntax: "mustache",
+                format: "markdown",
+                output: "str",
+                x: 100,
+                y: -50,
+                wires: [[thirdId]]
+            })
+
+            nodeDefinitions.push({
+                id: thirdId,
+                type: "PkgFile",
+                name: "package.json",
+                filename: "package.json",
+                template: content["pkjs"],
+                syntax: "mustache",
+                format: "json",
+                output: "str",
+                x: 100,
+                y: 0,
+                wires: [[nodeDefinitions[0].id]]
+            })
+
+            return nodeDefinitions;
+        })
     }
 
     function NodeFactoryFunctionality(config) {
@@ -208,22 +294,47 @@ module.exports = function (RED) {
 
                     handleTemplate(msg, node, jsonTmpl).then(function (data) {
                         var jsData = data;
+
                         handleTemplate(msg, node, htmlTmpl).then(function (data) {
-                            var nodeImpStr = JSON.stringify(convertToPkgFileNodes(msg, jsData, data));
+                            var nodeDef = convertToPkgFileNodes(msg, jsData, data)
 
-                            send({ payload: nodeImpStr })
+                            if (msg.node.createmanifest ) {
+                                /* create the package.json, readme and license files */
+                                createManifestFiles(msg, node, nodeDef).then( (data) => {
+                                    var nodeImpStr = JSON.stringify(data);
 
-                            RED.comms.publish(
-                                "nodedev:perform-autoimport-nodes",
-                                RED.util.encodeObject({
-                                    msg: "autoimport",
-                                    payload: nodeImpStr,
-                                    topic: msg.topic,
-                                    nodeid: node.id,
-                                    _msg: msg
+                                    send({ payload: nodeImpStr })
+
+                                    RED.comms.publish(
+                                        "nodedev:perform-autoimport-nodes",
+                                        RED.util.encodeObject({
+                                            msg: "autoimport",
+                                            payload: nodeImpStr,
+                                            topic: msg.topic,
+                                            nodeid: node.id,
+                                            _msg: msg
+                                        })
+                                    );
+                                }).catch( (err) => {
+                                    msg.error = err
+                                    done(err.message, msg)
                                 })
-                            );
+                            } else {
+                                var nodeImpStr = JSON.stringify(nodeDef);
 
+                                send({ payload: nodeImpStr })
+
+                                RED.comms.publish(
+                                    "nodedev:perform-autoimport-nodes",
+                                    RED.util.encodeObject({
+                                        msg: "autoimport",
+                                        payload: nodeImpStr,
+                                        topic: msg.topic,
+                                        nodeid: node.id,
+                                        _msg: msg
+                                    })
+                                );
+                            }
                             done()
                         }).catch((err) => {
                             msg.error = err

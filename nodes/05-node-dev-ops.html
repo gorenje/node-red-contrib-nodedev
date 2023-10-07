@@ -1,0 +1,77 @@
+<script type="text/javascript">
+    (function(){
+
+  function frontendSupportFunction() {
+  }
+
+  var functTwo = (arg) => {
+
+  };
+  
+  RED.nodes.registerType('NodeDevOps',{
+    color: '#e5e4ef',
+    icon: "font-awesome/fa-terminal",
+    category: 'nodedev',
+    defaults: {
+      name: {
+        value:"",
+      },
+    },
+
+    inputs: 0,
+
+    outputs: 1,
+
+    label: function() {
+      return (this.name || this._def.paletteLabel);
+    },
+
+    labelStyle: function() {
+      return this.name?"node_label_italic":"";
+    },
+
+    onpaletteadd: function() {
+    },
+
+    oneditprepare: function() {
+    },
+
+    oneditcancel: function() {
+    },
+
+    oneditsave: function() {
+    },
+
+    button: {
+      enabled: function() {
+        return !this.changed
+      },
+
+      onclick: function () {
+        if (this.changed) {
+          return RED.notify(RED._("notification.warning", {
+            message: RED._("notification.warnings.undeployedChanges")
+          }), "warning");
+        }
+        /* here goes the button code to be executed on click */
+      }
+    },
+
+  });
+})();
+</script>
+
+<script type="text/html" data-template-name="NodeDevOps">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name"/>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="NodeDevOps">
+    <p>NodeDevOps is the operations node that controals what happens with the package.</p>
+    Possible actions that can happen are GitHub commits and diffs, NPM publish or unpublish and installing the package
+    locally for local testing.
+
+    Local installations can be uninstalled so that changes can tested and modified quickly.
+</script>

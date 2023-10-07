@@ -23,6 +23,7 @@
   "node-red" : {
     "version": ">=3.0.0",
     "nodes": {
+      "nodedevops":     "nodes/05-node-dev-ops.js",
       "nodefactory":    "nodes/10-node-factory.js",
       "pkgfile":        "nodes/20-pkg-file.js",
       "npmtarball":     "nodes/30-npm-tarball.js",
