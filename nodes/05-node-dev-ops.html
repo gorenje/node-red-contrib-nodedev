@@ -1,25 +1,73 @@
 <script type="text/javascript">
-    (function(){
+  (function(){
+  
+    function sendToBackend(node,data = {}) {
 
-  function frontendSupportFunction() {
-  }
+      $.ajax({
+        url:         "NodeDevOps/" + node.id,
+        type:        "POST",
+        contentType: "application/json; charset=utf-8",
 
-  var functTwo = (arg) => {
+        data: JSON.stringify(data),
 
-  };
+        success: function (resp) {
+          RED.notify("Node Developer Operation trigger", {
+            type: "success",
+            id: "NodeDevOps",
+            timeout: 2000
+          });
+        },
+
+        error: function (jqXHR, textStatus, errorThrown) {
+          if (jqXHR.status == 404) {
+            RED.notify("Node has not yet been deployed, please deploy.", "error");
+          } else if (jqXHR.status == 405) {
+            RED.notify("Not Allowed.", "error");
+          } else if (jqXHR.status == 500) {
+            RED.notify(node._("common.notification.error", {
+              message: node._("inject.errors.failed")
+            }), "error");
+          } else if (jqXHR.status == 0) {
+            RED.notify(node._("common.notification.error", {
+              message: node._("common.notification.errors.no-response")
+            }), "error");
+          } else {
+            RED.notify(node._("common.notification.error", {
+              message: node._("common.notification.errors.unexpected", {
+                status: jqXHR.status, message: textStatus }) }), "error");
+          }
+        }
+      });
+    }
   
   RED.nodes.registerType('NodeDevOps',{
     color: '#e5e4ef',
     icon: "font-awesome/fa-terminal",
     category: 'nodedev',
     defaults: {
-      name: {
-        value:"",
-      },
+      name: { value:"" },
+
+      pname: { value: "", required: true },
+      pversion: { value: "", required: true },
+
+      noderedinstall: { value: false },
+      randompackagename: { value: false },
+
+      gitcommit: { value: false },
+      gitcheckforchange: { value: false },
+      githubowner: { value: ""},
+      githubrepo: { value: ""},
+      githubbranch: { value: "main"},
+      githubauthor: { value: ""},
+      githubauthoremail: { value: "" },
+      githubmessage: { value: "" },
+
+      npmpublish: { value: false },
+      npmunpublish: { value: false },
+      npmotp: { value: ""},
     },
 
     inputs: 0,
-
     outputs: 1,
 
     label: function() {
@@ -34,6 +82,63 @@
     },
 
     oneditprepare: function() {
+
+     $('#node-input-noderedinstall').on('change', () => {
+          if ( $('#node-input-noderedinstall').is(":checked") ) {
+              $("#noderedinstall-options").animate({opacity: 'show', height: 'show'}, 450);
+          } else {
+              $("#noderedinstall-options").animate({opacity: 'hide', height: 'hide'}, 450);
+          }
+     });
+
+     $('#node-input-gitcommit').on('change', () => {
+          if ( $('#node-input-gitcommit').is(":checked") ) {
+              $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
+              $("#gitcommit-options").animate({opacity: 'show', height: 'show'}, 450);
+              $('#node-input-gitcheckforchange').prop('checked',false)
+          } else {
+              $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
+              if ( !$('#node-input-gitcheckforchange').is(":checked") ) {
+                $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
+              }
+          }
+     });
+
+     $('#node-input-gitcheckforchange').on('change', () => {
+          if ( $('#node-input-gitcheckforchange').is(":checked") ) {
+              $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
+              $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
+              $('#node-input-gitcommit').prop('checked',false)
+          } else {
+            if ( !$('#node-input-gitcommit').is(":checked") ) {
+              $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
+              $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
+            }
+          }
+     });
+
+     $('#node-input-npmpublish').on('change', () => {
+          if ( $('#node-input-npmpublish').is(":checked") ) {
+              $("#npmpublish-options").animate({opacity: 'show', height: 'show'}, 450);
+              $('#node-input-npmunpublish').prop('checked',false)
+          } else {
+            if ( !$('#node-input-npmunpublish').is(":checked") ) {
+              $("#npmpublish-options").animate({opacity: 'hide', height: 'hide'}, 450);
+            }
+          }
+     });
+
+     $('#node-input-npmunpublish').on('change', () => {
+          if ( $('#node-input-npmunpublish').is(":checked") ) {
+              $("#npmpublish-options").animate({opacity: 'show', height: 'show'}, 450);
+              $('#node-input-npmpublish').prop('checked',false)
+          } else {
+            if ( !$('#node-input-npmpublish').is(":checked") ) {
+              $("#npmpublish-options").animate({opacity: 'hide', height: 'hide'}, 450);
+            }
+          }
+     });
+
     },
 
     oneditcancel: function() {
@@ -41,6 +146,10 @@
 
     oneditsave: function() {
     },
+
+    onpaletteremove: function() {
+    },
+
 
     button: {
       enabled: function() {
@@ -53,7 +162,15 @@
             message: RED._("notification.warnings.undeployedChanges")
           }), "warning");
         }
-        /* here goes the button code to be executed on click */
+
+        var that = this;
+        var data = {}
+
+        Object.keys(that._def.defaults).forEach( kname => {
+          data[kname] = that[kname]
+        })
+        
+        sendToBackend(that, data)
       }
     },
 
@@ -62,16 +179,108 @@
 </script>
 
 <script type="text/html" data-template-name="NodeDevOps">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name"/>
+  </div>
+
+  <hr/>
+  
+  <div class="form-row">
+    <label for="node-input-pname" style="min-width: 150px;"><i class="fa fa-tag"></i> Package Name</label>
+    <input type="text" id="node-input-pname" placeholder="@username/node-red-contrib-somename"/>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-pversion" style="min-width: 150px;"><i class="fa fa-tag"></i> Package Version</label>
+    <input type="text" id="node-input-pversion" placeholder="0.0.1"/>
+  </div>
+  
+  <hr/>
+
+  <div class="form-row">
+    <label for="node-input-noderedinstall" style="min-width: 120px;">
+              <span>Install locally?</span>
+          </label>
+    <input type="checkbox" id="node-input-noderedinstall" style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+  
+  <div id="noderedinstall-options">
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name"/>
+      <label for="node-input-randompackagename" style="min-width: 180px;">
+                <span>Randomise Package Name?</span>
+            </label>
+      <input type="checkbox" id="node-input-randompackagename" style="display:inline-block; width:15px; vertical-align:baseline;">
     </div>
+  </div>
+
+  <hr/>
+  <div class="form-row">
+    <label for="node-input-npmpublish" style="min-width: 120px;">
+         <span>NPMjs: Publish</span>
+    </label>
+    <input type="checkbox" id="node-input-npmpublish" style="display:inline-block; width:15px; vertical-align:baseline;">
+    <label for="node-input-npmunpublish" style="margin-left: 30px; min-width: 100px;">
+           <span>Unpublish</span>
+    </label>
+    <input type="checkbox" id="node-input-npmunpublish" style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+
+  <div id="npmpublish-options">
+    <div class="form-row">
+      <label for="node-input-npmotp" style="min-width: 150px;"><i class="fa fa-tag"></i> One Time Password</label>
+      <input type="text" id="node-input-npmotp" placeholder="111999"/>
+    </div>
+  </div>
+
+  <hr />
+  <div class="form-row">
+      <label for="node-input-gitcommit" style="min-width: 120px;">
+               <span>GitHub: Commit?</span>
+      </label>
+    <input type="checkbox" id="node-input-gitcommit" style="display:inline-block; width:15px; vertical-align:baseline;">
+    <label for="node-input-gitcheckforchange" style="margin-left: 30px; min-width: 100px;">
+                <span>What changed?</span>
+     </label>
+     <input type="checkbox" id="node-input-gitcheckforchange" style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+
+
+  <div id="github-options">
+    <div class="form-row">
+      <label for="node-input-githubowner" style="min-width: 150px;"><i class="fa fa-tag"></i> GitHub Username</label>
+      <input type="text" id="node-input-githubowner" placeholder="username"/>
+    </div>
+    <div class="form-row">
+       <label for="node-input-githubrepo" style="min-width: 150px;"><i class="fa fa-tag"></i> Repository</label>
+       <input type="text" id="node-input-githubrepo" placeholder=""/>
+    </div>
+    <div class="form-row">
+       <label for="node-input-githubbranch" style="min-width: 150px;"><i class="fa fa-tag"></i> Branch</label>
+       <input type="text" id="node-input-githubbranch" placeholder="main"/>
+    </div>
+  </div>
+
+  <div id="gitcommit-options">
+    <div class="form-row">
+      <label for="node-input-githubmessage" style="min-width: 150px;"><i class="fa fa-tag"></i> Commit Message</label>
+      <input type="text" id="node-input-githubmessage" placeholder="Initial Commit"/>
+    </div>
+    <div class="form-row">
+      <label for="node-input-githubauthor" style="min-width: 150px;"><i class="fa fa-tag"></i> Author Name</label>
+      <input type="text" id="node-input-githubauthor" placeholder="Joe Blog"/>
+    </div>
+    <div class="form-row">
+      <label for="node-input-githubauthoremail" style="min-width: 150px;"><i class="fa fa-tag"></i> Author Email</label>
+      <input type="text" id="node-input-githubauthoremail" placeholder="joe@spreads-the.love"/>
+    </div>
+  </div>
 </script>
 
 <script type="text/html" data-help-name="NodeDevOps">
-    <p>NodeDevOps is the operations node that controals what happens with the package.</p>
-    Possible actions that can happen are GitHub commits and diffs, NPM publish or unpublish and installing the package
-    locally for local testing.
+  <p>NodeDevOps is the operations node that controals what happens with the package.</p>
+  Possible actions that can happen are GitHub commits and diffs, NPM publish or unpublish and installing the package
+  locally for local testing.
 
-    Local installations can be uninstalled so that changes can tested and modified quickly.
+  Local installations can be uninstalled so that changes can tested and modified quickly.
 </script>

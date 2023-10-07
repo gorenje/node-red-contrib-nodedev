@@ -125,7 +125,7 @@
 
         {{ #node.frt2bakcomm }}
         var that = this;
-        sendToBackend(that, {"data": "button pressed on frontend"})
+        sendToBackend(that, {"payload": "button pressed on frontend"})
         {{ /node.frt2bakcomm }}
 
         /* here goes the button code to be executed on click */

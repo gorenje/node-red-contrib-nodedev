@@ -43,7 +43,7 @@ module.exports = function (RED) {
                 var userscope = manifest.name.split("/")[0];
                 opts[userscope + ":registry"] = "https://registry.npmjs.org"
 
-                if (cfg.action == "publish") {
+                if (msg.npmpublish || cfg.action == "publish") {
                     libpub.publish(
                         manifest, tarball, opts
                     ).then((data) => {
@@ -54,19 +54,19 @@ module.exports = function (RED) {
                         msg.error = exp;
                         done("publish failed", msg)
                     })
-                }
-
-                if (cfg.action == "unpublish") {
-                    libpub.unpublish(
-                        manifest.name, opts
-                    ).then((data) => {
-                        msg.payload = JSON.stringify(data);
-                        send(msg)
-                        done()
-                    }).catch((exp) => {
-                        msg.error = exp;
-                        done("publish failed", msg)
-                    })
+                } else {
+                    if (msg.npmunpublish || cfg.action == "unpublish") {
+                        libpub.unpublish(
+                            manifest.name, opts
+                        ).then((data) => {
+                            msg.payload = JSON.stringify(data);
+                            send(msg)
+                            done()
+                        }).catch((exp) => {
+                            msg.error = exp;
+                            done("unpublish failed", msg)
+                        })
+                    }
                 }
             })
         });
