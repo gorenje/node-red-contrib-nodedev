@@ -16,10 +16,10 @@
             "fc620efcbaf77846",
             "d981181116ccfb16"
         ],
-        "x": 504,
-        "y": 489.2857666015625,
-        "w": 1037.857177734375,
-        "h": 363.7142333984375
+        "x": 458,
+        "y": 493.2857666015625,
+        "w": 1099.857177734375,
+        "h": 378.7142333984375
     },
     {
         "id": "ea7b1b985ba6ac70",
@@ -32,13 +32,15 @@
         "hasbutton": false,
         "hasinput": true,
         "outputcount": 1,
-        "autoimport": true,
         "category": "",
         "summary": "",
         "description": "",
         "icon": "font-awesome/fa-industry",
-        "x": 1445.857177734375,
-        "y": 532.2857666015625,
+        "frt2bakcomm": false,
+        "bak2frtcomm": false,
+        "createmanifest": false,
+        "x": 1461.857177734375,
+        "y": 574.2857666015625,
         "wires": [
             []
         ]
@@ -56,8 +58,8 @@
         "sendError": false,
         "encoding": "none",
         "allProps": false,
-        "x": 1100.857177734375,
-        "y": 590.2857666015625,
+        "x": 1018.857177734375,
+        "y": 579.2857666015625,
         "wires": [
             [
                 "ea7b1b985ba6ac70"
@@ -76,8 +78,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 780.857177734375,
-        "y": 530.2857666015625,
+        "x": 595.857177734375,
+        "y": 534.2857666015625,
         "wires": [
             [
                 "24b26f5122abf1bb"
@@ -107,8 +109,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 650,
-        "y": 647,
+        "x": 604,
+        "y": 669,
         "wires": [
             [
                 "96278268709caba6"
@@ -123,7 +125,6 @@
         "name": "retrieve tgz URL for package",
         "func": "pacote.manifest(\n    msg.packagename + \"@\" + msg.packageversion\n).then(manifest => {\n    msg.payload = manifest._resolved\n    node.send(msg)\n}).catch( err => {\n    msg.error = err\n    node.error(\"failed to get url\", msg)\n})\n\n\n",
         "outputs": 1,
-        "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -133,8 +134,8 @@
                 "module": "pacote"
             }
         ],
-        "x": 822,
-        "y": 812,
+        "x": 807,
+        "y": 825,
         "wires": [
             [
                 "fc620efcbaf77846"
@@ -161,8 +162,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1128,
-        "y": 770,
+        "x": 1032,
+        "y": 695,
         "wires": [
             [
                 "d981181116ccfb16"
@@ -186,8 +187,8 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 1316,
-        "y": 689,
+        "x": 1313,
+        "y": 831,
         "wires": [
             [
                 "ea7b1b985ba6ac70"
