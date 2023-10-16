@@ -30,11 +30,11 @@ Examples are included:
 
 ### Config node with sidebar
 
-The following gif shows how the example of a config node with sidebar button works:
+The following [animation](https://cdn.openmindmap.org/content/1697462227098_confignode2.gif) shows how the example of a config node with sidebar button works:
 
 ![img](https://cdn.openmindmap.org/content/1697462227098_confignode2.gif)
 
-This gif shows the development and installation of a palette node:
+This [animation](https://cdn.openmindmap.org/content/1697013164685_out-fps15.gif) shows the development and installation of a palette node:
 
 ![img](https://cdn.openmindmap.org/content/1697013164685_out-fps15.gif)
 
