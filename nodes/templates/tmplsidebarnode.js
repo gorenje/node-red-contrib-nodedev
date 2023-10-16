@@ -13,7 +13,7 @@ module.exports = function (RED) {
         if (req.body) {
           res.status(200).send({
             "status": "ok",
-            "value": req.body.data
+            "value": "server says, data was : '" + req.body.data + "'"
           })
         } else {
           res.sendStatus(404);
