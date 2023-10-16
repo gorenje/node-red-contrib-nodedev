@@ -16,7 +16,7 @@
       if (globalYourConfigNode === null) {
          var configNodes = [];
          RED.nodes.eachConfig(function(configNode) {
-             if (configNode.type === '{{ node.name }}') { 
+             if (configNode.type === '{{ node.name }}Cfg') { 
                  configNodes.push(configNode); 
              }
          });
@@ -80,6 +80,51 @@
 
       ensureYourConfigNodeExists();
 
+      {{#node.frt2bakcomm}}
+      $('#node-input-button-to-server').on('click', (e) => {
+         if ( e ) { e.preventDefault(); }
+         $.ajax({
+            url: "{{ node.name }}Cfg",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+
+            data: JSON.stringify({
+               "value": globalYourConfigNode.data
+            }),
+
+            success: function (resp) {
+               RED.notify("Server responded: " + resp.value, {
+                  type: "success",
+                  timeout: 2000
+               });
+
+            },
+
+            error: function (jqXHR, textStatus, errorThrown) {
+               if (jqXHR.status == 404) {
+                  RED.notify("Node has not yet been deployed, please deploy.", "error");
+               } else if (jqXHR.status == 405) {
+                  RED.notify("Not Allowed.", "error");
+               } else if (jqXHR.status == 500) {
+                  RED.notify(node._("common.notification.error", {
+                     message: node._("inject.errors.failed")
+                  }), "error");
+               } else if (jqXHR.status == 0) {
+                  RED.notify(node._("common.notification.error", {
+                     message: node._("common.notification.errors.no-response")
+                  }), "error");
+               } else {
+                  RED.notify(node._("common.notification.error", {
+                     message: node._("common.notification.errors.unexpected", {
+                        status: jqXHR.status, message: textStatus
+                     })
+                  }), "error");
+               }
+            }
+         });
+      });
+      {{/node.frt2bakcomm}}
+
       {{#node.hasbutton}}
       var doSomething = (e) => {
          if (e) { e.preventDefault(); }
@@ -131,8 +176,16 @@
 {{#node.hasbutton}}
  <div class="form-row">
    <div style="position: relative; height: 100%; margin: 15px;">
-      <button id="node-input-button" class="success" style="width: 100%; margin-top: 30px">Do something</button>
+      <button id="node-input-button" style="width: 100%; margin-top: 30px">Do something</button>
    </div>
  </div>
 {{/node.hasbutton}}
+
+{{#node.frt2bakcomm}}
+ <div class="form-row">
+   <div style="position: relative; height: 100%; margin: 15px;">
+      <button id="node-input-button-to-server" style="width: 100%; margin-top: 30px">Send Data To Server</button>
+   </div>
+ </div>
+{{/node.frt2bakcomm}}
 </script>
