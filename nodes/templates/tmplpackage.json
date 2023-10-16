@@ -1,28 +1,33 @@
 {
   "name" : "{{__.ocb3}} pname {{__.ccb3}}",
-  "version": "{{__.ocb2}} pversion {{__.ccb2}}",
+  "version": "{{__.ocb3}} pversion {{__.ccb3}}",
   "dependencies": {
   },
 
+  "description": "{{__.ocb3}} pdescription {{__.ccb3}}",
   "keywords": [
     "node-red"
   ],
 
-  "homepage": "https://github.com/{{__.ocb2}} githubowner {{__.ccb2}}/{{__.ocb2}} githubrepo {{__.ccb2}}#readme",
   "license": "Don't do evil.",
-  "author": "Joe Blog <joe.blog@spreads-the.love>",
+  "homepage": "https://github.com/{{__.ocb2}} githubowner {{__.ccb2}}/{{__.ocb2}} githubrepo {{__.ccb2}}#readme",
+  "author": "{{__.ocb3}} pauthorname {{__.ccb3}} <{{__.ocb3}} pauthoremail {{__.ccb3}}>",
   "engines": {
     "node": ">=14"
   },
 
   "node-red" : {
     "version": ">=3.0.0",
+    {{#node.isplugin}}
+    "plugins": {
+       {{{__.pluginstanza}}}
+     },
+    {{/node.isplugin}}
     "nodes": {
       {{{__.nodestanza}}}
     }
   },
 
-  "description": "Description of what these nodes do.",
   "repository": {
     "type": "github",
     "url": "git+https://github.com/{{__.ocb2}} githubowner {{__.ccb2}}/{{__.ocb2}} githubrepo {{__.ccb2}}.git"

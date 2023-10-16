@@ -47,7 +47,7 @@
     <div class="form-row">
         <label for="node-input-summary">
           <i class="fa fa-tag"></i>
-          <span>Summary</span>
+          <span>Summary (REQUIRED)</span>
         </label>
         <div style="height: 150px; min-height:150px; max-height: 150px;" class="node-text-editor" id="node-input-summary">
         </div>
@@ -56,12 +56,19 @@
     <div class="form-row">
         <label for="node-input-description">
               <i class="fa fa-tag"></i>
-              <span>Description</span>
+              <span>Description (REQUIRED)</span>
             </label>
         <div style="height: 350px; min-height:350px; max-height: 350px;" class="node-text-editor" id="node-input-description">
         </div>
     </div>
 
+    <div class="form-row">
+        <label for="node-input-isplugin" style="min-width: 250px;">
+                    <span>Plugin: Sidebar + Config?</span>
+                </label>
+        <input type="checkbox" id="node-input-isplugin" style="display:inline-block; width:15px; vertical-align:baseline;">
+    </div>
+    
     <div class="form-row">
         <label for="node-input-frt2bakcomm" style="min-width: 250px;">
                 <span>Frontend to Backend communication?</span>
@@ -119,7 +126,9 @@
         
         data["color"]       = $('#node-input-colour').val();
         data["icon"]        = $('#red-ui-editor-node-icon').val();
+        data["iconclass"]   = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
         data["name"]        = $('#node-input-nodename').val();
+        data["namelwr"]     = data["name"].toLowerCase();
         data["outputcount"] = $('#node-input-outputcount').val();
         data["category"]    = $('#node-input-category').val();
 
@@ -128,7 +137,8 @@
         data["bak2frtcomm"]    = $('#node-input-bak2frtcomm').is(":checked");
         data["frt2bakcomm"]    = $('#node-input-frt2bakcomm').is(":checked");
         data["createmanifest"] = $('#node-input-createmanifest').is(":checked");
-        
+        data["isplugin"]       = $('#node-input-isplugin').is(":checked");
+
         data["__task"]      = "generate_from_templates";
                 
         $.ajax({
@@ -177,19 +187,20 @@
         color: "#e5e4ef",
         category: 'nodedev',
         defaults: {
-            name: { value: "" },
-            nodename: { value: "" },
-            color: { value: "#e5e4ef" },
-            hasbutton: { value: false },
-            hasinput: { value: true },
-            outputcount: { value: 1 },
-            category: { value: "" },
-            summary: { value: ""},
-            description: { value: ""},
-            icon: { value: "font-awesome/fa-industry" },
-            frt2bakcomm: { value: false },
-            bak2frtcomm: { value: false },
-            createmanifest: { value: false }
+            name:           { value: "" },
+            nodename:       { value: "", required: true },
+            color:          { value: "#e5e4ef" },
+            hasbutton:      { value: false },
+            hasinput:       { value: true },
+            outputcount:    { value: 1 },
+            category:       { value: "" },
+            summary:        { value: "", required: true },
+            description:    { value: "", required: true },
+            icon:           { value: "font-awesome/fa-industry" },
+            frt2bakcomm:    { value: false },
+            bak2frtcomm:    { value: false },
+            createmanifest: { value: false },
+            isplugin:       { value: false },
         },
         inputs: 1,
         outputs: 1,

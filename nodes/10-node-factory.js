@@ -165,62 +165,137 @@ module.exports = function (RED) {
         });
     }
 
-    function convertToPkgFileNodes(msg, jsCtnt, htmlCtnt) {
-        var allNodes = [];
-
-        var secondId = RED.util.generateId();
-
-        allNodes.push({
-            id: RED.util.generateId(),
-            type: "PkgFile",
-            name: msg.node.name + ".js",
-            filename: "nodes/" + msg.node.name.toLowerCase() + ".js",
-            template: jsCtnt,
-            syntax: "mustache",
-            format: "javascript",
-            output: "str",
-            x: 100,
-            y: 50,
-            wires: [[secondId]]
-        })
-
-        allNodes.push({
-            id: secondId,
-            type: "PkgFile",
-            name: msg.node.name + ".html",
-            filename: "nodes/" + msg.node.name.toLowerCase() + ".html",
-            template: htmlCtnt,
-            syntax: "mustache",
-            format: "html",
-            output: "str",
-            x: 100,
-            y: 100,
-            wires: [[]]
-        })
-
-        return allNodes;
-    }
-
-    function createManifestFiles(msg, node, nodeDefinitions) {
-        /* ASSUMPTION: assume the .js file is defined first and 
-        then the .html file in the node definitions */
-
-        var packageJsonPath = path.join(__dirname, 'templates', 'tmplpackage.json');
-        var readmePath = path.join(__dirname, 'templates', 'tmplreadme.md');
-        var licensePath = path.join(__dirname, 'templates', 'tmpllicense');
-
-        var pkjsTmpl = fs.readFileSync(packageJsonPath, 'utf8');
-        var rdmeTmpl = fs.readFileSync(readmePath, 'utf8');
-        var lcnsTmpl = fs.readFileSync(licensePath, 'utf8');
-
-        spcRepDict["nodestanza"] = " \"" + msg.node.name.toLowerCase() + "\": \"" + nodeDefinitions[0].filename + "\""
+    function createPluginNodeDefintions(msg, node) {
+        var sidebarHtmlPath = path.join(__dirname, 'templates', 'tmplsidebar.html');
+        var nodeJsPath = path.join(__dirname, 'templates', 'tmplsidebarnode.js');
+        var nodeHtmlPath = path.join(__dirname, 'templates', 'tmplsidebarnode.html');
 
         var content = {};
 
         var promises = [
-            handleTemplate(msg, node, pkjsTmpl).then((c) => { content["pkjs"] = c }),
-            handleTemplate(msg, node, rdmeTmpl).then((c) => { content["rdme"] = c }),
-            handleTemplate(msg, node, lcnsTmpl).then((c) => { content["lcns"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(sidebarHtmlPath, 'utf8')).then((c) => { content["sbht"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(nodeJsPath, 'utf8')).then((c) => { content["ndjs"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(nodeHtmlPath, 'utf8')).then((c) => { content["ndht"] = c }),
+        ];
+
+        return Promise.all(promises).then(() => {
+            var secondId = RED.util.generateId();
+            var thirdId = RED.util.generateId();
+
+            return [{
+                id: RED.util.generateId(),
+                type: "PkgFile",
+                name: msg.node.name + "Cfg.js",
+                filename: "nodes/" + msg.node.namelwr + ".js",
+                template: content["ndjs"],
+                syntax: "mustache",
+                format: "javascript",
+                output: "str",
+                x: 100,
+                y: 50,
+                wires: [[secondId]]
+            },
+
+            {
+                id: secondId,
+                type: "PkgFile",
+                name: "Sidebar: " + msg.node.name + ".html",
+                filename: "plugins/" + msg.node.namelwr + ".html",
+                template: content["sbht"],
+                syntax: "mustache",
+                format: "html",
+                output: "str",
+                x: 100,
+                y: 100,
+                wires: [[thirdId]]
+            },
+
+            {
+                id: thirdId,
+                type: "PkgFile",
+                name: msg.node.name + "Cfg.html",
+                filename: "nodes/" + msg.node.namelwr + ".html",
+                template: content["ndht"],
+                syntax: "mustache",
+                format: "html",
+                output: "str",
+                x: 100,
+                y: 150,
+                wires: [[]]
+            }]
+        })
+    }
+
+    function createSimpleNodeDefintions(msg,node) {
+        var htmlPath = path.join(__dirname, 'templates', 'tmpl.html');
+        var jsPath = path.join(__dirname, 'templates', 'tmpl.js');
+
+        var content = {};
+
+        var promises = [
+            handleTemplate(msg, node, fs.readFileSync(htmlPath, 'utf8')).then((c) => { content["html"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(jsPath, 'utf8')).then((c) => { content["jasc"] = c }),
+        ];
+
+        return Promise.all(promises).then(() => {
+            var secondId = RED.util.generateId();
+
+            return [{
+                id: RED.util.generateId(),
+                type: "PkgFile",
+                name: msg.node.name + ".js",
+                filename: "nodes/" + msg.node.namelwr + ".js",
+                template: content["jasc"],
+                syntax: "mustache",
+                format: "javascript",
+                output: "str",
+                x: 100,
+                y: 50,
+                wires: [[secondId]]
+            },
+
+            {
+                id: secondId,
+                type: "PkgFile",
+                name: msg.node.name + ".html",
+                filename: "nodes/" + msg.node.namelwr + ".html",
+                template: content["html"],
+                syntax: "mustache",
+                format: "html",
+                output: "str",
+                x: 100,
+                y: 100,
+                wires: [[]]
+            }]
+        })
+    }
+
+    function createNodeDefintions(msg, node) {
+        if ( msg.node.isplugin ) {
+            return createPluginNodeDefintions(msg, node)
+        } else {
+            return createSimpleNodeDefintions(msg, node)
+        }
+    }
+
+    function createManifestFiles(msg, node, nodeDefinitions) {
+        var packageJsonPath = path.join(__dirname, 'templates', 'tmplpackage.json');
+        var readmePath = path.join(__dirname, 'templates', 'tmplreadme.md');
+        var licensePath = path.join(__dirname, 'templates', 'tmpllicense');
+
+        /* ASSUMPTION: assume the .js file is defined first and
+            then the .html file in the node definitions */
+        spcRepDict["nodestanza"] = " \"" + msg.node.namelwr + "\": \"" + nodeDefinitions[0].filename + "\""
+        if ( msg.node.isplugin ) {
+            spcRepDict["pluginstanza"] = " \"sidebar-plugin\": \"" + nodeDefinitions[1].filename + "\""
+        }
+
+        var content = {};
+
+        var promises = [
+            handleTemplate(msg, node, fs.readFileSync(packageJsonPath, 'utf8')).then((c) => { content["pkjs"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(readmePath, 'utf8')).then((c) => { content["rdme"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(licensePath, 'utf8')).then((c) => { content["lcns"] = c }),
         ];
 
         return Promise.all(promises).then( () => {
@@ -284,43 +359,15 @@ module.exports = function (RED) {
         });
 
         node.on("input", function (msg, send, done) {
+            send({ payload: msg.node })
+            
             if (msg.node && msg.node.__task == "generate_from_templates") {
                 try {
-                    var htmlPath = path.join(__dirname, 'templates', 'tmpl.html');
-                    var jsPath = path.join(__dirname, 'templates', 'tmpl.js');
-
-                    var jsonTmpl = fs.readFileSync(jsPath, 'utf8');
-                    var htmlTmpl = fs.readFileSync(htmlPath, 'utf8');
-
-                    handleTemplate(msg, node, jsonTmpl).then(function (data) {
-                        var jsData = data;
-
-                        handleTemplate(msg, node, htmlTmpl).then(function (data) {
-                            var nodeDef = convertToPkgFileNodes(msg, jsData, data)
-
-                            if (msg.node.createmanifest ) {
-                                /* create the package.json, readme and license files */
-                                createManifestFiles(msg, node, nodeDef).then( (data) => {
-                                    var nodeImpStr = JSON.stringify(data);
-
-                                    send({ payload: nodeImpStr })
-
-                                    RED.comms.publish(
-                                        "nodedev:perform-autoimport-nodes",
-                                        RED.util.encodeObject({
-                                            msg: "autoimport",
-                                            payload: nodeImpStr,
-                                            topic: msg.topic,
-                                            nodeid: node.id,
-                                            _msg: msg
-                                        })
-                                    );
-                                }).catch( (err) => {
-                                    msg.error = err
-                                    done(err.message, msg)
-                                })
-                            } else {
-                                var nodeImpStr = JSON.stringify(nodeDef);
+                    createNodeDefintions(msg,node).then( (nodeDef) => {
+                        if (msg.node.createmanifest ) {
+                            /* create the package.json, readme and license files */
+                            createManifestFiles(msg, node, nodeDef).then( (data) => {
+                                var nodeImpStr = JSON.stringify(data);
 
                                 send({ payload: nodeImpStr })
 
@@ -334,17 +381,31 @@ module.exports = function (RED) {
                                         _msg: msg
                                     })
                                 );
-                            }
-                            done()
-                        }).catch((err) => {
-                            msg.error = err
-                            done(err.message, msg)
-                        })
+                            }).catch( (err) => {
+                                msg.error = err
+                                done(err.message, msg)
+                            })
+                        } else {
+                            var nodeImpStr = JSON.stringify(nodeDef);
+
+                            send({ payload: nodeImpStr })
+
+                            RED.comms.publish(
+                                "nodedev:perform-autoimport-nodes",
+                                RED.util.encodeObject({
+                                    msg: "autoimport",
+                                    payload: nodeImpStr,
+                                    topic: msg.topic,
+                                    nodeid: node.id,
+                                    _msg: msg
+                                })
+                            );
+                        }
+                        done()
                     }).catch((err) => {
                         msg.error = err
                         done(err.message, msg)
                     })
-                    //send({ payload: jsonString })
                 } catch (err) {
                     msg.error = err
                     done(err.message, msg)

@@ -47,20 +47,23 @@
     defaults: {
       name: { value:"" },
 
-      pname: { value: "", required: true },
-      pversion: { value: "", required: true },
+      pname:        { value: "", required: true },
+      pversion:     { value: "", required: true },
+      pauthorname:  { value: "", required: true },
+      pauthoremail: { value: "", required: true },
+      pdescription: { value: "", required: true },
 
       noderedinstall: { value: false },
       randompackagename: { value: false },
 
-      gitcommit: { value: false },
+      gitcommit:         { value: false },
       gitcheckforchange: { value: false },
-      githubowner: { value: ""},
-      githubrepo: { value: ""},
-      githubbranch: { value: "main"},
-      githubauthor: { value: ""},
+      githubowner:       { value: ""},
+      githubrepo:        { value: ""},
+      githubbranch:      { value: "main"},
+      githubauthor:      { value: ""},
       githubauthoremail: { value: "" },
-      githubmessage: { value: "" },
+      githubmessage:     { value: "" },
 
       npmpublish: { value: false },
       npmunpublish: { value: false },
@@ -196,6 +199,21 @@
     <input type="text" id="node-input-pversion" placeholder="0.0.1"/>
   </div>
   
+  <div class="form-row">
+    <label for="node-input-pauthorname" style="min-width: 250px;"><i class="fa fa-address-book-o"></i> Package Author Name</label>
+    <input type="text" id="node-input-pauthorname" placeholder="Alfred E. Neumann"/>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-pauthoremail" style="min-width: 250px;"><i class="fa fa-envelope-o"></i> Package Author Email</label>
+    <input type="text" id="node-input-pauthoremail" placeholder="joe.blog@example.com"/>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-pdescription" style="min-width: 150px;"><i class="fa fa-book"></i> Package Description</label>
+    <input type="text" id="node-input-pdescription" placeholder="Package description"/>
+  </div>
+
   <hr/>
 
   <div class="form-row">
@@ -248,15 +266,15 @@
 
   <div id="github-options">
     <div class="form-row">
-      <label for="node-input-githubowner" style="min-width: 150px;"><i class="fa fa-tag"></i> GitHub Username</label>
+      <label for="node-input-githubowner" style="min-width: 150px;"><i class="fa fa-user-o"></i> GitHub Username</label>
       <input type="text" id="node-input-githubowner" placeholder="username"/>
     </div>
     <div class="form-row">
-       <label for="node-input-githubrepo" style="min-width: 150px;"><i class="fa fa-tag"></i> Repository</label>
+       <label for="node-input-githubrepo" style="min-width: 150px;"><i class="fa fa-paw"></i> Repository</label>
        <input type="text" id="node-input-githubrepo" placeholder=""/>
     </div>
     <div class="form-row">
-       <label for="node-input-githubbranch" style="min-width: 150px;"><i class="fa fa-tag"></i> Branch</label>
+       <label for="node-input-githubbranch" style="min-width: 150px;"><i class="fa fa-tree"></i> Branch</label>
        <input type="text" id="node-input-githubbranch" placeholder="main"/>
     </div>
   </div>
@@ -267,11 +285,11 @@
       <input type="text" id="node-input-githubmessage" placeholder="Initial Commit"/>
     </div>
     <div class="form-row">
-      <label for="node-input-githubauthor" style="min-width: 150px;"><i class="fa fa-tag"></i> Author Name</label>
+      <label for="node-input-githubauthor" style="min-width: 150px;"><i class="fa fa-address-book-o"></i> Author Name</label>
       <input type="text" id="node-input-githubauthor" placeholder="Joe Blog"/>
     </div>
     <div class="form-row">
-      <label for="node-input-githubauthoremail" style="min-width: 150px;"><i class="fa fa-tag"></i> Author Email</label>
+      <label for="node-input-githubauthoremail" style="min-width: 150px;"><i class="fa fa-envelope-o"></i> Author Email</label>
       <input type="text" id="node-input-githubauthoremail" placeholder="joe@spreads-the.love"/>
     </div>
   </div>

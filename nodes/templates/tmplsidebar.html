@@ -1,0 +1,138 @@
+<script type="text/javascript">
+(function() {
+   var globalYourConfigNode = null;
+
+   function ensureYourConfigNodeExists() {
+      // This function makes sure there is 1 instance of your config node is available, and that the globalYourConfigNode variable refers to it.
+      // Explained in the next step of this tutorial... --> https://discourse.nodered.org/t/tutorial-create-a-sidebar-plugin-and-persist-the-data-in-a-config-node/82020
+
+      // If we had found it previously, check if it has been deleted by the user behind our back
+      if (globalYourConfigNode !== null) {
+         var configNode = RED.nodes.node(globalYourConfigNode.id);
+         if (configNode === null) { globalYourConfigNode = null; }
+      }
+
+      // If not found previously, let's go find it
+      if (globalYourConfigNode === null) {
+         var configNodes = [];
+         RED.nodes.eachConfig(function(configNode) {
+             if (configNode.type === '{{ node.name }}') { 
+                 configNodes.push(configNode); 
+             }
+         });
+
+         // Make sure we only have 1 config node
+         while (configNodes.length > 1) {
+             var configNode = configNodes.pop();
+             RED.nodes.remove(configNode.id);
+             RED.nodes.dirty(true);
+         }
+
+         // When we found a config node, let's use that one
+         if (configNodes.length === 1) { globalYourConfigNode = configNodes[0]; }
+      }
+
+      // When it doesn't exist yet, create it if required
+      if (globalYourConfigNode === null) {
+         // Remark: since this config node is dynamically created (and only used in this sidebar which isn't another node), the config
+         // node is in fact "unused".  But since we don't want it to appear "unused" in the "config nodes" panel, we need to set hasUsers
+         // to false (see https://github.com/node-red/node-red/blob/master/CHANGELOG.md#0161-maintenance-release).
+         // The hasUsers needs also to be specified in the RED.nodes.registerType statement!
+         globalYourConfigNode = {
+             id: RED.nodes.id(), // on the server side, this is called RED.util.generateId()
+             _def: RED.nodes.getType("{{ node.name }}Cfg"),
+             type: "{{ node.name }}Cfg",
+             hasUsers: false, 
+             users: [],
+             name: "{{ node.name }}",
+             label: function() { return this.name || "{{ node.name }}"},
+             /* values and data defined by this config node */
+             data: "some default value", // Default data
+         }
+
+         // Add the new config node to the collection of Node-RED nodes
+         RED.nodes.add(globalYourConfigNode);
+
+         // Make sure the "Deploy" button becomes active
+         RED.nodes.dirty(true);
+      }      
+   }
+
+   // Add your plugin as a new tabsheet in the right sidebar AFTER the flow editor is completely started
+   var initialiseConfigNodeOnce = () => {
+      RED.events.off('runtime-state', initialiseConfigNodeOnce);
+
+      // The html content of the sidebar has been specified below as a data-template, from where it can be loaded:
+      var content = $($('script[type="text/x-red"][data-template-name="{{ node.name }}"]').i18n().html());
+    
+      // Add a "Your sidebar" tabsheet to the right sidebar panel, in which this sidebar panel can be displayed
+      // --> more details: https://nodered.org/docs/api/ui/sidebar/
+      RED.sidebar.addTab({
+         id: "{{ node.name }}",
+         label: "{{ node.namelwr }}", // short name for the tab
+         name: "{{ node.name }}", // long name for the menu
+         content: content,
+         closeable: true,
+         // disableOnEdit: true,
+         enableOnEdit: true,
+         iconClass: "{{{ node.iconclass }}}" // your fontawesome icon
+      });
+
+      ensureYourConfigNodeExists();
+
+      {{#node.hasbutton}}
+      var doSomething = (e) => {
+         if (e) { e.preventDefault(); }
+         RED.notify("Button pressed in the side or action "+
+                    "triggered. Current value: <b>" + globalYourConfigNode.data + "</b>", 
+                    "success");
+      }
+
+      $('#node-input-button').on('click', (e) => {
+         doSomething(e);
+      })
+
+      /* name of action will become "My Sidebar Action", label is generated
+         from action name - see https://nodered.org/docs/api/ui/actions/ */
+      RED.actions.add("{{ node.namelwr }}:my-sidebar-action",function() {
+        doSomething();
+      });
+      {{/node.hasbutton}}
+
+      // At startup load your config node data into the plugin sidebar html elements
+      $("#node-input-data").val(globalYourConfigNode.data);
+
+      // When the user has entered new data in the sidebar, then store it into the config node
+      $("#node-input-data").on("change", function() {
+        ensureYourConfigNodeExists();
+
+        let data = $(this).val();
+
+         if (globalYourConfigNode.data != data) {
+            globalYourConfigNode.data = data;
+            // Since the config node has been updated, the 'Deploy' button should become active
+            RED.nodes.dirty(true);
+         }
+      })
+   };
+   RED.events.on('runtime-state', initialiseConfigNodeOnce);
+})();
+</script>
+
+<!-- The html for the right sidebar plugin screen -->
+<script type="text/x-red" data-template-name="{{ node.name }}">
+  <div class="form-row">
+    <div style="position: relative; height: 100%; margin: 15px;">
+      <label for="node-input-data" style="margin-top: 15px"><i class="fa fa-cog"></i> Data</label>
+      <input type="text" id="node-input-data" style="width: 100%; margin-top: 30px">
+    </div>
+  </div>
+  
+{{#node.hasbutton}}
+ <div class="form-row">
+   <div style="position: relative; height: 100%; margin: 15px;">
+      <button id="node-input-button" class="success" style="width: 100%; margin-top: 30px">Do something</button>
+   </div>
+ </div>
+{{/node.hasbutton}}
+</script>

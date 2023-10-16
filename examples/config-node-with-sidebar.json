@@ -1,0 +1,113 @@
+[
+    {
+        "id": "e68c8450d6e047e6",
+        "type": "NpmTarBall",
+        "z": "5644e181ee8af639",
+        "name": "",
+        "x": 905,
+        "y": 656,
+        "wires": [
+            [
+                "ddb9e4e7ca9e2797"
+            ]
+        ]
+    },
+    {
+        "id": "ddb9e4e7ca9e2797",
+        "type": "NodeRedInstall",
+        "z": "5644e181ee8af639",
+        "name": "",
+        "x": 983,
+        "y": 710,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6f04b8605d139351",
+        "type": "group",
+        "z": "5644e181ee8af639",
+        "name": "Step 1: Generate the missing nodes",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "4f2e91f3e9fa51b7"
+        ],
+        "x": 326,
+        "y": 562,
+        "w": 232,
+        "h": 82
+    },
+    {
+        "id": "4f2e91f3e9fa51b7",
+        "type": "NodeFactory",
+        "z": "5644e181ee8af639",
+        "g": "6f04b8605d139351",
+        "name": "",
+        "nodename": "Fubar",
+        "color": "#FFF0F0",
+        "hasbutton": true,
+        "hasinput": true,
+        "outputcount": 1,
+        "category": "snafu",
+        "summary": "Summary",
+        "description": "Description",
+        "icon": "font-awesome/fa-venus-double",
+        "frt2bakcomm": false,
+        "bak2frtcomm": false,
+        "createmanifest": true,
+        "isplugin": true,
+        "x": 422,
+        "y": 603,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a599fd3ebf69cdb1",
+        "type": "group",
+        "z": "5644e181ee8af639",
+        "name": "Step 2: Connect and installing to Node-RED",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "b45307819c625e63"
+        ],
+        "x": 326,
+        "y": 232,
+        "w": 284,
+        "h": 82
+    },
+    {
+        "id": "b45307819c625e63",
+        "type": "NodeDevOps",
+        "z": "5644e181ee8af639",
+        "g": "a599fd3ebf69cdb1",
+        "name": "",
+        "pname": "@johnsmith/fubar-node",
+        "pversion": "0.0.1",
+        "pauthorname": "Alfred E. Neumann",
+        "pauthoremail": "alfred@example.com",
+        "pdescription": "Fubar nods.",
+        "noderedinstall": true,
+        "randompackagename": true,
+        "gitcommit": false,
+        "gitcheckforchange": false,
+        "githubowner": "",
+        "githubrepo": "",
+        "githubbranch": "main",
+        "githubauthor": "",
+        "githubauthoremail": "",
+        "githubmessage": "",
+        "npmpublish": false,
+        "npmunpublish": false,
+        "npmotp": "",
+        "x": 442,
+        "y": 273,
+        "wires": [
+            []
+        ]
+    }
+]
