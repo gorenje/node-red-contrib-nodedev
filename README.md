@@ -28,6 +28,17 @@ Examples are included:
 - Converting an existing tar-gzip package file into a collection of `PkgFile` nodes for testing and maintaince and development --> [flow](https://flowhub.org/f/eef4037a6d25a1e0)
 - `NodeFactory` example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED --> [flow](https://flowhub.org/f/7bece6814c033925)
 
+### Config node with sidebar
+
+The following gif shows how the example of a config node with sidebar button works:
+
+![img](https://cdn.openmindmap.org/content/1697462227098_confignode2.gif)
+
+This gif shows the development and installation of a palette node:
+
+![img](https://cdn.openmindmap.org/content/1697013164685_out-fps15.gif)
+
+
 ### Tips
 
 *How to avoid restarting Node-RED?*
