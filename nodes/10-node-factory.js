@@ -280,8 +280,9 @@ module.exports = function (RED) {
 
     function createManifestFiles(msg, node, nodeDefinitions) {
         var packageJsonPath = path.join(__dirname, 'templates', 'tmplpackage.json');
-        var readmePath = path.join(__dirname, 'templates', 'tmplreadme.md');
-        var licensePath = path.join(__dirname, 'templates', 'tmpllicense');
+        var readmePath = path.join(__dirname,      'templates', 'tmplreadme.md');
+        var licensePath = path.join(__dirname,     'templates', 'tmpllicense');
+        var changelogPath = path.join(__dirname,   'templates', 'tmplchangelog.md');
 
         /* ASSUMPTION: assume the .js file is defined first and
             then the .html file in the node definitions */
@@ -294,13 +295,15 @@ module.exports = function (RED) {
 
         var promises = [
             handleTemplate(msg, node, fs.readFileSync(packageJsonPath, 'utf8')).then((c) => { content["pkjs"] = c }),
-            handleTemplate(msg, node, fs.readFileSync(readmePath, 'utf8')).then((c) => { content["rdme"] = c }),
-            handleTemplate(msg, node, fs.readFileSync(licensePath, 'utf8')).then((c) => { content["lcns"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(readmePath,      'utf8')).then((c) => { content["rdme"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(licensePath,     'utf8')).then((c) => { content["lcns"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(changelogPath,   'utf8')).then((c) => { content["chlg"] = c }),
         ];
 
         return Promise.all(promises).then( () => {
             var secondId = RED.util.generateId();
             var thirdId = RED.util.generateId();
+            var fourthId = RED.util.generateId();
 
             nodeDefinitions.push({
                 id: RED.util.generateId(),
@@ -312,7 +315,7 @@ module.exports = function (RED) {
                 format: "text",
                 output: "str",
                 x: 100,
-                y: -100,
+                y: -150,
                 wires: [[ secondId ]]
             })
 
@@ -326,12 +329,26 @@ module.exports = function (RED) {
                 format: "markdown",
                 output: "str",
                 x: 100,
-                y: -50,
+                y: -100,
                 wires: [[thirdId]]
             })
 
             nodeDefinitions.push({
                 id: thirdId,
+                type: "PkgFile",
+                name: "CHANGELOG.md",
+                filename: "CHANGELOG.md",
+                template: content["chlg"],
+                syntax: "mustache",
+                format: "markdown",
+                output: "str",
+                x: 100,
+                y: -50,
+                wires: [[fourthId]]
+            })
+
+            nodeDefinitions.push({
+                id: fourthId,
                 type: "PkgFile",
                 name: "package.json",
                 filename: "package.json",
