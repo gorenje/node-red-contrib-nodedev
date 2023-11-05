@@ -29,8 +29,8 @@
   },
 
   "repository": {
-    "type": "github",
-    "url": "git+https://github.com/{{__.ocb2}} githubowner {{__.ccb2}}/{{__.ocb2}} githubrepo {{__.ccb2}}.git"
+    "type": "git",
+    "url": "https://github.com/{{__.ocb2}} githubowner {{__.ccb2}}/{{__.ocb2}} githubrepo {{__.ccb2}}.git"
   },
   "bugs": {
     "url": "https://github.com/{{__.ocb2}} githubowner {{__.ccb2}}/{{__.ocb2}} githubrepo {{__.ccb2}}"

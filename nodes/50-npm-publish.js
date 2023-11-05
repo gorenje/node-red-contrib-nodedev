@@ -33,7 +33,7 @@ module.exports = function (RED) {
                 })[0].contents);
 
                 var opts = {
-                    userAgent: "node-red-contrib-nodedev@1.1.1",
+                    npmVersion: "node-red-contrib-nodedev@0.1.5",
                     access: "public",
                     otp: msg.npmotp || cfg.otp,
                     authToken: auth_token,
@@ -44,6 +44,17 @@ module.exports = function (RED) {
                 opts[userscope + ":registry"] = "https://registry.npmjs.org"
 
                 if (msg.npmpublish || cfg.action == "publish") {
+
+                    // generate readme content - it seems that npm publish does this.
+                    let rdme = msg.contents.filter((d) => {
+                        return d.name == "README.md"
+                    })[0];
+
+                    if ( rdme ) {
+                        manifest["readmeFilename"] = "README.md";
+                        manifest["readme"] = rdme.contents;
+                    }
+
                     libpub.publish(
                         manifest, tarball, opts
                     ).then((data) => {
