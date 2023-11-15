@@ -1,5 +1,8 @@
 ## Node-RED nodes for the development of Node-RED nodes in Node-RED using Node-RED nodes.
 
+
+*** Work In Progress, not stable. ***
+
 *What?*
 
 The idea behind this collection of nodes to democratise the development of Node-RED nodes. Normally the development of your [own nodes](https://nodered.org/docs/creating-nodes/) will require the use of a third-party editor. Something like VSCode or Vim or Atom or god forbid, [Emacs](https://discourse.nodered.org/t/node-red-node-development-in-node-red/81525/2). This requirement makes creating nodes that much harder. So why not create nodes for Node-RED in Node-RED? After all, if you are using Node-RED, you probably understand how to use Node-RED.

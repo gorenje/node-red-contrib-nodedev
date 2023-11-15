@@ -1,0 +1,188 @@
+<script type="text/javascript">
+(function() {
+   var globalYourConfigNode = null;
+
+   function doSubmission(pkgname,pkgversion) {
+      ensureYourConfigNodeExists();
+
+      $.ajax({
+         url:         "NodeFactorySidebarCfg",
+         type:        "POST",
+         contentType: "application/json; charset=utf-8",
+
+         data: JSON.stringify({
+            pkgname: $("#node-input-nodefactorysidebar-package-name").val(),
+            pkgversion: $("#node-input-nodefactorysidebar-package-version").val()
+         }),
+
+         success: function (resp) {
+            RED.notify("Submission triggered", {
+               type: "warning",
+               id: "NodeFactorySidebar",
+               timeout: 2000
+            });
+         },
+
+         error: function (jqXHR, textStatus, errorThrown) {
+            RED.notify("Submission failed: " + textStatus, {
+               type: "error",
+               id: "NodeFactorySidebar",
+               timeout: 2000
+            });
+            console.log(textStatus,errorThrown )
+         }
+      });      
+   }
+
+   function ensureYourConfigNodeExists() {
+      // This function makes sure there is 1 instance of your config node is available, and that the globalYourConfigNode variable refers to it.
+      // Explained in the next step of this tutorial... --> https://discourse.nodered.org/t/tutorial-create-a-sidebar-plugin-and-persist-the-data-in-a-config-node/82020
+
+      // If we had found it previously, check if it has been deleted by the user behind our back
+      if (globalYourConfigNode !== null) {
+         var configNode = RED.nodes.node(globalYourConfigNode.id);
+         if (configNode === null) { globalYourConfigNode = null; }
+      }
+
+      // If not found previously, let's go find it
+      if (globalYourConfigNode === null) {
+         var configNodes = [];
+         RED.nodes.eachConfig(function(configNode) {
+             if (configNode.type === 'NodeFactorySidebarCfg') { 
+                 configNodes.push(configNode); 
+             }
+         });
+
+         // Make sure we only have 1 config node
+         while (configNodes.length > 1) {
+             var configNode = configNodes.pop();
+             RED.nodes.remove(configNode.id);
+             RED.nodes.dirty(true);
+         }
+
+         // When we found a config node, let's use that one
+         if (configNodes.length === 1) { globalYourConfigNode = configNodes[0]; }
+      }
+
+      // When it doesn't exist yet, create it if required
+      if (globalYourConfigNode === null) {
+         // Remark: since this config node is dynamically created (and only used in this sidebar which isn't another node), the config
+         // node is in fact "unused".  But since we don't want it to appear "unused" in the "config nodes" panel, we need to set hasUsers
+         // to false (see https://github.com/node-red/node-red/blob/master/CHANGELOG.md#0161-maintenance-release).
+         // The hasUsers needs also to be specified in the RED.nodes.registerType statement!
+         let typ = RED.nodes.getType("NodeFactorySidebarCfg");
+
+         globalYourConfigNode = {
+             id: RED.nodes.id(), // on the server side, this is called RED.util.generateId()
+             _def: typ,
+             type: "NodeFactorySidebarCfg",
+             hasUsers: false, 
+             users: [],
+             name: "NodeFactorySidebar",
+             label: function() { return this.name || "NodeFactorySidebar"},
+             /* values and data defined by this config node */
+             pkgname: typ.defaults.pkgname.value, 
+             pkgversion: typ.defaults.pkgversion.value
+         }
+
+         // Add the new config node to the collection of Node-RED nodes
+         RED.nodes.add(globalYourConfigNode);
+
+         // Make sure the "Deploy" button becomes active
+         RED.nodes.dirty(true);
+      }      
+   }
+
+   // Add your plugin as a new tabsheet in the right sidebar AFTER the flow editor is completely started
+   var initialiseConfigNodeOnce = () => {
+      RED.events.off('runtime-state', initialiseConfigNodeOnce);
+
+      // The html content of the sidebar has been specified below as a data-template, from where it can be loaded:
+      var content = $($('script[type="text/x-red"][data-template-name="NodeFactorySidebar"]').i18n().html());
+    
+      // Add a "Your sidebar" tabsheet to the right sidebar panel, in which this sidebar panel can be displayed
+      // --> more details: https://nodered.org/docs/api/ui/sidebar/
+      RED.sidebar.addTab({
+         id: "NodeFactorySidebar",
+         label: "Node Factory", // short name for the tab
+         name: "Node Factory", // long name for the menu
+         content: content,
+         closeable: true,
+         // disableOnEdit: true,
+         enableOnEdit: true,
+         iconClass: "fa fa-industry" // your fontawesome icon
+      });
+
+      ensureYourConfigNodeExists();
+
+      var doSomething = (e) => {
+         if (e) { e.preventDefault(); }
+         doSubmission()
+      }
+
+      $('#node-input-nodefactorysidebar-generate-btn').on('click', doSomething );
+
+      $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
+
+      $("#node-input-nodefactorysidebar-package-version").on("change", function() {
+         ensureYourConfigNodeExists();
+
+         let data = $(this).val();
+
+         if (globalYourConfigNode.pkgversion != data) {
+           globalYourConfigNode.pkgversion = data;
+           RED.nodes.dirty(true);
+         }
+      })
+      $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
+
+      $("#node-input-nodefactorysidebar-package-name").on("change", function() {
+        ensureYourConfigNodeExists();
+
+        let data = $(this).val();
+
+        if (globalYourConfigNode.pkgname != data) {
+           globalYourConfigNode.pkgname = data;
+           RED.nodes.dirty(true);
+        }
+      })
+
+   };
+
+   RED.events.on('runtime-state', initialiseConfigNodeOnce);
+})();
+</script>
+
+<!-- The html for the right sidebar plugin screen -->
+<script type="text/x-red" data-template-name="NodeFactorySidebar">
+   <div class="form-row" style="margin-left: 10px; margin-top: 30px;">
+      Enter package details here:
+   </div>
+
+  <div class="form-row" style="margin-left: 10px;">
+   <label for="node-input-nodefactorysidebar-package-name">
+      <i class="fa fa-tag"></i>
+      Name
+    </label>
+      <input type="text" id="node-input-nodefactorysidebar-package-name"
+              placeholder="node-red-dashboard">
+   </div>
+
+   <div class="form-row" style="margin-left: 10px;">
+      <label for="node-input-nodefactorysidebar-package-version">
+         <i class="fa fa-tag"></i>
+         Version
+      </label>
+      <input type="text" id="node-input-nodefactorysidebar-package-version"
+           placeholder="3.5.0">
+   </div>
+
+   <div class="form-row">
+      <div style="position: relative; height: 100%; margin: 15px;">
+         <button id="node-input-nodefactorysidebar-generate-btn" 
+                 class="red-ui-button"
+                 style="width: 100%; margin-top: 30px">Generate Nodes</button>
+      </div>
+   </div>
+
+</script>

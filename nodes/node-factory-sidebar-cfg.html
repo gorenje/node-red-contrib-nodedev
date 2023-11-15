@@ -1,0 +1,22 @@
+<script type="text/javascript">
+(function ($) {
+   RED.nodes.registerType('NodeFactorySidebarCfg', {
+      category: 'config',
+      hasUsers: false,
+      defaults: {
+         pkgname: { value: "node-red-dashboard" },
+         pkgversion: { value: "latest" }
+      },
+      paletteLabel: 'NodeFactorySidebarCfg',
+      label: function () {
+         return "NodeFactorySidebarCfg"
+      }
+  });
+})(jQuery);
+</script>
+
+<!-- The html for the config node info panel (in right sidebar) -->
+<script type="text/x-red" data-template-name="NodeFactorySidebarCfg">
+    <p>Generate nodes for an existing node package.</p>
+   Generate nodes for an existing node package.
+</script>

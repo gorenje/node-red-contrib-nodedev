@@ -6,29 +6,39 @@
     "tar-stream":    "latest",
     "mustache":      "latest",
     "libnpmpublish": "latest",
-    "streamx":       "latest"
+    "streamx":       "latest",
+    "got":           "latest",
+    "pacote":        "latest"
   },
 
   "keywords": [
-    "node-red", "node development", "introspection", "bootstrapping", "recursion"
+    "node-red", 
+    "node development", 
+    "introspection", 
+    "bootstrapping", 
+    "recursion"
   ],
 
   "homepage": "https://github.com/gorenje/node-red-contrib-nodedev#readme",
   "license": "Don't do evil.",
-  "author": "Gerrit Riessen <does.anyone@spread-the.love> (https://spread-the.love)",
+  "author": "Gerrit Riessen <gerrit@openmindmap.org> (https://spread-the.love)",
   "engines": {
     "node": ">=8"
   },
 
   "node-red" : {
     "version": ">=3.0.0",
+    "plugins": {
+      "nodefactory_sidebar": "plugins/node-factory-sidebar.html"
+    },
     "nodes": {
       "nodedevops":     "nodes/05-node-dev-ops.js",
       "nodefactory":    "nodes/10-node-factory.js",
       "pkgfile":        "nodes/20-pkg-file.js",
       "npmtarball":     "nodes/30-npm-tarball.js",
       "noderedinstall": "nodes/40-node-red-install.js",
-      "npmpublish":     "nodes/50-npm-publish.js"
+      "npmpublish":     "nodes/50-npm-publish.js",
+      "nodefactorycfg": "nodes/node-factory-sidebar-cfg.js"
     }
   },
 

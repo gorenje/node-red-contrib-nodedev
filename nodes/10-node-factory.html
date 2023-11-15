@@ -97,21 +97,34 @@
 
 </script>
 
+<script type="text/html" data-help-name="NodeFactory">
+    <p>Generate node templates providing starting points for node development</p>
+    The Node-Factory can be used to create example code for various types of Node-RED nodes.
+</script>
+
 <script type="text/javascript">
 (function () {
 
-   RED.comms.subscribe("nodedev:perform-autoimport-nodes", (event,data) => {
-     if ( data.msg == "autoimport" ) {
-        setTimeout(() => {
-            RED.clipboard.import();
-        
+    RED.comms.subscribe("nodedev:perform-autoimport-nodes", (event,data) => {
+        if ( data.msg == "notify") {
+            RED.notify(data.text, {
+                type:    data.type,
+                id:      data.id || "NodeFactory",
+                timeout: data.timeout || 2000
+            });
+        }
+
+        if ( data.msg == "autoimport" ) {
             setTimeout(() => {
-                $('#red-ui-clipboard-dialog-import-text').val(
-                   data.payload
-                ).trigger("paste");
-            }, 300);
-        },400)
-     }
+                RED.clipboard.import();
+            
+                setTimeout(() => {
+                    $('#red-ui-clipboard-dialog-import-text').val(
+                    data.payload
+                    ).trigger("paste");
+                }, 300);
+            },400)
+        }
     });
 
     function doSubmission(node) {

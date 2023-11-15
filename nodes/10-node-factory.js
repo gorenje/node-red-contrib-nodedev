@@ -5,9 +5,6 @@ module.exports = function (RED) {
     var path = require('path');
     
     var mustache = require("mustache");
-    var tarStream = require('tar-stream');
-    var streamx = require('streamx');
-    var pakoGzip = require('pako');
 
     var spcRepDict = {
         "ocb2": "{{",
@@ -430,76 +427,12 @@ module.exports = function (RED) {
             } else {
                 /* assume that payload is a buffer with a .tgz if not, error out */
                 try {
-                    const extract = tarStream.extract()
+                    const onError = (err) => {
+                        msg.error = err;
+                        done("extraction error", msg)
+                    }
 
-                    var allFiles = [];
-
-                    /* 
-                     * there is no indication in a tar file of whether a file is binary or textual.
-                     * we can only make a guess by the extension of the filename.
-                     ***/
-                    var computeFormat = (filename) => {
-                        var ext = filename.split(".").at(-1);
-
-                        return {
-                            "html": "html",
-                            "js": "javascript",
-                            "md": "markdown",
-                            "json": "json",
-                            /* binary formats are encoded in base64 */
-                            "png": "base64",
-                            "tiff": "base64",
-                            "tif": "base64",
-                            "jpg": "base64",
-                            "jpeg": "base64",
-                            "bin": "base64",
-                            "bmp": "base64",
-                            "gif": "base64",
-                        }[ext.toLowerCase()] || "text";
-                    };
-
-                    extract.on('entry', function (header, stream, next) {
-                        // header is the tar header
-                        // stream is the content body (might be an empty stream)
-                        // call next when you are done with this entry
-
-                        var buffer = [];
-
-                        stream.on('data', function (data) {
-                            buffer.push(data)
-                        });
-
-                        stream.on('end', function () {
-                            var frmt = computeFormat(header.name.split("/").at(-1));
-
-                            allFiles.push({
-                                id: RED.util.generateId(),
-                                type: "PkgFile",
-                                name: header.name.split("/").at(-1),
-                                filename: header.name.replace(/^package\//, ''),
-                                template: Buffer.concat(buffer).toString(frmt == "base64" ? 'base64' : 'utf8'),
-                                syntax: "mustache",
-                                format: frmt,
-                                output: "str",
-                                x: 100,
-                                y: 50 * (allFiles.length + 1),
-                                wires: [
-                                    []
-                                ]
-                            })
-
-                            next() // ready for next entry
-                        })
-
-                        stream.resume() // just auto drain the stream
-                    })
-
-                    extract.on('finish', function () {
-                        // all entries read, wire them together
-                        for (var idx = 0; idx < allFiles.length - 1; idx++) {
-                            allFiles[idx].wires = [[allFiles[idx + 1].id]];
-                        }
-
+                    const onFinish = (allFiles) => {
                         msg.payload = JSON.stringify(allFiles);
                         send(msg)
 
@@ -515,15 +448,9 @@ module.exports = function (RED) {
                         );
 
                         done()
-                    })
-
-                    extract.on('error', function (err) {
-                        msg.error = err;
-                        done("extraction error", msg)
-                    });
-
-                    var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(msg.payload))))
-                    stream.pipe(extract);
+                    }
+                    
+                    require('./lib/tarhelpers.js').convertTarFile(RED, msg.payload, onFinish, onError)
                 } catch (err) {
                     msg.error = err
                     done(err.message, msg)
