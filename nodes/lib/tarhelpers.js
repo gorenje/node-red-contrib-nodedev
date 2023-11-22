@@ -16,6 +16,11 @@ module.exports = (function () {
             "js": "javascript",
             "md": "markdown",
             "json": "json",
+            "txt": "text",
+            "css": "css",
+            "yaml": "yaml",
+            "yml": "yaml",
+
             /* binary formats are encoded in base64 */
             "png": "base64",
             "tiff": "base64",
@@ -27,7 +32,10 @@ module.exports = (function () {
             "gif": "base64",
             "woff2": "base64",
             "woff": "base64",
-            "tff": "base64",
+            "ttf": "base64",
+            "mov": "base64",
+            "ico": "base64",
+            "eot": "base64",
         }[ext.toLowerCase()] || "text";
     }
 
