@@ -15,7 +15,7 @@
         }),
 
         success: function (resp) {
-          RED.notify("Successfully sent something to the backend", {
+          RED.notify( RED._("{{ node.name}}.notifyf2b.success"), {
             type: "warning",
             id: "{{node.name}}",
             timeout: 2000
@@ -84,7 +84,7 @@
       this.messageFromBackendHandler = (topic,dataobj) => {
         console.log( "here goes the code for handling a message from the backend", topic, dataobj);
 
-        RED.notify("Backend sent something to the frontend - check browser console.", {
+        RED.notify(RED._("{{ node.name}}.notify.commfrombackend"), {
             type: "success",
             id: "{{node.name}}",
             timeout: 2000
@@ -125,7 +125,7 @@
 
         {{ #node.frt2bakcomm }}
         var that = this;
-        sendToBackend(that, {"payload": "button pressed on frontend"})
+        sendToBackend(that, {"payload": RED._("{{ node.name}}.notifyf2b.buttonpressed")})
         {{ /node.frt2bakcomm }}
 
         /* here goes the button code to be executed on click */
@@ -138,13 +138,8 @@
 </script>
 
 <script type="text/html" data-template-name="{{ node.name }}">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name"/>
-    </div>
-</script>
-
-<script type="text/html" data-help-name="{{ node.name }}">
-  <p>{{{ node.summary }}}</p>
-  {{{ node.description }}}
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
+    <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name">
+  </div>
 </script>

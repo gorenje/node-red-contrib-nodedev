@@ -66,6 +66,10 @@ Since all this happens in the browser, there is no leaving Node-RED, making it m
 - [NPMjs node package](https://www.npmjs.com/package/@gregoriusrippenstein/node-red-contrib-nodedev)
 - [Node-RED node package](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev)
 
+### Similar Projects
+
+- [node-maker](https://github.com/steveorevo/node-maker) which helps to make UI components for nodes in Node-RED.
+
 ### Outlook
 
 Wherever the road shall lead, there it will go.

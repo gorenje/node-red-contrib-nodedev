@@ -14,8 +14,8 @@ module.exports = function(RED) {
       {{#node.bak2frtcomm}}
         RED.comms.publish("{{node.name}}:message-from-backend",
                RED.util.encodeObject({
-                    ...msg,
-                    "data": "message from backend",
+                  ...msg,
+                  "data": RED._("{{ node.name}}.notify.msgfrombackend"),
                 })
         );
       {{/node.bak2frtcomm}}
@@ -49,7 +49,7 @@ module.exports = function(RED) {
         } catch (err) {
           console.error(err);
           res.status(500).send(err.toString());
-          node.error("{{ node.name }}: Submission failed: " + err.toString())
+          node.error("{{ node.name }}: " + RED._("{{ node.name }}.notifyf2b.submissionfailed") + ": " + err.toString())
         }
       } else {
         res.sendStatus(404);

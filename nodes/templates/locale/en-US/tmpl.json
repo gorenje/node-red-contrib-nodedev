@@ -1,0 +1,24 @@
+{
+  "{{ node.name }}": {
+{{#node.bak2frtcomm}}
+      "notify": {
+         "commfrombackend": "Backend sent something to the frontend - check browser console.",
+         "msgfrombackend": "message from backend"
+  {{ #node.frt2bakcomm }}
+      },
+  {{ /node.frt2bakcomm }}
+  {{ ^node.frt2bakcomm }}
+      }
+  {{ /node.frt2bakcomm }}
+{{/node.bak2frtcomm}}
+
+{{ #node.frt2bakcomm }}
+      "notifyf2b": {
+          "submissionfailed": "submission failed",
+          "buttonpressed": "button pressed on frontend",
+          "success": "Successfully sent something to the backend"
+      }
+{{ /node.frt2bakcomm }}
+
+  }
+}
