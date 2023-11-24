@@ -62,7 +62,7 @@ Since all this happens in the browser, there is no leaving Node-RED, making it m
 ### Artifacts
 
 - [Flow that maintains](https://flowhub.org/f/b92be5062203ff69) this codebase
-- [GitHub repo](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev)
+- [GitHub repo](https://github.com/gorenje/node-red-contrib-nodedev)
 - [NPMjs node package](https://www.npmjs.com/package/@gregoriusrippenstein/node-red-contrib-nodedev)
 - [Node-RED node package](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev)
 
