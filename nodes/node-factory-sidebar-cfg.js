@@ -66,6 +66,20 @@ module.exports = function (RED) {
         }
     }
 
+    function createGroup(pkgname, pversion, allFiles) {
+        return {
+            "id": RED.util.generateId(), 
+             "type": "group",
+             "name": "Package: " + pkgname + "@" + pversion,
+             "style": {
+                "label": true,
+                "label-position": "ne",
+                "color": "#001f60"
+            },
+            "nodes": allFiles.map( d => d.id )
+        }
+    }
+
     RED.httpAdmin.post("/NodeFactorySidebarCfg",
         RED.auth.needsPermission("nodedev.write"),
         (req, res) => {
@@ -101,9 +115,13 @@ module.exports = function (RED) {
                             lastNode.wires[0].push(tarballNode.id)
 
                             allFiles.push(nodeDevOp);
-                            allFiles.push(tarballNode)
-                            allFiles.push(nrInstallNode)
-                            
+                            allFiles.push(tarballNode);
+                            allFiles.push(nrInstallNode);
+
+                            allFiles = [
+                                createGroup(msg.pkgname, nodeDevOp.pversion || msg.pkgversion, allFiles)
+                            ].concat(allFiles);
+
                             RED.comms.publish(
                                 "nodedev:perform-autoimport-nodes",
                                 RED.util.encodeObject({

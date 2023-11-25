@@ -47,6 +47,39 @@
 </script>
 
 <script type="text/javascript">
+(function(){
+
+    var returnInfo = (that) => {
+        const escapeHTML = str =>
+            str.replace(
+                /[&<>'"]/g,
+                tag =>
+                ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+
+        switch(that.format) {
+            case 'markdown':
+            case 'text':
+                return that.template
+                
+            case "json":
+            case "yaml":
+            case "javascript":
+            case "css":
+                return ["```" + that.format, that.template, "```"].join("\n")
+
+            case "html":
+                return ["```" + that.format, escapeHTML(that.template), "```"].join("\n")
+        }
+        return ""
+    };
+
     RED.nodes.registerType('PkgFile',{
         color:"#e5e4ef",
         category: 'nodedev',
@@ -58,15 +91,20 @@
             template: {value:""},
             output: {value:"str"},
         },
+
         inputs:1,
         outputs:1,
         icon: "font-awesome/fa-file-o",
+        info: function() { return returnInfo(this) },
+
         label: function() {
             return this.name || this.filename || this._def.paletteLabel;
         },
+
         labelStyle: function() {
             return this.name?"node_label_italic":"";
         },
+
         oneditprepare: function() {
             const that = this;
             const stateId = RED.editor.generateViewStateId("node", this, "");
@@ -132,4 +170,5 @@
             this.editor.resize();
         }
     });
+})();
 </script>

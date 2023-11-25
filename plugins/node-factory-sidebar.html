@@ -11,8 +11,8 @@
          contentType: "application/json; charset=utf-8",
 
          data: JSON.stringify({
-            pkgname: $("#node-input-nodefactorysidebar-package-name").val(),
-            pkgversion: $("#node-input-nodefactorysidebar-package-version").val()
+            pkgname: $("#node-input-nodefactorysidebar-package-name").val().trim(),
+            pkgversion: $("#node-input-nodefactorysidebar-package-version").val().trim()
          }),
 
          success: function (resp) {
@@ -104,8 +104,8 @@
       // --> more details: https://nodered.org/docs/api/ui/sidebar/
       RED.sidebar.addTab({
          id: "NodeFactorySidebar",
-         label: "Node Factory", // short name for the tab
-         name: "Node Factory", // long name for the menu
+         label: "Pkg Import", // short name for the tab
+         name: "Package Import", // long name for the menu
          content: content,
          closeable: true,
          // disableOnEdit: true,
@@ -122,19 +122,17 @@
 
       $('#node-input-nodefactorysidebar-generate-btn').on('click', doSomething );
 
-      $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
-
       $("#node-input-nodefactorysidebar-package-version").on("change", function() {
          ensureYourConfigNodeExists();
 
          let data = $(this).val();
 
          if (globalYourConfigNode.pkgversion != data) {
-           globalYourConfigNode.pkgversion = data;
+           globalYourConfigNode.pkgversion = data.trim();
            RED.nodes.dirty(true);
          }
       })
-      $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
+      $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
 
       $("#node-input-nodefactorysidebar-package-name").on("change", function() {
         ensureYourConfigNodeExists();
@@ -142,11 +140,11 @@
         let data = $(this).val();
 
         if (globalYourConfigNode.pkgname != data) {
-           globalYourConfigNode.pkgname = data;
+           globalYourConfigNode.pkgname = data.trim();
            RED.nodes.dirty(true);
         }
       })
-
+      $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
    };
 
    RED.events.on('runtime-state', initialiseConfigNodeOnce);
@@ -156,6 +154,12 @@
 <!-- The html for the right sidebar plugin screen -->
 <script type="text/x-red" data-template-name="NodeFactorySidebar">
    <div class="form-row" style="margin-left: 10px; margin-top: 30px;">
+      Import <a href="https://npmjs.com" target=_blank>npmJs.com</a> packages as a flow. packages
+      are imported as a collection of PkgFile nodes. This can help to learn from other
+      peoples experiences and code.
+   </div>
+
+   <div class="form-row" style="margin-left: 10px;">
       Enter package details here:
    </div>
 
@@ -181,7 +185,7 @@
       <div style="position: relative; height: 100%; margin: 15px;">
          <button id="node-input-nodefactorysidebar-generate-btn" 
                  class="red-ui-button"
-                 style="width: 100%; margin-top: 30px">Generate Nodes</button>
+                 style="width: 100%; margin-top: 30px">Import Package</button>
       </div>
    </div>
 
