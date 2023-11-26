@@ -72,11 +72,21 @@
             case "yaml":
             case "javascript":
             case "css":
+            case "sql":
                 return ["```" + that.format, that.template, "```"].join("\n")
 
+            case "php":
+            case "python":
             case "html":
                 return ["```" + that.format, escapeHTML(that.template), "```"].join("\n")
+                
+            case "base64":
+                let mth = (that.filename || "").match(/[.](png|jpg|jpeg|tiff|tif|gif|ico)$/i)
+                if ( mth ) {
+                    return "<img src=\"data:image/" + mth[1].toLowerCase() + ";base64," + that.template + "\"/>"
+                }
         }
+        
         return ""
     };
 
