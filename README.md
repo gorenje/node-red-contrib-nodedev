@@ -42,6 +42,21 @@ This [animation](https://cdn.openmindmap.org/content/1697013164685_out-fps15.gif
 ![img](https://cdn.openmindmap.org/content/1697013164685_out-fps15.gif)
 
 
+### Importing existing packages
+
+Using the `Package Import` sidebar, it is also possible to install existing packages to find out how others have built their nodes. 
+
+The gif shows some of the features:
+
+- import existing package,
+- view the source files in Node-RED,
+- preview of file content is shown in the info box,
+- installing package locally is possible using the NodeDevOps node.
+
+![img](https://cdn.openmindmap.org/content/1701013172299_nodedevinstall.gif)
+
+Of course making changes to the PkgFile nodes and then reinstalling the package will reflect those changes. This makes it simple to take an existing package, make modifications to suit oneself and then push those changes upstream to the original developer(s).
+
 ### Tips
 
 *How to avoid restarting Node-RED?*
