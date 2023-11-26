@@ -3,6 +3,7 @@ module.exports = (function () {
     var tarStream = require('tar-stream');
     var streamx = require('streamx');
     var pakoGzip = require('pako');
+    var buffer = require('buffer');
 
     /*
      * there is no indication in a tar file of whether a file is binary or textual.
@@ -20,6 +21,8 @@ module.exports = (function () {
             "css": "css",
             "yaml": "yaml",
             "yml": "yaml",
+            "svg": "xml",
+            "xml": "xml",
 
             /* binary formats are encoded in base64 */
             "png": "base64",
@@ -63,8 +66,7 @@ module.exports = (function () {
                     type: "PkgFile",
                     name: header.name.split("/").at(-1),
                     filename: header.name.replace(/^package\//, ''),
-                    // @ts-ignore
-                    template: Buffer.concat(buffer).toString(frmt == "base64" ? 'base64' : 'utf8'),
+                    template: buffer.Buffer.concat(buffer).toString(frmt == "base64" ? 'base64' : 'utf8'),
                     syntax: "plain", // not mustache templates, these are files.
                     format: frmt,
                     output: "str",
@@ -91,8 +93,7 @@ module.exports = (function () {
         })
 
         extract.on('error', onError );
-
-        var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
+        var stream = streamx.Readable.from(buffer.Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
         stream.pipe(extract);
     }
 

@@ -25,6 +25,7 @@
                 <option value="python">Python</option>
                 <option value="sql">SQL</option>
                 <option value="yaml">YAML</option>
+                <option value="xml">XML</option>
                 <option value="base64">Base64</option>
                 <option value="text">Text</option>
             </select>
@@ -63,6 +64,8 @@
                 }[tag] || tag)
             );
 
+        let mth;
+        
         switch(that.format) {
             case 'markdown':
             case 'text':
@@ -80,11 +83,19 @@
             case "html":
                 return ["```" + that.format, escapeHTML(that.template), "```"].join("\n")
                 
+            case "xml":
+                mth = (that.filename || "").match(/[.](svg)$/i)
+                if ( mth ) {
+                    return "<img src=\"data:image/svg+xml;base64," + btoa(that.template) + "\"/>"
+                }
+                break;
+
             case "base64":
-                let mth = (that.filename || "").match(/[.](png|jpg|jpeg|tiff|tif|gif|ico)$/i)
+                mth = (that.filename || "").match(/[.](png|jpg|jpeg|tiff|tif|gif|ico)$/i)
                 if ( mth ) {
                     return "<img src=\"data:image/" + mth[1].toLowerCase() + ";base64," + that.template + "\"/>"
                 }
+                break;
         }
         
         return ""
