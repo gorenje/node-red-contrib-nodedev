@@ -1,6 +1,6 @@
 {
   "name" : "@gregoriusrippenstein/node-red-contrib-nodedev",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "dependencies": {
     "pako":          "latest",
     "tar-stream":    "latest",
