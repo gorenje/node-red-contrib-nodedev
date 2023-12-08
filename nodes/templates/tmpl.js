@@ -19,8 +19,25 @@ module.exports = function(RED) {
                 })
         );
       {{/node.bak2frtcomm}}
-        send(msg);
-        done();
+        // How to send a status update
+        node.status({ fill: "green", shape: "ring", text: "status set" });
+
+        // Send a message and how to handle errors.
+        try {
+          try {
+            send(msg);
+            done();
+          } catch ( err ) {
+            // use node.error if the node might send subsequent messages
+            node.error("error occurred", { ...msg, error: err })
+            done();
+          }
+        } catch (err) {
+          // use done if the node won't send anymore messages for the
+          // message it received.
+          msg.error = err
+          done(err.message, msg)
+        }
     });
   }
 
@@ -49,7 +66,7 @@ module.exports = function(RED) {
         } catch (err) {
           console.error(err);
           res.status(500).send(err.toString());
-          node.error("{{ node.name }}: " + RED._("{{ node.name }}.label.submissionfailed") + ": " + err.toString())
+          node.error("{{ node.name }}: " + RED._("{{ node.name }}.label.submissionfailed") + ": " + err.toString(), { error: err })
         }
       } else {
         res.sendStatus(404);

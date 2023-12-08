@@ -22,6 +22,7 @@ module.exports = (function () {
             "yml": "yaml",
             "svg": "xml",
             "xml": "xml",
+            "ts": "typescript",
 
             /* binary formats are encoded in base64 */
             "png": "base64",
