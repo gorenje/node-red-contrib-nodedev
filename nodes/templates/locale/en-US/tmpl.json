@@ -31,7 +31,7 @@
   {{/node.frt2bakcomm }}
 {{/node.bak2frtcomm}}
 
-    "errors": {
+    "error": {
 
     },
     "tip": {
