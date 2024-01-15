@@ -60,6 +60,9 @@
       name: {
         value:"",
       },
+    {{#node.minify}}
+      l: { value: false },
+    {{/node.minify}}
     },
 
     {{#node.hasinput}}
@@ -94,6 +97,12 @@
       {{/node.bak2frtcomm}}
     },
 
+    onpaletteremove: function() {
+      {{#node.bak2frtcomm}}
+      RED.comms.unsubscribe('{{node.name}}:message-from-backend',this.messageFromBackendHandler);
+      {{/node.bak2frtcomm}}
+    },
+
     oneditprepare: function() {
     },
 
@@ -103,12 +112,8 @@
     oneditsave: function() {
     },
 
-    onpaletteremove: function() {
-      {{#node.bak2frtcomm}}
-      RED.comms.unsubscribe('{{node.name}}:message-from-backend',this.messageFromBackendHandler);
-      {{/node.bak2frtcomm}}
+    oneditresize: function(size) {
     },
-
 
     {{#node.hasbutton}}
     button: {

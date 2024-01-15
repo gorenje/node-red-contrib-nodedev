@@ -15,7 +15,7 @@ module.exports = function(RED) {
         RED.comms.publish("{{node.name}}:message-from-backend",
                RED.util.encodeObject({
                   ...msg,
-                  "data": RED._("{{ node.name}}.label.msgfrombackend"),
+                 "data": RED._("{{ node.name}}.label.msgfrombackend"),
                 })
         );
       {{/node.bak2frtcomm}}

@@ -13,7 +13,11 @@ module.exports = function (RED) {
             msg.commit_message = msg.githubmessage;
             
             if (msg.randompackagename) {
-                msg.pname += Math.random().toString().substring(2)
+                msg.pversion = ( 
+                    Math.random().toString().substring(2).substring(2, 3) + "." + 
+                    Math.random().toString().substring(2).substring(2, 3) + "." + 
+                    Math.random().toString().substring(2).substring(2, 5).replace(/^0/, '1')
+                )
             }
 
             if (msg.randompackagename && (msg.gitcommit || msg.npmpublish || msg.npmunpublish) ) {

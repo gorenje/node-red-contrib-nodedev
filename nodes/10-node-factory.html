@@ -28,6 +28,11 @@
             <span>Has button?</span>
         </label>
         <input type="checkbox" id="node-input-hasbutton" style="display:inline-block; width:15px; vertical-align:baseline;">
+
+        <label for="node-input-minify">
+            <span>Minify by default?</span>
+        </label>
+        <input type="checkbox" id="node-input-minify" style="margin-left: 10px; display:inline-block; width:15px; vertical-align:baseline;">
     </div>
 
     <div class="form-row">
@@ -146,6 +151,7 @@
         data["category"]    = $('#node-input-category').val();
 
         data["hasbutton"]      = $('#node-input-hasbutton').is(":checked");
+        data["minify"]         = $('#node-input-minify').is(":checked");
         data["hasinput"]       = $('#node-input-hasinput').is(":checked");
         data["bak2frtcomm"]    = $('#node-input-bak2frtcomm').is(":checked");
         data["frt2bakcomm"]    = $('#node-input-frt2bakcomm').is(":checked");
@@ -204,6 +210,7 @@
             nodename:       { value: "", required: true },
             color:          { value: "#e5e4ef" },
             hasbutton:      { value: false },
+            minify:         { value: false },
             hasinput:       { value: true },
             outputcount:    { value: 1 },
             category:       { value: "" },
