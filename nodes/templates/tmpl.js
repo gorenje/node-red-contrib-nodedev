@@ -15,12 +15,12 @@ module.exports = function(RED) {
         RED.comms.publish("{{node.name}}:message-from-backend",
                RED.util.encodeObject({
                   ...msg,
-                 "data": RED._("{{ node.name}}.label.msgfrombackend"),
+                 "data": RED._("{{ node.namelwr}}.label.msgfrombackend"),
                 })
         );
       {{/node.bak2frtcomm}}
         // How to send a status update
-        node.status({ fill: "green", shape: "ring", text: "status set" });
+        node.status({ fill: "green", shape: "ring", text: RED._("{{ node.namelwr}}.label.statusset") });
 
         // Send a message and how to handle errors.
         try {
@@ -66,7 +66,7 @@ module.exports = function(RED) {
         } catch (err) {
           console.error(err);
           res.status(500).send(err.toString());
-          node.error("{{ node.name }}: " + RED._("{{ node.name }}.label.submissionfailed") + ": " + err.toString(), { error: err })
+          node.error("{{ node.name }}: " + RED._("{{ node.namelwr }}.label.submissionfailed") + ": " + err.toString(), { error: err })
         }
       } else {
         res.sendStatus(404);

@@ -225,6 +225,7 @@ module.exports = function (RED) {
 
     function createSimpleNodeDefintions(msg,node) {
         var htmlPath = path.join(__dirname, 'templates', 'tmpl.html');
+        var htmlJsPath = path.join(__dirname, 'templates', 'tmpl.html.js');
         var jsPath = path.join(__dirname, 'templates', 'tmpl.js');
         var localeJsonPath = path.join(__dirname, 'templates', 'locale', 'en-US', 'tmpl.json')
         var localeHtmlPath = path.join(__dirname, 'templates', 'locale', 'en-US', 'tmpl.html')
@@ -233,6 +234,7 @@ module.exports = function (RED) {
 
         var promises = [
             handleTemplate(msg, node, fs.readFileSync(htmlPath, 'utf8')).then((c) => { content["html"] = c }),
+            handleTemplate(msg, node, fs.readFileSync(htmlJsPath, 'utf8')).then((c) => { content["htjs"] = c }),
             handleTemplate(msg, node, fs.readFileSync(jsPath, 'utf8')).then((c) => { content["jasc"] = c }),
             handleTemplate(msg, node, fs.readFileSync(localeJsonPath, 'utf8')).then((c) => { content["ljsn"] = c }),
             handleTemplate(msg, node, fs.readFileSync(localeHtmlPath, 'utf8')).then((c) => { content["lhtm"] = c }),
@@ -240,6 +242,7 @@ module.exports = function (RED) {
 
         return Promise.all(promises).then(() => {
             var secondId = RED.util.generateId();
+            var secondIdTempJs = RED.util.generateId();
             var thirdId = RED.util.generateId();
             var fourthId = RED.util.generateId();
 
@@ -254,7 +257,24 @@ module.exports = function (RED) {
                 output: "str",
                 x: 100,
                 y: 50,
-                wires: [[secondId]]
+                wires: [[secondIdTempJs]]
+            },
+            {
+                "id": secondIdTempJs,
+                "type": "template",
+                "name": msg.node.name + ".html.js",
+                "field": msg.node.name+ "TmplJs",
+                "fieldType": "msg",
+                "format": "javascript",
+                "syntax": "mustache",
+                "template": content["htjs"],
+                "x": 100,
+                "y": 100,
+                "wires": [
+                    [
+                        secondId
+                    ]
+                ]
             },
             {
                 id: secondId,
@@ -266,7 +286,7 @@ module.exports = function (RED) {
                 format: "html",
                 output: "str",
                 x: 100,
-                y: 100,
+                y: 150,
                 wires: [[thirdId]]
             },
             {
@@ -279,7 +299,7 @@ module.exports = function (RED) {
                 format: "json",
                 output: "str",
                 x: 120,
-                y: 150,
+                y: 200,
                 wires: [[fourthId]]
             },
             {
@@ -292,7 +312,7 @@ module.exports = function (RED) {
                 format: "html",
                 output: "str",
                 x: 120,
-                y: 200,
+                y: 250,
                 wires: [[]]
             }
             ]

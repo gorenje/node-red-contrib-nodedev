@@ -1,5 +1,5 @@
 {
-  "{{ node.name }}": {
+  "{{ node.namelwr }}": {
 {{#node.bak2frtcomm}}
       "label": {
          "commfrombackend": "Backend sent something to the frontend - check browser console.",
@@ -10,6 +10,8 @@
           "buttonpressed": "button pressed on frontend",
           "success": "Successfully sent something to the backend"
   {{ /node.frt2bakcomm }}
+         ,
+          "statusset": "Status Set"
       },
 {{/node.bak2frtcomm}}
 
@@ -18,7 +20,8 @@
       "label": {
           "submissionfailed": "submission failed",
           "buttonpressed": "button pressed on frontend",
-          "success": "Successfully sent something to the backend"
+          "success": "Successfully sent something to the backend",
+          "statusset": "Status Set"
       },
   {{/node.frt2bakcomm }}
 {{/node.bak2frtcomm}}
@@ -26,17 +29,11 @@
 {{^node.bak2frtcomm}}
   {{^node.frt2bakcomm }}
     "label": {
-      "hello": "world"
+      "statusset": "Status Set"
     },
   {{/node.frt2bakcomm }}
 {{/node.bak2frtcomm}}
 
-    "error": {
-
-    },
-    "tip": {
-
-    },
     "status": {
       "waiting": "Waiting for Godot",
       "timeout": "No more time to waiting"
