@@ -132,34 +132,7 @@
         }
     });
 
-    function doSubmission(node) {
-
-        var data = {};
-
-        /* the data has not been stored on the node when this is called, 
-            need to retrieve everything from the various fields...
-        */
-        data["summary"]     = node.editorSummary.getValue();
-        data["description"] = node.editorDesc.getValue();
-        
-        data["color"]       = $('#node-input-colour').val();
-        data["icon"]        = $('#red-ui-editor-node-icon').val();
-        data["iconclass"]   = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
-        data["name"]        = $('#node-input-nodename').val();
-        data["namelwr"]     = data["name"].toLowerCase();
-        data["outputcount"] = $('#node-input-outputcount').val();
-        data["category"]    = $('#node-input-category').val();
-
-        data["hasbutton"]      = $('#node-input-hasbutton').is(":checked");
-        data["minify"]         = $('#node-input-minify').is(":checked");
-        data["hasinput"]       = $('#node-input-hasinput').is(":checked");
-        data["bak2frtcomm"]    = $('#node-input-bak2frtcomm').is(":checked");
-        data["frt2bakcomm"]    = $('#node-input-frt2bakcomm').is(":checked");
-        data["createmanifest"] = $('#node-input-createmanifest').is(":checked");
-        data["isplugin"]       = $('#node-input-isplugin').is(":checked");
-
-        data["__task"]      = "generate_from_templates";
-                
+    function postDataOff(node,data) {
         $.ajax({
             url: "NodeFactory/" + node.id,
             type: "POST",
@@ -201,7 +174,52 @@
             }
         });
     }
-    
+
+    function doSubmission(node) {
+        let data = {};
+
+        /* the data has not been stored on the node when this is called, 
+            need to retrieve everything from the various fields...
+        */
+        data["summary"]     = node.editorSummary.getValue();
+        data["description"] = node.editorDesc.getValue();
+        
+        data["color"]       = $('#node-input-colour').val();
+        data["icon"]        = $('#red-ui-editor-node-icon').val();
+        data["iconclass"]   = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
+        data["name"]        = $('#node-input-nodename').val();
+        data["namelwr"]     = data["name"].toLowerCase();
+        data["outputcount"] = $('#node-input-outputcount').val();
+        data["category"]    = $('#node-input-category').val();
+
+        data["hasbutton"]      = $('#node-input-hasbutton').is(":checked");
+        data["minify"]         = $('#node-input-minify').is(":checked");
+        data["hasinput"]       = $('#node-input-hasinput').is(":checked");
+        data["bak2frtcomm"]    = $('#node-input-bak2frtcomm').is(":checked");
+        data["frt2bakcomm"]    = $('#node-input-frt2bakcomm').is(":checked");
+        data["createmanifest"] = $('#node-input-createmanifest').is(":checked");
+        data["isplugin"]       = $('#node-input-isplugin').is(":checked");
+
+        data["__task"]      = "generate_from_templates";
+
+        postDataOff(node,data)        
+    }
+
+    function doButtonSubmission(node) {
+        let data = {}
+
+        Object.keys(node._def.defaults).forEach( attrname => {
+            data[attrname] = node[attrname]
+        })
+
+        data["name"]      = node.nodename; // name clashes with the default 'name' attribute
+        data["namelwr"]   = data["name"].toLowerCase();
+        data["iconclass"] = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
+        data["__task"]    = "generate_from_templates";
+        
+        postDataOff(node,data)
+    }
+
     RED.nodes.registerType('NodeFactory', {
         color: "#e5e4ef",
         category: 'nodedev',
@@ -363,6 +381,22 @@
         },
 
         oneditresize: function (size) {
+        },
+
+        button: {
+            enabled: function() {
+                return !this.changed
+            },
+
+            onclick: function () {
+                if (this.changed) {
+                    return RED.notify(RED._("notification.warning", {
+                        message: RED._("notification.warnings.undeployedChanges")
+                    }), "warning");
+                }
+
+                doButtonSubmission(this)
+            }
         },
     });
 })();
