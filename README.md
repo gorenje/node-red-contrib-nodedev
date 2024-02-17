@@ -1,8 +1,5 @@
 ## Node-RED nodes for the development of Node-RED nodes in Node-RED using Node-RED nodes.
 
-
-*** Work In Progress, not stable. ***
-
 *What?*
 
 The idea behind this collection of nodes to democratise the development of Node-RED nodes. Normally the development of your [own nodes](https://nodered.org/docs/creating-nodes/) will require the use of a third-party editor. Something like VSCode or Vim or Atom or god forbid, [Emacs](https://discourse.nodered.org/t/node-red-node-development-in-node-red/81525/2). This requirement makes creating nodes that much harder. So why not create nodes for Node-RED in Node-RED? After all, if you are using Node-RED, you probably understand how to use Node-RED.
@@ -23,6 +20,31 @@ Of course, all this is very meta and it gets worse since these nodes are maintai
 This is not an inbuilt extension of Node-RED and obviously a more integrated workflow would be simpler. This is a attempt to find a better solution to node development, one by which testing and fixing nodes becomes faster.
 
 It also gets more confusing since these nodes will open the Node-RED import dialog with pre-defined nodes. These are generally safe to import since that's how this package creates an initial set of nodes for representing a node package. Also importing nodes for an unknown node package is not recommended unless it happens to be your own package!
+
+### Motivation
+
+A comparison of Node-RED extensions and indirections
+
+| | Link Call |  Subflow | Link Nodes[^4] | Custom Node | Function node | Flow Tab |
+|:--|:--|:--|:--|:--|:--|:--|
+| Outputs [^1]  | =1 | >=1 | =1 | >=1 | >=1 | - |
+| Embeddable[^2] | Yes | Yes | - | Yes | Yes | Yes |
+| Modifiable[^3] | Yes | Yes | Yes | - | Yes | Yes |
+| Packages[^5] | - | -  | - | Yes | Yes | - |
+| Reusable[^6] | - | Yes | - | Yes | - | Yes |
+| Button[^7] | - | - | - | Yes | - | - |
+| Iconification[^8] | Yes | Yes | Yes | Yes | Yes | - |
+
+What this package does is make custom nodes modifiable within Node-RED.
+
+[^1]: Number of outputs definable. Subflows can have many outputs, link-call nodes only ever have one output. Zero outputs is possible for all extensions, one is standard and more than one is difficult.
+[^2]: Embeddable means with the functionality can be included in a flow.  Link-in/-out nodes redirect the flow of messages without those messages returning to the point where they left the original flow.
+[^3]: Does Node-RED provide support of modifying the extension? Node-RED does not provide any support for modifying custom nodes *within* Node-RED.
+[^4]: A combination of Link-in and Link-out nodes.
+[^5]: Can external NPMjs packages be included in the extension?
+[^6]: Is there a structured form of reusability for other flows? Subflows are structured to be reused, function nodes are not.
+[^7]: Can the extension be triggered with a button, i.e., as an inject node?
+[^8]: Can the icon be customised to make for simpler identification?
 
 ### Examples 
 
