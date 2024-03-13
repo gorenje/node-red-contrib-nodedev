@@ -28,20 +28,22 @@ module.exports = function (RED) {
                 var auth_token = result;
                 var tarball = Buffer.from(msg.payload)
 
-                var manifest = JSON.parse(msg.contents.filter((d) => {
+                let registry = msg.npmregistry || cfg.registry || 'registry.npmjs.org'
+
+                let manifest = JSON.parse(msg.contents.filter((d) => {
                     return d.name == "package.json"
                 })[0].contents);
 
                 var opts = {
-                    npmVersion: "node-red-contrib-nodedev@0.1.5",
-                    access: "public",
+                    npmVersion: "node-red-contrib-nodedev@0.3.2",
+                    access: msg.npmaccess || cfg.access || "public",
                     otp: msg.npmotp || cfg.otp,
                     authToken: auth_token,
-                    '//registry.npmjs.org/:_authToken': auth_token,
                 };
+                opts[`//${registry}/:_authToken`] = auth_token
 
                 var userscope = manifest.name.split("/")[0];
-                opts[userscope + ":registry"] = "https://registry.npmjs.org"
+                opts[userscope + ":registry"] = `https://${registry}`
 
                 if (msg.npmpublish || cfg.action == "publish") {
 
@@ -65,20 +67,18 @@ module.exports = function (RED) {
                         msg.error = exp;
                         done("publish failed", msg)
                     })
-                } else {
-                    if (msg.npmunpublish || cfg.action == "unpublish") {
-                        libpub.unpublish(
-                            manifest.name, opts
-                        ).then((data) => {
-                            msg.payload = JSON.stringify(data);
-                            send(msg)
-                            done()
-                        }).catch((exp) => {
-                            msg.error = exp;
-                            done("unpublish failed", msg)
-                        })
-                    }
-                }
+                } else if (msg.npmunpublish || cfg.action == "unpublish") {
+                    libpub.unpublish(
+                        manifest.name, opts
+                    ).then((data) => {
+                        msg.payload = JSON.stringify(data);
+                        send(msg)
+                        done()
+                    }).catch((exp) => {
+                        msg.error = exp;
+                        done("unpublish failed", msg)
+                    })
+                }                
             })
         });
     }

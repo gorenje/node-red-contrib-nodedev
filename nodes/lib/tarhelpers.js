@@ -67,7 +67,7 @@ module.exports = (function () {
                     name: header.name.split("/").at(-1),
                     filename: header.name.replace(/^package\//, ''),
                     template: Buffer.concat(buffer).toString(frmt == "base64" ? 'base64' : 'utf8'),
-                    syntax: "plain", // not mustache templates, these are files.
+                    syntax: header.name.replace(/^package\//, '') == "package.json" ? "mustache" : "plain",
                     format: frmt,
                     output: "str",
                     x: 250 * Math.floor(allFiles.length / 40),

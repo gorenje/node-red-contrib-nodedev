@@ -13,6 +13,12 @@
       action: {
         value: "publish"
       },
+      access: {
+        value: "public"
+      },
+      registry: { 
+        value: "registry.npmjs.org"
+      },
       authToken: {
         value: "NPM_AUTH_TOKEN",
       },
@@ -25,7 +31,7 @@
     outputs: 1,
 
     label: function() {
-      return (this.name || this._def.paletteLabel);
+      return (this.name || (this.action == "publish" ? "NpmPublish" : "NpmUnpublish" )|| this._def.paletteLabel);
     },
 
     labelStyle: function() {
@@ -68,9 +74,19 @@
     </div>
 
     <div class="form-row">
+        <label for="node-input-registry"><i class="fa fa-database"></i> Registry</label>
+        <input type="text" id="node-input-registry" placeholder="Registry">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-access"><i class="fa fa-user-secret"></i> Access</label>
+        <input type="text" id="node-input-access" placeholder="Access">
+    </div>
+
+    <div class="form-row">
       <label for="node-input-authToken">
             <i class="fa fa-tag"></i>
-            NPM Auth Token
+            Auth Token
        </label>
       <input type="text" id="node-input-authToken">
       <input type="hidden" id="node-input-authTokenType">
