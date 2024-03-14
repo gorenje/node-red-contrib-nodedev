@@ -80,6 +80,53 @@ module.exports = function (RED) {
         }
     }
 
+    RED.httpAdmin.post("/NodeDevOtpGenerator",
+        RED.auth.needsPermission("nodedev.write"),
+        (req, res) => {
+            try {
+                if ( req.body ) {
+                    var msg = req.body;
+                    var cfgnode = req.body.cfgnode;
+                    var node = RED.nodes.getNode(cfgnode.id)
+
+                    RED.util.evaluateNodeProperty(cfgnode.secret, cfgnode.secretType, node, msg, (err, result) => {
+                        if (err || (result || "").trim() == "") {
+                            res.sendStatus(404);
+                        } else {
+                            const OTPAuth = require('otpauth');
+                            let otp = undefined
+
+                            let opts = {
+                                issuer: cfgnode.issuer,
+                                label: cfgnode.otplabel,
+                                digits: parseInt(cfgnode.digits),
+                                secret: result,
+                                algorithm: cfgnode.algorithm,
+                            };
+
+                            if (cfgnode.otptype == 'totp') {
+                                opts.period = parseInt(cfgnode.period)
+                                otp = new OTPAuth.TOTP(opts)
+                            } else if (cfg.otptype == 'hotp') {
+                                opts.counter = parseInt(cfgnode.counter)
+                                otp = new OTPAuth.HOTP(opts)
+                            } else {
+                                return res.send("unknown otp type").status(404)
+                            }
+                            
+                            res.send({data:{otp:otp.generate()}}).status(200)
+                        }
+                    })
+                } else {
+                    res.sendStatus(406);
+                }
+            } catch (ex) {
+                console.error("ERROR", ex)
+                res.sendStatus(500);
+            }
+        }
+    )
+
     RED.httpAdmin.post("/NodeFactorySidebarCfg",
         RED.auth.needsPermission("nodedev.write"),
         (req, res) => {

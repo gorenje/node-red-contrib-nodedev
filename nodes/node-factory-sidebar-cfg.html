@@ -5,7 +5,17 @@
       hasUsers: false,
       defaults: {
          pkgname: { value: "node-red-dashboard" },
-         pkgversion: { value: "latest" }
+         pkgversion: { value: "latest" },
+         /* otp stuff */
+         otptype: { value: "totp" },
+         algorithm: { value: "SHA1"},
+         secret: { value: "OTP_SECRET"},
+         secretType: { value: "env"},
+         issuer: { value: ""},
+         otplabel: { value: ""},
+         digits: { value: 6 },
+         counter: { value: 0 },
+         period: { value: 30 }
       },
       paletteLabel: 'PackageImporter',
       label: function () {

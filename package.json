@@ -8,7 +8,8 @@
     "libnpmpublish": "^9.0.0",
     "streamx":       "^2.15.5",
     "got":           "^13",
-    "pacote":        "^17.0.4"
+    "pacote":        "^17.0.4",
+    "otpauth":       "^5.0.8"
   },
 
   "keywords": [
@@ -38,6 +39,7 @@
       "npmtarball":     "nodes/30-npm-tarball.js",
       "noderedinstall": "nodes/40-node-red-install.js",
       "npmpublish":     "nodes/50-npm-publish.js",
+      "otpgenerator":   "nodes/60-otp-generator.js",
       "nodefactorycfg": "nodes/node-factory-sidebar-cfg.js"
     }
   },

@@ -1,0 +1,124 @@
+<script type="text/javascript">
+    RED.nodes.registerType('OTPGenerate',{
+        category: 'nodedev',
+        color: '#e5e4ef',
+        defaults: {
+            name: {value:""},
+
+            otptype: {value:"totp"},
+            secret: { value: "OTP_SECRET"},
+            secretType: { value: "env"},
+            issuer: { value: "" },
+            label: { value: "" },
+            digits: { value: 6 },
+            period: { value: 30 },
+            algorithm: { value: "SHA1" },
+            counter: { value: 0 },
+
+            property: { value:"payload" },
+            propertyType: { value:"msg" }
+        },
+        inputs:1,
+        outputs:1,
+        icon: "font-awesome/fa-user-secret",
+        
+        label: function() {
+            return (this.name || this._def.paletteLabel);
+        },
+        
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        },
+        
+        oneditprepare: function() {
+            let that = this;
+
+            $("#node-input-secret").typedInput({
+                types:["env", "msg", "global", "cred"],
+                typeField: "#node-input-secretType"
+            });
+
+            $("#node-input-property").typedInput({
+                default:'msg',
+                types:['msg', 'flow', 'global'],
+                typeField: "#node-input-propertyType"
+            });
+
+            $("#node-input-property").typedInput('value', that.property || that._def.defaults.property.value || 'payload');
+            $("#node-input-property").typedInput('type', that.propertyType || that._def.defaults.propertyType.value || 'msg');
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="OTPGenerate">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+
+    <div class="form-row">
+        <label for="node-input-otptype"><i class="fa fa-tag"></i> Type</label>
+        <select id="node-input-otptype">
+            <option value="totp">Time-Based (TOTP)</option>
+            <option value="hotp">HMAC-based (HOTP)</option>
+        </select>
+    </div>
+
+    <div class="form-row" style="margin-left: 10px; margin-top: 20px;">
+        <label for="node-input-secret">
+                <i class="fa fa-key"></i>
+                Secret
+            </label>
+        <input type="text" id="node-input-secret">
+        <input type="hidden" id="node-input-secretType">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-algorithm"><i class="fa fa-tag"></i> Algorithm</label>
+        <select id="node-input-algorithm">
+                <option value="SHA1">SHA1</option>
+                <option value="SHA256">SHA256</option>
+                <option value="SHA512">SHA512</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-issuer"><i class="fa fa-tag"></i> Issuer</label>
+        <input type="text" id="node-input-issuer" placeholder="Issuer">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-label"><i class="fa fa-tag"></i> Label</label>
+        <input type="text" id="node-input-label" placeholder="Label">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-digits"><i class="fa fa-tag"></i> Digits</label>
+        <input type="text" id="node-input-digits" placeholder="Digits">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-period"><i class="fa fa-tag"></i> Period</label>
+        <input type="text" id="node-input-period" placeholder="Period">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-counter"><i class="fa fa-tag"></i> Counter</label>
+        <input type="text" id="node-input-counter" placeholder="Counter">
+    </div>
+
+    <hr/>
+
+    <div class="form-row">
+        <label for="node-input-property">Property to set</label>
+        <input type="text" id="node-input-property"/>
+        <input type="hidden" id="node-input-propertyType"/>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="OTPGenerate">
+    <p>One Time Password (HOTP/TOTP) generator</p>
+
+    Based off the <a href="https://flows.nodered.org/node/node-red-contrib-otpauth">OTPAuth node</a>
+</script>

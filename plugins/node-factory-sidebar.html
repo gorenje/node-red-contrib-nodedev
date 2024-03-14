@@ -2,6 +2,35 @@
 (function() {
    var globalYourConfigNode = null;
 
+   function doGenerateOTP(cfgnode, cb) {
+      ensureYourConfigNodeExists();
+
+      $.ajax({
+         url:         "NodeDevOtpGenerator",
+         type:        "POST",
+         contentType: "application/json; charset=utf-8",
+
+         data: JSON.stringify({
+            cfgnode: cfgnode
+         }),
+
+         success: function (resp) {
+            $('#node-input-nodedev-sidebar-otp').val(resp.data.otp)
+            cb(resp)
+         },
+
+         error: function (jqXHR, textStatus, errorThrown) {
+            RED.notify("Generating failed: " + textStatus, {
+               type: "error",
+               id: "NodeFactorySidebar",
+               timeout: 2000
+            });
+            console.log(textStatus,errorThrown )
+         }
+      });      
+
+   }
+
    function doSubmission(pkgname,pkgversion) {
       ensureYourConfigNodeExists();
 
@@ -73,16 +102,25 @@
          let typ = RED.nodes.getType("NodeFactorySidebarCfg");
 
          globalYourConfigNode = {
-             id: RED.nodes.id(), // on the server side, this is called RED.util.generateId()
-             _def: typ,
-             type: "NodeFactorySidebarCfg",
-             hasUsers: false, 
-             users: [],
-             name: "NodeFactorySidebar",
-             label: function() { return this.name || "NodeFactorySidebar"},
-             /* values and data defined by this config node */
-             pkgname: typ.defaults.pkgname.value, 
-             pkgversion: typ.defaults.pkgversion.value
+            id: RED.nodes.id(), // on the server side, this is called RED.util.generateId()
+            _def: typ,
+            type: "NodeFactorySidebarCfg",
+            hasUsers: false, 
+            users: [],
+            name: "NodeFactorySidebar",
+            label: function() { return this.name || "NodeFactorySidebar"},
+            /* values and data defined by this config node */
+            pkgname: typ.defaults.pkgname.value, 
+            pkgversion: typ.defaults.pkgversion.value,
+            otptype: typ.defaults.otptype.value,
+            algorithm: typ.defaults.algorithm.value,
+            secret: typ.defaults.secret.value,
+            secretType: typ.defaults.secretType.value,
+            issuer: typ.defaults.issuer.value,
+            otplabel: typ.defaults.otplabel.value,
+            digits: typ.defaults.digits.value,
+            counter: typ.defaults.counter.value,
+            period: typ.defaults.period.value
          }
 
          // Add the new config node to the collection of Node-RED nodes
@@ -104,8 +142,8 @@
       // --> more details: https://nodered.org/docs/api/ui/sidebar/
       RED.sidebar.addTab({
          id: "NodeFactorySidebar",
-         label: "Pkg Import", // short name for the tab
-         name: "Package Import", // long name for the menu
+         label: "Node Dev", // short name for the tab
+         name: "Node Dev", // long name for the menu
          content: content,
          closeable: true,
          // disableOnEdit: true,
@@ -113,7 +151,33 @@
          iconClass: "fa fa-industry" // your fontawesome icon
       });
 
+      var tabs = RED.tabs.create({
+            id: 'func-nodedev-pkgimporter-tabs',
+            onchange: function(tab) {
+               $('#func-nodedev-pkgimporter-tabs-content').children().hide();
+               $('#' + tab.id).show();
+            }
+      });
+      
+      // Add first tab, pkg importer
+      tabs.addTab({
+            id: 'func-nodedev-pkgimporter-tab-pkgimport',
+            iconClass: 'fa fa-industry',
+            label: 'PkgImporter'
+      });
+
+      // Add first tab, otp
+      tabs.addTab({
+            id: 'func-nodedev-pkgimporter-tab-otpgenerator',
+            iconClass: 'fa fa-user-secret',
+            label: 'OTP Generator'
+      });
+
       ensureYourConfigNodeExists();
+
+      /*
+         ************ Package importer handlers
+      */
 
       var doSomething = (e) => {
          if (e) { e.preventDefault(); }
@@ -145,6 +209,123 @@
         }
       })
       $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
+
+      /*
+      ************* OTP generator handlers
+      */
+
+      $("#node-input-nodedev-sidebar-otp-secret").typedInput({
+         types:["env", "msg", "global", "cred"],
+         typeField: "#node-input-nodedev-sidebar-otp-secretType"
+      });
+
+      $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'value', globalYourConfigNode.secret || globalYourConfigNode._def.defaults.secret.value );
+      $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'type', globalYourConfigNode.secretType || globalYourConfigNode._def.defaults.secretType.value);
+
+
+      $("#node-input-nodedev-sidebar-otp-secret").on('change', () => {
+         ensureYourConfigNodeExists();
+         
+         let val = $("#node-input-nodedev-sidebar-otp-secret").typedInput('value');
+         let typ = $("#node-input-nodedev-sidebar-otp-secret").typedInput('type');
+
+         if ( val != globalYourConfigNode.secret ) {
+            globalYourConfigNode.secret = val;
+            RED.nodes.dirty(true);
+         }
+
+         if ( typ != globalYourConfigNode.secretType ) {
+            globalYourConfigNode.secretType = typ;
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-otptype').val(globalYourConfigNode.otptype || globalYourConfigNode._def.defaults.otptype.value)
+      $('#node-input-nodedev-sidebar-otp-algorithm').val(globalYourConfigNode.algorithm || globalYourConfigNode._def.defaults.algorithm.value)
+      $('#node-input-nodedev-sidebar-otp-issuer').val(globalYourConfigNode.issuer || globalYourConfigNode._def.defaults.issuer.value)
+      $('#node-input-nodedev-sidebar-otp-label').val(globalYourConfigNode.otplabel || globalYourConfigNode._def.defaults.otplabel.value)
+      $('#node-input-nodedev-sidebar-otp-digits').val(globalYourConfigNode.digits || globalYourConfigNode._def.defaults.digits.value)
+      $('#node-input-nodedev-sidebar-otp-period').val(globalYourConfigNode.period || globalYourConfigNode._def.defaults.period.value)
+      $('#node-input-nodedev-sidebar-otp-counter').val(globalYourConfigNode.counter || globalYourConfigNode._def.defaults.counter.value)
+
+      $('#node-input-nodedev-sidebar-otp-otptype').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-otptype').val()
+
+         if ( val != globalYourConfigNode.otptype) {
+            globalYourConfigNode.otptype = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-algorithm').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-algorithm').val()
+
+         if ( val != globalYourConfigNode.algorithm) {
+            globalYourConfigNode.algorithm = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-issuer').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-issuer').val()
+
+         if ( val != globalYourConfigNode.issuer) {
+            globalYourConfigNode.issuer = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-label').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-label').val()
+
+         if ( val != globalYourConfigNode.otplabel) {
+            globalYourConfigNode.otplabel = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-digits').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-digits').val()
+
+         if ( val != globalYourConfigNode.digits) {
+            globalYourConfigNode.digits = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-period').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-period').val()
+
+         if ( val != globalYourConfigNode.period) {
+            globalYourConfigNode.period = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#node-input-nodedev-sidebar-otp-counter').on('change', () => {
+         ensureYourConfigNodeExists();
+         let val =  $('#node-input-nodedev-sidebar-otp-counter').val()
+
+         if ( val != globalYourConfigNode.counter) {
+            globalYourConfigNode.counter = val
+            RED.nodes.dirty(true);
+         }
+      })
+
+      $('#nodedev-sidebar-otp-generate-btn').on('click', e => {
+         if ( e) { e.preventDefault()}
+         ensureYourConfigNodeExists();
+
+         doGenerateOTP(globalYourConfigNode, (resp) => {
+            $('#node-input-nodedev-sidebar-otp').val(resp.data.otp)
+         })
+      })
    };
 
    RED.events.on('runtime-state', initialiseConfigNodeOnce);
@@ -153,40 +334,109 @@
 
 <!-- The html for the right sidebar plugin screen -->
 <script type="text/x-red" data-template-name="NodeFactorySidebar">
-   <div class="form-row" style="margin-left: 10px; margin-top: 30px;">
-      Import <a href="https://npmjs.com" target=_blank>npmJs.com</a> packages as a flow. packages
-      are imported as a collection of PkgFile nodes. This can help to learn from other
-      peoples experiences and code.
-   </div>
+<div class="form-row func-nodedev-pkgimporter-tabs-row">
+    <ul style="min-width: 600px; margin-bottom: 20px;" id="func-nodedev-pkgimporter-tabs"></ul>
+</div>
 
-   <div class="form-row" style="margin-left: 10px;">
-      Enter package details here:
-   </div>
+<div id="func-nodedev-pkgimporter-tabs-content" style="min-height: calc(100% - 95px);">
 
-  <div class="form-row" style="margin-left: 10px;">
-   <label for="node-input-nodefactorysidebar-package-name">
-      <i class="fa fa-tag"></i>
-      Name
-    </label>
-      <input type="text" id="node-input-nodefactorysidebar-package-name"
+    <div id="func-nodedev-pkgimporter-tab-pkgimport" style="display:none">
+
+        <div class="form-row" style="margin-left: 10px; margin-top: 30px;">
+            Import <a href="https://npmjs.com" target=_blank>npmJs.com</a> packages as a flow. packages
+            are imported as a collection of PkgFile nodes. This can help to learn from other
+            peoples experiences and code.
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            Enter package details here:
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodefactorysidebar-package-name">
+                <i class="fa fa-tag"></i>
+                Name
+            </label>
+            <input type="text" id="node-input-nodefactorysidebar-package-name"
               placeholder="node-red-dashboard">
-   </div>
+        </div>
 
-   <div class="form-row" style="margin-left: 10px;">
-      <label for="node-input-nodefactorysidebar-package-version">
-         <i class="fa fa-tag"></i>
-         Version
-      </label>
-      <input type="text" id="node-input-nodefactorysidebar-package-version"
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodefactorysidebar-package-version">
+                <i class="fa fa-tag"></i>
+                Version
+            </label>
+            <input type="text" id="node-input-nodefactorysidebar-package-version"
            placeholder="3.5.0">
-   </div>
+        </div>
 
-   <div class="form-row">
-      <div style="position: relative; height: 100%; margin: 15px;">
-         <button id="node-input-nodefactorysidebar-generate-btn" 
+        <div class="form-row">
+            <div style="position: relative; height: 100%; margin: 15px;">
+                <button id="node-input-nodefactorysidebar-generate-btn"
                  class="red-ui-button"
                  style="width: 100%; margin-top: 30px">Import Package</button>
-      </div>
-   </div>
+            </div>
+        </div>
 
+    </div>
+
+    <div id="func-nodedev-pkgimporter-tab-otpgenerator" style="display:none">
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-otptype"><i class="fa fa-tag"></i> Type</label>
+            <select id="node-input-nodedev-sidebar-otp-otptype">
+                <option value="totp">Time-Based (TOTP)</option>
+                <option value="hotp">HMAC-based (HOTP)</option>
+            </select>
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-secret">
+                <i class="fa fa-key"></i>
+                Secret
+            </label>
+            <input type="text" id="node-input-nodedev-sidebar-otp-secret">
+            <input type="hidden" id="node-input-nodedev-sidebar-otp-secretType">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-algorithm"><i class="fa fa-tag"></i> Algorithm</label>
+            <select id="node-input-nodedev-sidebar-otp-algorithm">
+                    <option value="SHA1">SHA1</option>
+                    <option value="SHA256">SHA256</option>
+                    <option value="SHA512">SHA512</option>
+            </select>
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-issuer"><i class="fa fa-tag"></i> Issuer</label>
+            <input type="text" id="node-input-nodedev-sidebar-otp-issuer" placeholder="Issuer">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-label"><i class="fa fa-tag"></i> Label</label>
+            <input type="text" id="node-input-nodedev-sidebar-otp-label" placeholder="Label">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-digits"><i class="fa fa-tag"></i> Digits</label>
+            <input type="text" id="node-input-nodedev-sidebar-otp-digits" placeholder="Digits">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-period"><i class="fa fa-tag"></i> Period</label>
+            <input type="text" id="node-input-nodedev-sidebar-otp-period" placeholder="Period">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodedev-sidebar-otp-counter"><i class="fa fa-tag"></i> Counter</label>
+            <input type="text" id="node-input-nodedev-sidebar-otp-counter" placeholder="Counter">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <button id="nodedev-sidebar-otp-generate-btn" class="button">Generate</button>
+            <input type="text" id="node-input-nodedev-sidebar-otp" placeholder="OTP...">
+        </div>
+    </div>
+</div>
 </script>
