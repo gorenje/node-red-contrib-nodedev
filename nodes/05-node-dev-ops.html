@@ -70,6 +70,8 @@
       npmpublish: { value: false },
       npmunpublish: { value: false },
       npmotp: { value: ""},
+
+      writetgzfile: { value: false },
     },
 
     inputs: 0,
@@ -225,6 +227,13 @@
       <span>No package check?</span>
     </label>
     <input type="checkbox" id="node-input-ignore_package_check" style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-writetgzfile" style="min-width: 150px;"">
+      <span>Write .tgz file?</span>
+    </label>
+    <input type="checkbox" id="node-input-writetgzfile" style="display:inline-block; width:15px; vertical-align:baseline;">
   </div>
 
   <hr/>
