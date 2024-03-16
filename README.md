@@ -12,6 +12,8 @@ So this package tries to provide some supporting nodes for making node developme
 - A `NpmTarball` node will create a gzipped tarball for uploading to [npmjs.com](https://npmjs.com) where all nodes live. This does not need to have since nodes can be installed localling into the Node-RED instance.
 - A `NRInstall` node allows for installing the node package into the Node-RED instance in which the flow is running. This means that nodes can be created, tested and modified with Node-RED. There are a few tricks so that Node-RED does not need to be restarted upon updating the package, more below.
 - A `NodeFactory` node that can create templates for node development. It also converts existing `.tgz` packages to `PkgFile` nodes, meaning that existing packages can easily be ported to this style of development. 
+- A `NpmPublish` allows node packages to be published to a node registry, for example [npmjs](https://www.npmjs.com/). The NpmPublish can also be used to publish to private registries, for example, those based on [Verdaccio](https://verdaccio.org/).
+- A `OTPGenerate` node can be used to generate an One Time Password (OTP) for publishing nodes to registries. For example the NPMjs.com registry.
 
 *This is all very confusing?*
 
