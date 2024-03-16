@@ -54,6 +54,8 @@ Examples are included:
 
 - Converting an existing tar-gzip package file into a collection of `PkgFile` nodes for testing and maintaince and development --> [flow](https://flowhub.org/f/eef4037a6d25a1e0)
 - `NodeFactory` example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED --> [flow](https://flowhub.org/f/7bece6814c033925)
+- The [FlowHub node package](https://flowhub.org/f/4a831589774ecb04) is developed using the NodeDev nodes
+- Also the [introspection node package](https://flowhub.org/f/d73d76db3df96ba2) uses the NodeDev nodes
 
 ### Config node with sidebar
 
