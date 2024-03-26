@@ -41,7 +41,8 @@
 
          data: JSON.stringify({
             pkgname: $("#node-input-nodefactorysidebar-package-name").val().trim(),
-            pkgversion: $("#node-input-nodefactorysidebar-package-version").val().trim()
+            pkgversion: $("#node-input-nodefactorysidebar-package-version").val().trim(),
+            pkgregistry: $("#node-input-nodefactorysidebar-package-registry").val().trim()
          }),
 
          success: function (resp) {
@@ -210,6 +211,18 @@
       })
       $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
 
+      $("#node-input-nodefactorysidebar-package-registry").on("change", function() {
+        ensureYourConfigNodeExists();
+
+        let data = $(this).val();
+
+        if (globalYourConfigNode.pkgregistry != data) {
+           globalYourConfigNode.pkgregistry = data.trim();
+           RED.nodes.dirty(true);
+        }
+      })
+      $("#node-input-nodefactorysidebar-package-registry").val(globalYourConfigNode.pkgregistry);
+
       /*
       ************* OTP generator handlers
       */
@@ -368,6 +381,15 @@
             </label>
             <input type="text" id="node-input-nodefactorysidebar-package-version"
            placeholder="3.5.0">
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <label for="node-input-nodefactorysidebar-package-registry">
+                                <i class="fa fa-tag"></i>
+                                Registry
+                            </label>
+            <input type="text" id="node-input-nodefactorysidebar-package-registry"
+                           placeholder="https://registry.npmjs.org">
         </div>
 
         <div class="form-row">

@@ -190,7 +190,8 @@ module.exports = function (RED) {
                         }
                         
                         pacote.manifest(
-                            msg.pkgname + "@" + msg.pkgversion
+                            msg.pkgname + "@" + msg.pkgversion,
+                            { registry: msg.pkgregistry || 'https://registry.npmjs.org' }
                         ).then(manifest => {
                             RED.comms.publish(
                                 "nodedev:perform-autoimport-nodes",
