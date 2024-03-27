@@ -3,13 +3,14 @@ module.exports = (function () {
     var tarStream = require('tar-stream');
     var streamx = require('streamx');
     var pakoGzip = require('pako');
+    let pathUtil = require('path')
 
     /*
      * there is no indication in a tar file of whether a file is binary or textual.
      * we can only make a guess by the extension of the filename.
      ***/
     var computeFormat = (filename) => {
-        var ext = filename.split(".").at(-1);
+        let ext = pathUtil.extname(filename).substr(1).toLowerCase()
 
         return {
             "html": "html",
@@ -39,7 +40,7 @@ module.exports = (function () {
             "mov": "base64",
             "ico": "base64",
             "eot": "base64",
-        }[ext.toLowerCase()] || "text";
+        }[ext] || "text";
     }
 
     var convertTarFile = (RED, tgzData, onFinish, onError) => {
@@ -59,22 +60,23 @@ module.exports = (function () {
             });
 
             stream.on('end', function () {
-                var frmt = computeFormat(header.name.split("/").at(-1));
+                let filenameWithPath = header.name.replace(/^package\//, '')
+                let filename = pathUtil.basename(filenameWithPath)
+                let frmt = computeFormat(filename);
 
                 allFiles.push({
                     id: RED.util.generateId(),
                     type: "PkgFile",
-                    name: header.name.split("/").at(-1),
-                    filename: header.name.replace(/^package\//, ''),
+                    name: filename,
+                    filename: filenameWithPath,
+                    dirname: pathUtil.dirname(filenameWithPath),
                     template: Buffer.concat(buffer).toString(frmt == "base64" ? 'base64' : 'utf8'),
-                    syntax: header.name.replace(/^package\//, '') == "package.json" ? "mustache" : "plain",
+                    syntax: filename == "package.json" ? "mustache" : "plain",
                     format: frmt,
                     output: "str",
-                    x: 250 * Math.floor(allFiles.length / 40),
-                    y: 50 * (allFiles.length % 40),
-                    wires: [
-                        []
-                    ]
+                    x: 0,
+                    y: 0,
+                    wires: [[]]
                 })
 
                 next() // ready for next entry
@@ -84,9 +86,12 @@ module.exports = (function () {
         })
 
         extract.on('finish', function () {
-            // all entries read, wire them together
-            for (var idx = 0; idx < allFiles.length - 1; idx++) {
-                allFiles[idx].wires = [[allFiles[idx + 1].id]];
+            allFiles = allFiles.sort((a, b) => { return a.dirname < b.dirname ? -1 : (a.dirname >  b.dirname ? 1 : 0) } )
+
+            for (var idx = 0; idx < allFiles.length; idx++) {
+                allFiles[idx].x = 250 * Math.floor(idx / 40)
+                allFiles[idx].y = 50 * (idx % 40)
+                allFiles[idx].wires = allFiles[idx + 1] ? [[allFiles[idx + 1].id]] : [[]]
             }
 
             onFinish(allFiles)

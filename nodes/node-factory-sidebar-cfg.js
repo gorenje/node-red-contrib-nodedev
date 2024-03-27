@@ -66,6 +66,20 @@ module.exports = function (RED) {
         }
     }
 
+    function createGroupForDirectory(dirname, allIds) {
+        return {
+            "id": RED.util.generateId(),
+            "type": "group",
+            "name": `Dir: ${dirname}`,
+            "style": {
+                "label": true,
+                "label-position": "ne",
+                "color": "#001f60"
+            },
+            "nodes": allIds
+        }
+    }
+
     function createGroup(pkgname, pversion, allFiles) {
         return {
             "id": RED.util.generateId(), 
@@ -136,19 +150,14 @@ module.exports = function (RED) {
                     if ( msg.pkgname && msg.pkgversion ) {
                         const onFinish = (allFiles) => {
 
-                            /* these are no templates, these are files - no mustache intrepretation */
-                            allFiles.forEach(function(element) {
-                                element.syntax = "plain"
-                            });
-
-                            var lastNode = allFiles[allFiles.length - 1];
+                            var lastNode = allFiles.at(-1);
 
                             var nodeDevOp = createDevOpsNode(msg.pkgname, msg.pkgversion, allFiles[0].x, allFiles[0].y, allFiles[0].id)
                             var nrInstallNode = createNodeRedInstallNode(lastNode.x, lastNode.y)
                             var tarballNode = createTarballNode(lastNode.x, lastNode.y, nrInstallNode.id)
 
                             let pkgjson = allFiles.filter( a => {
-                                return a.filename == "package.json"
+                                return a.filename == "package.json" && a.dirname == "."
                             })[0];
 
                             if ( pkgjson) {
@@ -161,13 +170,29 @@ module.exports = function (RED) {
 
                             lastNode.wires[0].push(tarballNode.id)
 
-                            allFiles.push(nodeDevOp);
-                            allFiles.push(tarballNode);
-                            allFiles.push(nrInstallNode);
+
+                            /* group by dirname */
+                            let groupByDirectory = {}
+                            let dirGroups = []
+                            allFiles.forEach(a => {
+                                (groupByDirectory[a.dirname] ||= []).push(a.id)
+                            })
+
+                            Object.keys(groupByDirectory).forEach(d => {
+                                dirGroups.push(createGroupForDirectory(d, groupByDirectory[d]))
+                            })
+
+                            let nodeDevNodes = [
+                                nodeDevOp,
+                                tarballNode,
+                                nrInstallNode
+                            ]
 
                             allFiles = [
-                                createGroup(msg.pkgname, nodeDevOp.pversion || msg.pkgversion, allFiles)
-                            ].concat(allFiles);
+                                createGroup(msg.pkgname, nodeDevOp.pversion || msg.pkgversion, dirGroups.concat(nodeDevNodes))
+// @ts-ignore
+                            ].concat(dirGroups).concat(nodeDevNodes).concat(allFiles);   
+
 
                             RED.comms.publish(
                                 "nodedev:perform-autoimport-nodes",
