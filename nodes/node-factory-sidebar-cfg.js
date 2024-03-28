@@ -2,6 +2,64 @@ module.exports = function (RED) {
     let pacote = require('pacote');
     let tarHelpers = require('./lib/tarhelpers.js');
     
+    let dirGrpColours = (dirname) => {
+
+        dirname = (dirname.startsWith("dist/") || dirname == "dist") ? "dist" : dirname
+        dirname = (dirname.startsWith("nodes/locales/") || dirname == "nodes/locales" ) ? "nodes/locales" : dirname
+        dirname = (dirname.startsWith("locales/") || dirname == "locales") ? "nodes/locales" : dirname
+        dirname = (dirname.startsWith("samples/") || dirname == "samples") ? "examples" : dirname
+        dirname = (dirname != "." && dirname.startsWith(".")) ? ".dir" : dirname
+        
+        let lookup = {
+            ".dir": {
+                "stroke": "#dbcbe7",
+                "fill": "#dbcbe7",
+            },
+            ".": {
+                "stroke": "#ffefbf",
+                "fill": "#ffefbf",
+            },
+            "examples": {
+                "stroke": "#addb7b",
+                "fill": "#addb7b",
+            },
+            "nodes": {
+                "stroke": "#c8e7a7",
+                "fill": "#c8e7a7",
+            },
+            "plugins": {
+                "stroke": "#92d04f",
+                "fill": "#92d04f",
+            },
+            "nodes/lib": {
+                "stroke": "#e3f3d3",
+                "fill": "#e3f3d3",
+            },
+            "assets": {
+                "stroke": "#0070c0",
+                "fill": "#0070c0",
+            },
+            "icons": {
+                "stroke": "#3f93cf",
+                "fill": "#3f93cf",
+            },
+            "nodes/icons": {
+                "stroke": "#3f93cf",
+                "fill": "#3f93cf",
+            },
+            "dist": {
+                "stroke": "#ffbfbf",
+                "fill": "#ffbfbf"                
+            },
+            "nodes/locales": {
+                "stroke": "#bfdbef",
+                "fill": "#bfdbef",               
+            }
+        }
+
+        return lookup[dirname] || {}
+    }
+
     function ConfigNodeFactorySidebarFunctionality(config) {
         RED.nodes.createNode(this, config)
     }
@@ -67,14 +125,18 @@ module.exports = function (RED) {
     }
 
     function createGroupForDirectory(dirname, allIds) {
+        // no label position means that the label goes top-left.
         return {
             "id": RED.util.generateId(),
             "type": "group",
             "name": `Dir: ${dirname}`,
             "style": {
                 "label": true,
-                "label-position": "ne",
-                "color": "#001f60"
+                // "label-position": "ne",
+                "color": "#001f60",
+                "stroke-opacity": "0.75",
+                "fill-opacity": "0.5",
+                ...dirGrpColours(dirname)
             },
             "nodes": allIds
         }
@@ -170,7 +232,6 @@ module.exports = function (RED) {
 
                             lastNode.wires[0].push(tarballNode.id)
 
-
                             /* group by dirname */
                             let groupByDirectory = {}
                             let dirGroups = []
@@ -190,9 +251,7 @@ module.exports = function (RED) {
 
                             allFiles = [
                                 createGroup(msg.pkgname, nodeDevOp.pversion || msg.pkgversion, dirGroups.concat(nodeDevNodes))
-// @ts-ignore
-                            ].concat(dirGroups).concat(nodeDevNodes).concat(allFiles);   
-
+                            ].concat(dirGroups).concat(nodeDevNodes).concat(allFiles)
 
                             RED.comms.publish(
                                 "nodedev:perform-autoimport-nodes",
