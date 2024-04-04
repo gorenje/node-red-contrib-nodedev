@@ -128,6 +128,7 @@
      $('#node-input-githubgettar').on('change', () => {
           if ( $('#node-input-githubgettar').is(":checked") ) {
               $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
+              $('#node-input-ignore_package_check').prop('checked',true)
           } else {
              if ( !$('#node-input-gitcheckforchange').is(":checked") && !$('#node-input-gitcommit').is(":checked") ) {
               $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
