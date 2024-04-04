@@ -4,6 +4,7 @@ module.exports = (function () {
     var streamx = require('streamx');
     var pakoGzip = require('pako');
     let pathUtil = require('path')
+    const buffer = require('buffer')
 
     /*
      * there is no indication in a tar file of whether a file is binary or textual.
@@ -98,10 +99,34 @@ module.exports = (function () {
         })
 
         extract.on('error', onError );
-        var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
-        stream.pipe(extract);
-    }
 
+        try {
+            if (buffer.Buffer.isBuffer(tgzData)) {
+                import('file-type').then(module => {
+                    module.fileTypeFromBuffer(tgzData).then(filetype => {
+                        if ( filetype && filetype.ext == "tar") {
+                            var stream = streamx.Readable.from(tgzData)
+                            stream.pipe(extract);
+                        } else {
+                            var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
+                            stream.pipe(extract);
+                        }
+                    }).catch(err => {
+                        var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
+                        stream.pipe(extract);
+                    })
+                }).catch( e => {
+                    var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
+                    stream.pipe(extract);
+                })
+            } else {
+                var stream = streamx.Readable.from(Buffer.from(pakoGzip.inflate(new Uint8Array(tgzData))))
+                stream.pipe(extract);
+            }
+        } catch (ex) {
+            onError(ex)
+        }
+    }
 
     let exports = {
         computeFormat: computeFormat,

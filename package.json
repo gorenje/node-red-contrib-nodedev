@@ -9,7 +9,8 @@
     "streamx":       "^2.15.5",
     "got":           "^13",
     "pacote":        "^17.0.4",
-    "otpauth":       "^5.0.8"
+    "otpauth":       "^5.0.8",
+    "file-type":     ">=18.7.0"
   },
 
   "keywords": [

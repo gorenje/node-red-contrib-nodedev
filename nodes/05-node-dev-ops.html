@@ -66,6 +66,7 @@
       githubauthor:      { value: ""},
       githubauthoremail: { value: "" },
       githubmessage:     { value: "" },
+      githubgettar:      { value: false },
 
       npmpublish: { value: false },
       npmunpublish: { value: false },
@@ -120,6 +121,16 @@
             if ( !$('#node-input-gitcommit').is(":checked") ) {
               $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
               $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
+            }
+          }
+     });
+
+     $('#node-input-githubgettar').on('change', () => {
+          if ( $('#node-input-githubgettar').is(":checked") ) {
+              $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
+          } else {
+             if ( !$('#node-input-gitcheckforchange').is(":checked") && !$('#node-input-gitcommit').is(":checked") ) {
+              $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
             }
           }
      });
@@ -279,12 +290,17 @@
                <span>GitHub: Commit?</span>
       </label>
     <input type="checkbox" id="node-input-gitcommit" style="display:inline-block; width:15px; vertical-align:baseline;">
+
     <label for="node-input-gitcheckforchange" style="margin-left: 30px; min-width: 100px;">
                 <span>What changed?</span>
      </label>
      <input type="checkbox" id="node-input-gitcheckforchange" style="display:inline-block; width:15px; vertical-align:baseline;">
-  </div>
 
+    <label for="node-input-githubgettar" style="margin-left: 15px; min-width: 100px;">
+                <span>Get Repo?</span>
+     </label>
+     <input type="checkbox" id="node-input-githubgettar" style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
 
   <div id="github-options">
     <div class="form-row">
