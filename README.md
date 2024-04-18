@@ -23,6 +23,10 @@ This is not an inbuilt extension of Node-RED and obviously a more integrated wor
 
 It also gets more confusing since these nodes will open the Node-RED import dialog with pre-defined nodes. These are generally safe to import since that's how this package creates an initial set of nodes for representing a node package. Also importing nodes for an unknown node package is not recommended unless it happens to be your own package!
 
+### Screencast
+
+For a detailed explanation on how to use these nodes, check out the [screencast](https://blog.openmindmap.org/nodedev) presenting the NodeDev workflow.
+
 ### Motivation
 
 A comparison of Node-RED extensions and indirections
