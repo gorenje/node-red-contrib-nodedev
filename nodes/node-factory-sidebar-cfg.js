@@ -119,7 +119,6 @@ module.exports = function (RED) {
             "x": x+300,
             "y": y+100,
             "wires": [
-                []
             ]
         }
     }
