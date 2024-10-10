@@ -56,6 +56,8 @@
       noderedinstall: { value: false },
       randompackagename: { value: false },
 
+      nodered_uninstall: { value: false },
+
       ignore_package_check: { value: false },
 
       gitcommit:         { value: false },
@@ -90,9 +92,15 @@
     },
 
     oneditprepare: function() {
+     $('#node-input-nodered_uninstall').on('change', () => {
+        if ( $('#node-input-nodered_uninstall').is(":checked") ) {
+           $('#node-input-noderedinstall').prop('checked',false).trigger('change')
+        }
+     })
 
      $('#node-input-noderedinstall').on('change', () => {
           if ( $('#node-input-noderedinstall').is(":checked") ) {
+              $('#node-input-nodered_uninstall').prop('checked',false).trigger('change')
               $("#noderedinstall-options").animate({opacity: 'show', height: 'show'}, 450);
           } else {
               $("#noderedinstall-options").animate({opacity: 'hide', height: 'hide'}, 450);
@@ -264,6 +272,13 @@
             </label>
       <input type="checkbox" id="node-input-randompackagename" style="margin-left: 10px; display:inline-block; width:15px; vertical-align:baseline;">
     </div>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-nodered_uninstall" style="min-width: 120px;">
+                <span>Uninstall package?</span>
+            </label>
+    <input type="checkbox" id="node-input-nodered_uninstall" style="display:inline-block; width:15px; vertical-align:baseline;">
   </div>
 
   <hr/>

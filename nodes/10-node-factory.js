@@ -223,6 +223,31 @@ module.exports = function (RED) {
         })
     }
 
+    function createRealPluginNodeDefintions(msg,node) {
+        var pluginJsPath = path.join(__dirname, 'templates', 'tmplplugin.js');
+        var content = {};
+
+        var promises = [
+            handleTemplate(msg, node, fs.readFileSync(pluginJsPath, 'utf8')).then((c) => { content["jsac"] = c }),
+        ];
+
+        return Promise.all(promises).then(() => {
+            return [{
+                id: RED.util.generateId(),
+                type: "PkgFile",
+                name: msg.node.name + "Plugin.js",
+                filename: "plugins/" + msg.node.namelwr + ".js",
+                template: content["jsac"],
+                syntax: "mustache",
+                format: "javascript",
+                output: "str",
+                x: 100,
+                y: 50,
+                wires: [[]]
+            }]
+        })
+    }
+
     function createSimpleNodeDefintions(msg,node) {
         var htmlPath = path.join(__dirname, 'templates', 'tmpl.html');
         var htmlJsPath = path.join(__dirname, 'templates', 'tmpl.html.js');
@@ -322,6 +347,8 @@ module.exports = function (RED) {
     function createNodeDefintions(msg, node) {
         if ( msg.node.isplugin ) {
             return createPluginNodeDefintions(msg, node)
+        } else if (msg.node.isrealplugin ) {
+            return createRealPluginNodeDefintions(msg, node)
         } else {
             return createSimpleNodeDefintions(msg, node)
         }
@@ -338,6 +365,9 @@ module.exports = function (RED) {
         spcRepDict["nodestanza"] = " \"" + msg.node.namelwr + "\": \"" + nodeDefinitions[0].filename + "\""
         if ( msg.node.isplugin ) {
             spcRepDict["pluginstanza"] = " \"sidebar-plugin\": \"" + nodeDefinitions[1].filename + "\""
+        }
+        if (msg.node.isrealplugin) {
+            spcRepDict["pluginstanza"] = " \"" + msg.node.namelwr + "\": \"" + nodeDefinitions[0].filename + "\""
         }
 
         var content = {};

@@ -21,11 +21,25 @@
     {{#node.isplugin}}
     "plugins": {
        {{{__.pluginstanza}}}
-     },
-    {{/node.isplugin}}
+    },
     "nodes": {
       {{{__.nodestanza}}}
     }
+    {{/node.isplugin}}
+
+    {{#node.isrealplugin}}
+    "plugins": {
+       {{{__.pluginstanza}}}
+    }
+    {{/node.isrealplugin}}
+
+    {{^node.isplugin}}
+    {{^node.isrealplugin}}
+    "nodes": {
+      {{{__.nodestanza}}}
+    }
+    {{/node.isrealplugin}}
+    {{/node.isplugin}}
   },
 
   "repository": {
