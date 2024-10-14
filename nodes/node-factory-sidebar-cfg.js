@@ -271,22 +271,23 @@ module.exports = function (RED) {
                                 })
                             );
                         }
-                        
-                        pacote.manifest(
-                            msg.pkgname + "@" + msg.pkgversion,
-                            { registry: msg.pkgregistry || 'https://registry.npmjs.org' }
-                        ).then(manifest => {
+
+                        if (msg.pkgname.match(/^git@github.com:.+[.]git/i) || msg.pkgname.match(/https?:\/\/github.com\//i) ) {
+                            let mth = msg.pkgname.match(/^git@github.com:(.+)\/(.+)[.]git/i) || msg.pkgname.match(/https?:\/\/github.com\/([^\/]+)\/([^\/]+)\/?/i)
+
+                            let tarballUrl = "https://github.com/" + mth[1] + "/" + mth[2] + "/tarball/" + msg.pkgversion
+
                             RED.comms.publish(
                                 "nodedev:perform-autoimport-nodes",
                                 RED.util.encodeObject({
                                     msg: "notify",
-                                    text: "Found url for " + msg.pkgname + "@" + msg.pkgversion,
+                                    text: "Importing GitHub repo: <b>" + msg.pkgname + "</b> @ <b>" +  msg.pkgversion + "</b>",
                                     type: "warning",
                                 })
                             );
 
                             import('got').then((module) => {
-                                module.got.get(manifest._resolved,
+                                module.got.get(tarballUrl,
                                     {
                                         timeout: {
                                             request: 25000,
@@ -305,18 +306,53 @@ module.exports = function (RED) {
                             }).catch(err => {
                                 onError(err)
                             });
+                        } else {
+                            pacote.manifest(
+                                msg.pkgname + "@" + msg.pkgversion,
+                                { registry: msg.pkgregistry || 'https://registry.npmjs.org' }
+                            ).then(manifest => {
+                                RED.comms.publish(
+                                    "nodedev:perform-autoimport-nodes",
+                                    RED.util.encodeObject({
+                                        msg: "notify",
+                                        text: "Found url for <b>" + msg.pkgname + "</b> @ <b>" + msg.pkgversion + "</b>",
+                                        type: "warning",
+                                    })
+                                );
 
-                        }).catch(err => {
-                            RED.comms.publish(
-                                "nodedev:perform-autoimport-nodes",
-                                RED.util.encodeObject({
-                                    msg: "notify",
-                                    text: "Failed to retrieve tgz file for " + msg.pkgname + "@" + msg.pkgversion + ": " + err,
-                                    type: "error",
-                                })
-                            );
-                        })
+                                import('got').then((module) => {
+                                    module.got.get(manifest._resolved,
+                                        {
+                                            timeout: {
+                                                request: 25000,
+                                                response: 25000
+                                            },
+                                            responseType: 'buffer'
+                                        }).then(resp => {
+                                            try {
+                                                tarHelpers.convertTarFile(RED, resp.body, onFinish, onError);
+                                            } catch (err) {
+                                                onError(err)
+                                            }
+                                        }).catch(err => {
+                                            onError(err)
+                                        });
+                                }).catch(err => {
+                                    onError(err)
+                                });
 
+                            }).catch(err => {
+                                RED.comms.publish(
+                                    "nodedev:perform-autoimport-nodes",
+                                    RED.util.encodeObject({
+                                        msg: "notify",
+                                        text: "Failed to retrieve tgz file for " + msg.pkgname + "@" + msg.pkgversion + ": " + err,
+                                        type: "error",
+                                    })
+                                );
+                            })
+                        }
+                        
                         res.sendStatus(200);
                         
                         RED.comms.publish(
