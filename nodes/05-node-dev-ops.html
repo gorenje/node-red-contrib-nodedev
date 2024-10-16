@@ -1,208 +1,224 @@
 <script type="text/javascript">
-  (function(){
-  
-    function sendToBackend(node,data = {}) {
+  (function(){  
+    function sendToBackend(node, data = {}) {
+  $.ajax({
+    url: "NodeDevOps/" + node.id,
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
 
-      $.ajax({
-        url:         "NodeDevOps/" + node.id,
-        type:        "POST",
-        contentType: "application/json; charset=utf-8",
+    data: JSON.stringify(data),
 
-        data: JSON.stringify(data),
-
-        success: function (resp) {
-          RED.notify("Node Developer Operation trigger", {
-            type: "success",
-            id: "NodeDevOps",
-            timeout: 2000
-          });
-        },
-
-        error: function (jqXHR, textStatus, errorThrown) {
-          if (jqXHR.status == 404) {
-            RED.notify("Node has not yet been deployed, please deploy.", "error");
-          } else if (jqXHR.status == 405) {
-            RED.notify("Not Allowed.", "error");
-          } else if (jqXHR.status == 500) {
-            RED.notify(node._("common.notification.error", {
-              message: node._("inject.errors.failed")
-            }), "error");
-          } else if (jqXHR.status == 0) {
-            RED.notify(node._("common.notification.error", {
-              message: node._("common.notification.errors.no-response")
-            }), "error");
-          } else {
-            RED.notify(node._("common.notification.error", {
-              message: node._("common.notification.errors.unexpected", {
-                status: jqXHR.status, message: textStatus }) }), "error");
-          }
-        }
+    success: function (resp) {
+      RED.notify("Node Developer Operation trigger", {
+        type: "success",
+        id: "NodeDevOps",
+        timeout: 2000
       });
-    }
-  
-  RED.nodes.registerType('NodeDevOps',{
-    color: '#e5e4ef',
-    icon: "font-awesome/fa-terminal",
-    category: 'nodedev',
-    defaults: {
-      name: { value:"" },
-
-      pname:        { value: "", required: true },
-      pversion:     { value: "", required: true },
-      pauthorname:  { value: "", required: true },
-      pauthoremail: { value: "", required: true },
-      pdescription: { value: "", required: true },
-
-      noderedinstall: { value: false },
-      randompackagename: { value: false },
-
-      nodered_uninstall: { value: false },
-
-      ignore_package_check: { value: false },
-
-      gitcommit:         { value: false },
-      gitcheckforchange: { value: false },
-      githubowner:       { value: ""},
-      githubrepo:        { value: ""},
-      githubbranch:      { value: "main"},
-      githubauthor:      { value: ""},
-      githubauthoremail: { value: "" },
-      githubmessage:     { value: "" },
-      githubgettar:      { value: false },
-
-      npmpublish: { value: false },
-      npmunpublish: { value: false },
-      npmotp: { value: ""},
-
-      writetgzfile: { value: false },
     },
 
-    inputs: 0,
-    outputs: 1,
-
-    label: function() {
-      return (this.name || this._def.paletteLabel);
-    },
-
-    labelStyle: function() {
-      return this.name?"node_label_italic":"";
-    },
-
-    onpaletteadd: function() {
-    },
-
-    oneditprepare: function() {
-     $('#node-input-nodered_uninstall').on('change', () => {
-        if ( $('#node-input-nodered_uninstall').is(":checked") ) {
-           $('#node-input-noderedinstall').prop('checked',false).trigger('change')
-        }
-     })
-
-     $('#node-input-noderedinstall').on('change', () => {
-          if ( $('#node-input-noderedinstall').is(":checked") ) {
-              $('#node-input-nodered_uninstall').prop('checked',false).trigger('change')
-              $("#noderedinstall-options").animate({opacity: 'show', height: 'show'}, 450);
-          } else {
-              $("#noderedinstall-options").animate({opacity: 'hide', height: 'hide'}, 450);
-          }
-     });
-
-     $('#node-input-gitcommit').on('change', () => {
-          if ( $('#node-input-gitcommit').is(":checked") ) {
-              $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
-              $("#gitcommit-options").animate({opacity: 'show', height: 'show'}, 450);
-              $('#node-input-gitcheckforchange').prop('checked',false)
-          } else {
-              $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
-              if ( !$('#node-input-gitcheckforchange').is(":checked") ) {
-                $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
-              }
-          }
-     });
-
-     $('#node-input-gitcheckforchange').on('change', () => {
-          if ( $('#node-input-gitcheckforchange').is(":checked") ) {
-              $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
-              $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
-              $('#node-input-gitcommit').prop('checked',false)
-          } else {
-            if ( !$('#node-input-gitcommit').is(":checked") ) {
-              $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
-              $("#gitcommit-options").animate({opacity: 'hide', height: 'hide'}, 450);
-            }
-          }
-     });
-
-     $('#node-input-githubgettar').on('change', () => {
-          if ( $('#node-input-githubgettar').is(":checked") ) {
-              $("#github-options").animate({opacity: 'show', height: 'show'}, 450);
-              $('#node-input-ignore_package_check').prop('checked',true)
-          } else {
-             if ( !$('#node-input-gitcheckforchange').is(":checked") && !$('#node-input-gitcommit').is(":checked") ) {
-              $("#github-options").animate({opacity: 'hide', height: 'hide'}, 450);
-            }
-          }
-     });
-
-     $('#node-input-npmpublish').on('change', () => {
-          if ( $('#node-input-npmpublish').is(":checked") ) {
-              $("#npmpublish-options").animate({opacity: 'show', height: 'show'}, 450);
-              $('#node-input-npmunpublish').prop('checked',false)
-          } else {
-            if ( !$('#node-input-npmunpublish').is(":checked") ) {
-              $("#npmpublish-options").animate({opacity: 'hide', height: 'hide'}, 450);
-            }
-          }
-     });
-
-     $('#node-input-npmunpublish').on('change', () => {
-          if ( $('#node-input-npmunpublish').is(":checked") ) {
-              $("#npmpublish-options").animate({opacity: 'show', height: 'show'}, 450);
-              $('#node-input-npmpublish').prop('checked',false)
-          } else {
-            if ( !$('#node-input-npmpublish').is(":checked") ) {
-              $("#npmpublish-options").animate({opacity: 'hide', height: 'hide'}, 450);
-            }
-          }
-     });
-
-    },
-
-    oneditcancel: function() {
-    },
-
-    oneditsave: function() {
-    },
-
-    onpaletteremove: function() {
-    },
-
-
-    button: {
-      enabled: function() {
-        return !this.changed
-      },
-
-      onclick: function () {
-        if (this.changed) {
-          return RED.notify(RED._("notification.warning", {
-            message: RED._("notification.warnings.undeployedChanges")
-          }), "warning");
-        }
-
-        var that = this;
-        var data = {}
-
-        Object.keys(that._def.defaults).forEach( kname => {
-          data[kname] = that[kname]
-        })
-        
-        sendToBackend(that, data)
+    error: function (jqXHR, textStatus, errorThrown) {
+      if (jqXHR.status == 404) {
+        RED.notify("Node has not yet been deployed, please deploy.", "error");
+      } else if (jqXHR.status == 405) {
+        RED.notify("Not Allowed.", "error");
+      } else if (jqXHR.status == 500) {
+        RED.notify(node._("common.notification.error", {
+          message: node._("inject.errors.failed")
+        }), "error");
+      } else if (jqXHR.status == 0) {
+        RED.notify(node._("common.notification.error", {
+          message: node._("common.notification.errors.no-response")
+        }), "error");
+      } else {
+        RED.notify(node._("common.notification.error", {
+          message: node._("common.notification.errors.unexpected", {
+            status: jqXHR.status, message: textStatus
+          })
+        }), "error");
       }
+    }
+  });
+}
+
+RED.nodes.registerType('NodeDevOps', {
+  color: '#e5e4ef',
+  icon: "font-awesome/fa-terminal",
+  category: 'nodedev',
+  defaults: {
+    name: { value: "" },
+
+    pname: { value: "", required: true },
+    pversion: { value: "", required: true },
+    pauthorname: { value: "", required: true },
+    pauthoremail: { value: "", required: true },
+    pdescription: { value: "", required: true },
+
+    noderedinstall: { value: false },
+    randompackagename: { value: false },
+
+    nodered_uninstall: { value: false },
+
+    ignore_package_check: { value: false },
+
+    gitcommit: { value: false },
+    gitcheckforchange: { value: false },
+    githubowner: { value: "" },
+    githubrepo: { value: "" },
+    githubbranch: { value: "main" },
+    githubauthor: { value: "" },
+    githubauthoremail: { value: "" },
+    githubmessage: { value: "" },
+    githubgettar: { value: false },
+    githubtoken: { value: "GITHUB_TOKEN" },
+    githubtokenType: { value: "env" },
+
+    npmpublish: { value: false },
+    npmunpublish: { value: false },
+    npmotp: { value: "" },
+    npmtoken: { value: "NPM_AUTH_TOKEN" },
+    npmtokenType: { value: "env" },
+
+    writetgzfile: { value: false },
+
+  },
+
+  inputs: 0,
+  outputs: 1,
+
+  label: function () {
+    return (this.name || this._def.paletteLabel);
+  },
+
+  labelStyle: function () {
+    return this.name ? "node_label_italic" : "";
+  },
+
+  onpaletteadd: function () {
+  },
+
+  oneditprepare: function () {
+    $('#node-input-nodered_uninstall').on('change', () => {
+      if ($('#node-input-nodered_uninstall').is(":checked")) {
+        $('#node-input-noderedinstall').prop('checked', false).trigger('change')
+      }
+    })
+
+    $('#node-input-noderedinstall').on('change', () => {
+      if ($('#node-input-noderedinstall').is(":checked")) {
+        $('#node-input-nodered_uninstall').prop('checked', false).trigger('change')
+        $("#noderedinstall-options").animate({ opacity: 'show', height: 'show' }, 450);
+      } else {
+        $("#noderedinstall-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+      }
+    });
+
+    $('#node-input-gitcommit').on('change', () => {
+      if ($('#node-input-gitcommit').is(":checked")) {
+        $("#github-options").animate({ opacity: 'show', height: 'show' }, 450);
+        $("#gitcommit-options").animate({ opacity: 'show', height: 'show' }, 450);
+        $('#node-input-gitcheckforchange').prop('checked', false)
+      } else {
+        $("#gitcommit-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        if (!$('#node-input-gitcheckforchange').is(":checked")) {
+          $("#github-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        }
+      }
+    });
+
+    $('#node-input-gitcheckforchange').on('change', () => {
+      if ($('#node-input-gitcheckforchange').is(":checked")) {
+        $("#github-options").animate({ opacity: 'show', height: 'show' }, 450);
+        $("#gitcommit-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        $('#node-input-gitcommit').prop('checked', false)
+      } else {
+        if (!$('#node-input-gitcommit').is(":checked")) {
+          $("#github-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+          $("#gitcommit-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        }
+      }
+    });
+
+    $('#node-input-githubgettar').on('change', () => {
+      if ($('#node-input-githubgettar').is(":checked")) {
+        $("#github-options").animate({ opacity: 'show', height: 'show' }, 450);
+        $('#node-input-ignore_package_check').prop('checked', true)
+      } else {
+        if (!$('#node-input-gitcheckforchange').is(":checked") && !$('#node-input-gitcommit').is(":checked")) {
+          $("#github-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        }
+      }
+    });
+
+    $('#node-input-npmpublish').on('change', () => {
+      if ($('#node-input-npmpublish').is(":checked")) {
+        $("#npmpublish-options").animate({ opacity: 'show', height: 'show' }, 450);
+        $('#node-input-npmunpublish').prop('checked', false)
+      } else {
+        if (!$('#node-input-npmunpublish').is(":checked")) {
+          $("#npmpublish-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        }
+      }
+    });
+
+    $('#node-input-npmunpublish').on('change', () => {
+      if ($('#node-input-npmunpublish').is(":checked")) {
+        $("#npmpublish-options").animate({ opacity: 'show', height: 'show' }, 450);
+        $('#node-input-npmpublish').prop('checked', false)
+      } else {
+        if (!$('#node-input-npmpublish').is(":checked")) {
+          $("#npmpublish-options").animate({ opacity: 'hide', height: 'hide' }, 450);
+        }
+      }
+    });
+
+    $("#node-input-npmtoken").typedInput({
+      types: ["env", "msg", "global", "cred"],
+      typeField: "#node-input-npmtokenType"
+    });
+
+    $("#node-input-githubtoken").typedInput({
+      types: ["env", "msg", "global", "cred"],
+      typeField: "#node-input-githubtokenType"
+    });
+
+  },
+
+  oneditcancel: function () {
+  },
+
+  oneditsave: function () {
+  },
+
+  onpaletteremove: function () {
+  },
+
+
+  button: {
+    enabled: function () {
+      return !this.changed
     },
 
-  });
-})();
+    onclick: function () {
+      if (this.changed) {
+        return RED.notify(RED._("notification.warning", {
+          message: RED._("notification.warnings.undeployedChanges")
+        }), "warning");
+      }
+
+      var that = this;
+      var data = {}
+
+      Object.keys(that._def.defaults).forEach(kname => {
+        data[kname] = that[kname]
+      })
+
+      sendToBackend(that, data)
+    }
+  },
+
+});
+
+  })();
 </script>
 
 <script type="text/html" data-template-name="NodeDevOps">
@@ -211,8 +227,8 @@
     <input type="text" id="node-input-name" placeholder="Name"/>
   </div>
 
-  <hr/>
-  
+  <hr />
+
   <div class="form-row">
     <label for="node-input-pname" style="min-width: 150px;">Package Details:</label>
   </div>
@@ -226,7 +242,7 @@
     <label for="node-input-pversion" style="min-width: 150px;"><i class="fa fa-tag"></i> Version</label>
     <input type="text" id="node-input-pversion" placeholder="0.0.1"/>
   </div>
-  
+
   <div class="form-row">
     <label for="node-input-pauthorname" style="min-width: 150px;"><i class="fa fa-address-book-o"></i> Author Name</label>
     <input type="text" id="node-input-pauthorname" placeholder="Alfred E. Neumann"/>
@@ -256,15 +272,15 @@
     <input type="checkbox" id="node-input-writetgzfile" style="display:inline-block; width:15px; vertical-align:baseline;">
   </div>
 
-  <hr/>
+  <hr />
 
   <div class="form-row">
-    <label for="node-input-noderedinstall" style="min-width: 120px;">
+    <label for="node-input-noderedinstall" style="min-width: 180px;">
               <span>Install locally?</span>
           </label>
-    <input type="checkbox" id="node-input-noderedinstall" style="display:inline-block; width:15px; vertical-align:baseline;">
+    <input type="checkbox" id="node-input-noderedinstall" style="margin-left: 10px; display:inline-block; width:15px; vertical-align:baseline;">
   </div>
-  
+
   <div id="noderedinstall-options">
     <div class="form-row">
       <label for="node-input-randompackagename" style="min-width: 180px;">
@@ -275,13 +291,13 @@
   </div>
 
   <div class="form-row">
-    <label for="node-input-nodered_uninstall" style="min-width: 120px;">
-                <span>Uninstall package?</span>
+    <label for="node-input-nodered_uninstall" style="min-width: 180px;">
+                <span>Remove package locally?</span>
             </label>
-    <input type="checkbox" id="node-input-nodered_uninstall" style="display:inline-block; width:15px; vertical-align:baseline;">
+    <input type="checkbox" id="node-input-nodered_uninstall" style="margin-left: 10px; display:inline-block; width:15px; vertical-align:baseline;">
   </div>
 
-  <hr/>
+  <hr />
   <div class="form-row">
     <label for="node-input-npmpublish" style="min-width: 120px;">
          <span>NPMjs: Publish</span>
@@ -295,6 +311,14 @@
 
   <div id="npmpublish-options">
     <div class="form-row">
+      <label for="node-input-npmtoken" style="min-width: 150px;">
+        <i class="fa fa-key"></i>NPM Auth Token
+      </label>
+      <input type="text" id="node-input-npmtoken">
+      <input type="hidden" id="node-input-npmtokenType">
+    </div>
+
+    <div class="form-row">
       <label for="node-input-npmotp" style="min-width: 150px;"><i class="fa fa-tag"></i> One Time Password</label>
       <input type="text" id="node-input-npmotp" placeholder="111999"/>
     </div>
@@ -302,7 +326,7 @@
 
   <hr />
   <div class="form-row">
-      <label for="node-input-gitcommit" style="min-width: 120px;">
+    <label for="node-input-gitcommit" style="min-width: 120px;">
                <span>GitHub: Commit?</span>
       </label>
     <input type="checkbox" id="node-input-gitcommit" style="display:inline-block; width:15px; vertical-align:baseline;">
@@ -310,26 +334,34 @@
     <label for="node-input-gitcheckforchange" style="margin-left: 30px; min-width: 100px;">
                 <span>What changed?</span>
      </label>
-     <input type="checkbox" id="node-input-gitcheckforchange" style="display:inline-block; width:15px; vertical-align:baseline;">
+    <input type="checkbox" id="node-input-gitcheckforchange" style="display:inline-block; width:15px; vertical-align:baseline;">
 
     <label for="node-input-githubgettar" style="margin-left: 15px; min-width: 100px;">
-                <span>Get Repo?</span>
+                <span>Retrieve Repo?</span>
      </label>
-     <input type="checkbox" id="node-input-githubgettar" style="display:inline-block; width:15px; vertical-align:baseline;">
+    <input type="checkbox" id="node-input-githubgettar" style="display:inline-block; width:15px; vertical-align:baseline;">
   </div>
 
   <div id="github-options">
+    <div class="form-row">
+      <label for="node-input-githubtoken" style="min-width: 150px;">
+        <i class="fa fa-key"></i>GitHub Auth Token
+      </label>
+      <input type="text" id="node-input-githubtoken">
+      <input type="hidden" id="node-input-githubtokenType">
+    </div>
+
     <div class="form-row">
       <label for="node-input-githubowner" style="min-width: 150px;"><i class="fa fa-user-o"></i> GitHub Username</label>
       <input type="text" id="node-input-githubowner" placeholder="username"/>
     </div>
     <div class="form-row">
-       <label for="node-input-githubrepo" style="min-width: 150px;"><i class="fa fa-paw"></i> Repository</label>
-       <input type="text" id="node-input-githubrepo" placeholder=""/>
+      <label for="node-input-githubrepo" style="min-width: 150px;"><i class="fa fa-paw"></i> Repository</label>
+      <input type="text" id="node-input-githubrepo" placeholder=""/>
     </div>
     <div class="form-row">
-       <label for="node-input-githubbranch" style="min-width: 150px;"><i class="fa fa-tree"></i> Branch</label>
-       <input type="text" id="node-input-githubbranch" placeholder="main"/>
+      <label for="node-input-githubbranch" style="min-width: 150px;"><i class="fa fa-tree"></i> Branch</label>
+      <input type="text" id="node-input-githubbranch" placeholder="main"/>
     </div>
   </div>
 
@@ -346,6 +378,7 @@
       <label for="node-input-githubauthoremail" style="min-width: 150px;"><i class="fa fa-envelope-o"></i> Author Email</label>
       <input type="text" id="node-input-githubauthoremail" placeholder="joe@spreads-the.love"/>
     </div>
+
   </div>
 </script>
 
