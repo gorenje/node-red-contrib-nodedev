@@ -2,9 +2,11 @@
 
 *What?*
 
-The idea behind this collection of nodes to democratise the development of Node-RED nodes. Normally the development of your [own nodes](https://nodered.org/docs/creating-nodes/) will require the use of a third-party editor. Something like VSCode or Vim or Atom or god forbid, [Emacs](https://discourse.nodered.org/t/node-red-node-development-in-node-red/81525/2). This requirement makes creating nodes that much harder. So why not create nodes for Node-RED in Node-RED? After all, if you are using Node-RED, you probably understand how to use Node-RED.
+The idea behind this collection of nodes to democratise the development of Node-RED nodes. Normally the development of your [own nodes](https://nodered.org/docs/creating-nodes/) will require the use of a third-party editor. Something like VSCode or Vim or Atom or [Emacs](https://discourse.nodered.org/t/node-red-node-development-in-node-red/81525/2). This requirement makes creating nodes that much harder. So why not create nodes for Node-RED in Node-RED? After all, if you are using Node-RED, you probably understand how to use Node-RED.
 
-So this package tries to provide some supporting nodes for making node development in Node-RED possible and simpler. I have created a set of nodes that fulfill my needs, everything else is bound my imagination. 
+So this package tries to provide some supporting nodes for making node development in Node-RED possible and simpler. I have created a set of nodes that fulfill my needs, everything else is bound my imagination.
+
+Imagine a [continous integration](https://en.wikipedia.org/wiki/Continuous_integration) server combined with an editor. This can be done because Node-RED can both editor code (using something like a function node) and also perform actions such as posting data off to servers (http request node). 
 
 *What do these nodes provide?*
 
@@ -14,14 +16,13 @@ So this package tries to provide some supporting nodes for making node developme
 - A `NodeFactory` node that can create templates for node development. It also converts existing `.tgz` packages to `PkgFile` nodes, meaning that existing packages can easily be ported to this style of development. 
 - A `NpmPublish` allows node packages to be published to a node registry, for example [npmjs](https://www.npmjs.com/). The NpmPublish can also be used to publish to private registries, for example, those based on [Verdaccio](https://verdaccio.org/).
 - A `OTPGenerate` node can be used to generate an One Time Password (OTP) for publishing nodes to registries. For example the NPMjs.com registry.
+- The `NodeDevOps` node controls what is done, i.e., install package locally, commit to GitHub or publish to Npm. For these operations to work, a support [flow](https://flowhub.org/f/d0506e991d512ace) needs to be installed in Node-RED. This can be done using the [FlowHub nodes](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-flowhub). 
 
 *This is all very confusing?*
 
-Of course, all this is very meta and it gets worse since these nodes are maintained by this [flow](https://flowhub.org/f/b92be5062203ff69). These nodes are creating in Node-RED in a kind of a bootstrapping for further node development in Node-RED.
+Of course, all this is very meta and it gets worse since these nodes are maintained by this [flow](https://flowhub.org/f/b92be5062203ff69). These nodes are bootstrapped in Node-RED to aid Node-RED node development within Node-RED. On the other hand, Node-RED node [development](https://nodered.org/docs/creating-nodes/) is initially also confusing (requiring at least three different files). That's why the NodeFactory provides templates for various types of nodes.
 
-This is not an inbuilt extension of Node-RED and obviously a more integrated workflow would be simpler. This is a attempt to find a better solution to node development, one by which testing and fixing nodes becomes faster.
-
-It also gets more confusing since these nodes will open the Node-RED import dialog with pre-defined nodes. These are generally safe to import since that's how this package creates an initial set of nodes for representing a node package. Also importing nodes for an unknown node package is not recommended unless it happens to be your own package!
+This is not an inbuilt extension of Node-RED and obviously a more integrated workflow would be simpler. This is a attempt to find a better solution to Node-RED node development (*not* NodeJS development), one by which testing and fixing nodes becomes faster because everything is done in Node-RED.
 
 ### Screencast
 
