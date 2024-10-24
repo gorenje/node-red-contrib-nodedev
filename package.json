@@ -31,7 +31,8 @@
   "node-red" : {
     "version": ">=3.0.0",
     "plugins": {
-      "nodefactory_sidebar": "plugins/node-factory-sidebar.html"
+      "nodefactory_sidebar": "plugins/node-factory-sidebar.html",
+      "supportdraganddrop":  "plugins/support-drag-and-drop.html"
     },
     "nodes": {
       "nodedevops":     "nodes/05-node-dev-ops.js",

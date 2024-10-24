@@ -86,6 +86,7 @@ module.exports = (function () {
         "liquid": "liquid",
         "html.liquid": "liquid",
         "lua": "lua",
+        "mdx": "mdx",
         "s": "mips",
         "md": "markdown",
         "markdown": "markdown",
@@ -153,6 +154,10 @@ module.exports = (function () {
         "iecst": "st",
         "iecplc": "st",
         "lc3lib": "st",
+        "TcPOU": "st",
+        "TcDUT": "st",
+        "TcGVL": "st",
+        "TcIO": "st",
         "swift": "swift",
         "tf": "hcl",
         "tfvars": "hcl",
@@ -162,6 +167,7 @@ module.exports = (function () {
         "tsx": "typescript",
         "cts": "typescript",
         "mts": "typescript",
+        "tsp": "typespec",
         "v": "verilog",
         "vh": "verilog",
         "vb": "vb",
@@ -219,6 +225,7 @@ module.exports = (function () {
         "xml": "xml",
         "ts": "typescript",
         "sql": "sql",
+        "sh": "shell",
 
 
         /* binary formats are encoded in base64 */
