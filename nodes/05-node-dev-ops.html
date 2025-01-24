@@ -78,6 +78,8 @@ RED.nodes.registerType('NodeDevOps', {
     npmtoken: { value: "NPM_AUTH_TOKEN" },
     npmtokenType: { value: "env" },
 
+    flowsnoderedorg_update: { value: false },
+    
     writetgzfile: { value: false },
 
   },
@@ -298,6 +300,7 @@ RED.nodes.registerType('NodeDevOps', {
   </div>
 
   <hr />
+
   <div class="form-row">
     <label for="node-input-npmpublish" style="min-width: 120px;">
          <span>NPMjs: Publish</span>
@@ -325,6 +328,7 @@ RED.nodes.registerType('NodeDevOps', {
   </div>
 
   <hr />
+
   <div class="form-row">
     <label for="node-input-gitcommit" style="min-width: 120px;">
                <span>GitHub: Commit?</span>
@@ -378,8 +382,17 @@ RED.nodes.registerType('NodeDevOps', {
       <label for="node-input-githubauthoremail" style="min-width: 150px;"><i class="fa fa-envelope-o"></i> Author Email</label>
       <input type="text" id="node-input-githubauthoremail" placeholder="joe@spreads-the.love"/>
     </div>
-
   </div>
+
+  <hr />
+
+  <div class="form-row">
+    <label for="node-input-flowsnoderedorg_update" style="min-width: 180px;">
+           <span>Flows.NodeRed.org: Update</span>
+      </label>
+    <input type="checkbox" id="node-input-flowsnoderedorg_update" style="display:inline-block; width:15px; vertical-align:baseline;">
+  </div>
+
 </script>
 
 <script type="text/html" data-help-name="NodeDevOps">
