@@ -226,6 +226,7 @@ module.exports = (function () {
         "ts": "typescript",
         "sql": "sql",
         "sh": "shell",
+        "ipynb": "json",
 
 
         /* binary formats are encoded in base64 */
