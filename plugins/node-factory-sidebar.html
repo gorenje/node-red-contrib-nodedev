@@ -160,18 +160,22 @@
             }
       });
       
-      // Add first tab, pkg importer
       tabs.addTab({
             id: 'func-nodedev-pkgimporter-tab-pkgimport',
             iconClass: 'fa fa-industry',
             label: 'PkgImporter'
       });
 
-      // Add first tab, otp
       tabs.addTab({
             id: 'func-nodedev-pkgimporter-tab-otpgenerator',
             iconClass: 'fa fa-user-secret',
             label: 'OTP Generator'
+      });
+
+      tabs.addTab({
+            id: 'func-nodedev-pkgimporter-tab-options',
+            iconClass: 'fa fa-cog',
+            label: 'Options'
       });
 
       ensureYourConfigNodeExists();
@@ -462,6 +466,17 @@
         <div class="form-row" style="margin-left: 10px;">
             <button id="nodedev-sidebar-otp-generate-btn" class="button">Generate</button>
             <input type="text" id="node-input-nodedev-sidebar-otp" placeholder="OTP...">
+        </div>
+    </div>
+
+    <div id="func-nodedev-pkgimporter-tab-options" style="display:none">
+        <div class="form-row" style="margin-left: 10px;">
+            Drag & Drop
+        </div>
+
+        <div class="form-row" style="margin-left: 10px;">
+            <input style="width: 10%;" type="checkbox" id="nodedev-drag-drop-generate-pkgfile-nodes"/>
+            <label for="nodedev-drag-drop-generate-pkgfile-nodes" style="width: 40%;"><i class="fa fa-code" ></i> Create PkgFile nodes on drop?</label>
         </div>
     </div>
 </div>

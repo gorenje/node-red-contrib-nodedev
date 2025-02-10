@@ -9,6 +9,11 @@
             */
             window.ddEvent = event
 
+            // checkbox on the options tab
+            if ( !$("#nodedev-drag-drop-generate-pkgfile-nodes").is(":checked") ) {
+                return
+            }
+
             let itemPtr = event.originalEvent.dataTransfer.items
             let itemCount = itemPtr.length
 
