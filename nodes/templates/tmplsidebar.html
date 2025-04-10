@@ -45,7 +45,7 @@
              hasUsers: false, 
              users: [],
              name: "{{ node.name }}",
-             label: function() { return this.name || "{{ node.name }}"},
+             label: function() { return "{{ node.nodelabel }}" || this.name },
              /* values and data defined by this config node */
              data: "some default value", // Default data
          }

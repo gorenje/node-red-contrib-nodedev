@@ -5,10 +5,16 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-nodename"><i class="fa fa-tag"></i> Node Name</label>
-        <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-nodename" placeholder="Node Name">
+        <label for="node-input-nodename"><i class="fa fa-tag"></i> Node Type</label>
+        <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-nodename" placeholder="Node Type">
         </div>
     </div> 
+
+    <div class="form-row">
+        <label for="node-input-nodelabel"><i class="fa fa-tag"></i> Node Label</label>
+        <div style="display: inline-block; width: calc(100% - 105px)"><input type="text" id="node-input-nodelabel" placeholder="Node Label">
+        </div>
+    </div>
 
     <div class="form-row">
         <label for="node-input-category"><i class="fa fa-tag"></i> Node Category</label>
@@ -195,6 +201,7 @@
         data["icon"]        = $('#red-ui-editor-node-icon').val();
         data["iconclass"]   = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
         data["name"]        = $('#node-input-nodename').val();
+        data["nodelabel"]   = $('#node-input-nodelabel').val();
         data["namelwr"]     = data["name"].toLowerCase();
         data["outputcount"] = $('#node-input-outputcount').val();
         data["category"]    = $('#node-input-category').val();
@@ -227,10 +234,11 @@
             data[attrname] = node[attrname]
         })
 
-        data["name"]      = node.nodename; // name clashes with the default 'name' attribute
-        data["namelwr"]   = data["name"].toLowerCase();
-        data["iconclass"] = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
-        data["__task"]    = "generate_from_templates";
+        data["name"]         = node.nodename; // name clashes with the default 'name' attribute
+        data["namelwr"]      = data["name"].toLowerCase();
+        data["iconclass"]    = "fa " + data["icon"].split("/")[1]; /* Assume font-awesomeness */
+        data["__task"]       = "generate_from_templates";
+        data["name_escaped"] = data["name"].replaceAll("-",'_').replace(new RegExp(/[ \t\s]/g),'')
         
         postDataOff(node,data)
     }
@@ -241,6 +249,7 @@
         defaults: {
             name:           { value: "" },
             nodename:       { value: "", required: true },
+            nodelabel:      { value: "", required: true },
             color:          { value: "#e5e4ef" },
             hasbutton:      { value: false },
             minify:         { value: false },

@@ -54,6 +54,7 @@
     color: '{{ node.color }}',
     icon: "{{{ node.icon }}}",
     category: '{{ node.category }}',
+    paletteLabel: '{{ node.nodelabel }}',
     defaults: {
       name: {
         value:"",

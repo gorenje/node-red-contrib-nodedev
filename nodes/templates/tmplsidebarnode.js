@@ -1,9 +1,9 @@
 module.exports = function (RED) {
-  function Config{{ node.name }}Functionality(config) {
+  function Config{{ node.name_escaped }}Functionality(config) {
     RED.nodes.createNode(this, config)
   }
   
-  RED.nodes.registerType('{{ node.name }}Cfg', Config{{ node.name }}Functionality);
+  RED.nodes.registerType('{{ node.name }}Cfg', Config{{ node.name_escaped }}Functionality);
 
 {{ #node.frt2bakcomm }}
   RED.httpAdmin.post("/{{ node.name }}Cfg",

@@ -1,5 +1,5 @@
 module.exports = function(RED) {
-  function Core{{ node.name }}Functionality(config) {
+  function Core{{ node.name_escaped }}Functionality(config) {
     RED.nodes.createNode(this,config);
 
     var node = this;
@@ -41,7 +41,7 @@ module.exports = function(RED) {
     });
   }
 
-  RED.nodes.registerType("{{ node.name }}", Core{{ node.name }}Functionality);
+  RED.nodes.registerType("{{ node.name }}", Core{{ node.name_escaped }}Functionality);
 
 {{ #node.frt2bakcomm }}
   RED.httpAdmin.post("/{{ node.name }}/:id",
