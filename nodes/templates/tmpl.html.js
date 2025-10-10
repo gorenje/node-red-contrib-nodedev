@@ -81,6 +81,12 @@
       return this.name?"node_label_italic":"";
     },
 
+    // called when node is added to workspace also if copied and pasted.
+    // once for each node added to the workspace
+    onadd: function() {
+    },
+
+    // called when node added to palette - one time
     onpaletteadd: function() {
       {{#node.bak2frtcomm}}
       this.messageFromBackendHandler = (topic,dataobj) => {
