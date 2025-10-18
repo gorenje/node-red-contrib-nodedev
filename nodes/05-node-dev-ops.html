@@ -58,6 +58,7 @@ RED.nodes.registerType('NodeDevOps', {
 
     nodered_uninstall: { value: false },
 
+    create_control_center: { value: false },
     ignore_package_check: { value: false },
 
     gitcommit: { value: false },
@@ -99,6 +100,12 @@ RED.nodes.registerType('NodeDevOps', {
   },
 
   oneditprepare: function () {
+    $('#node-input-create_control_center').on('change', () => {
+      if ($('#node-input-create_control_center').is(":checked") ) {
+        $('#node-input-gitcommit').prop('checked', true).trigger('change')
+      } 
+    })
+
     $('#node-input-nodered_uninstall').on('change', () => {
       if ($('#node-input-nodered_uninstall').is(":checked")) {
         $('#node-input-noderedinstall').prop('checked', false).trigger('change')
@@ -258,6 +265,13 @@ RED.nodes.registerType('NodeDevOps', {
   <div class="form-row">
     <label for="node-input-pdescription" style="min-width: 150px;"><i class="fa fa-book"></i> Description</label>
     <input type="text" id="node-input-pdescription" placeholder="Package description"/>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-create_control_center" style="min-width: 150px;"">
+      <span>Create Control Center?</span>
+    </label>
+    <input type="checkbox" id="node-input-create_control_center" style="display:inline-block; width:15px; vertical-align:baseline;">
   </div>
 
   <div class="form-row">
