@@ -1,0 +1,2223 @@
+[
+    {
+        "id": "d0506e991d512ace",
+        "type": "tab",
+        "label": "[NodeDev] install,publish,push",
+        "disabled": false,
+        "info": "::: aim\n\nProvide a backbone for the development nodes within Node-RED.\n\n:::\n\n::: requirements\n\n- [nodedev node package](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev)\n- the [holistic JSON schema validator](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-validation-and-documentation)\n\n- For GitHub commits, the repository has to be created and one commit needs to have been done.\n- GITHUB_TOKEN set in the env, details described in the [GitHub Base functionality](https://flowhub.org/f/390ee0021ded4910)\n\n- For NPM publish, there needs to be an env variable `NPM_AUTH_TOKEN` that needs to be defined.\n- For NPM publish, authentication is assumed to be OTP (one time password) and the OTP has to be entered, the flow deployed and then the button pressed. So an OTP with longer expiry might be good.\n\n::: \n\n\n<!--\n// [] aba9a5d741241f1c [group] \"entry point\"\n// [] f3879ed58795ea91 [group] \"example message\"\n// [] 8c02f3fe5cd0a0a9 [group] \"GitHub API Functionality\"\n// [] d8867a43abe7260c [group] \"Entry points\"\n// [] 3ccaf963f1e72024 [group] \"\"\n// [] 56b55d2b5d03f424 [group] \"Node-RED local installation\"\n// [] 5d202e6481e451cb [group] \"GitHub functionality\"\n// [] 94fb93c898275493 [group] \"NPM Publish\"\n// [] 88aca7ba3d72dff1 [group] \"NPM Unpublish\"\n-->\n\n\n\n::: background\n\nThis flow provides the following functionality:\n\n- <a class=\"ahl-group-only\" data-ids=\"56b55d2b5d03f424\">Local installation</a> of node code developed using the [nodedev](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-nodedev) node package\n- <a class=\"ahl-group-only\" data-ids=\"5d202e6481e451cb\">GitHub commit</a> functionality so that all package files are committed in the correct repo structure.\n- <a class=\"ahl-group-only\" data-ids=\"94fb93c898275493\">NPM Publish</a> to bring the node package to market, and\n- <a class=\"ahl-group-only\" data-ids=\"88aca7ba3d72dff1\">NPM Unpublish</a> in cases of mistakes.\n\nValidation of the `msg` object and example of required properties are <a class=\"ahl-group-only\" data-ids=\"3ccaf963f1e72024\">also provided</a>.\n\n:::\n\n\n### Assumption\n\nThat the package name is scoped with a username, i.e. `@username/node-red-contrib-XYZ`.\n\nThe registry to publish to is assumed to be `https://registry.npmjs.org`.\n\nAlso some requirements as defined in the [creating your own node](https://nodered.org/docs/creating-nodes/packaging) have been enforced by the <a class=\"ahl-node-only\" data-ids=\"2a7132258cbcf313\">package validation node</a>.\n\n::: discussion \n\nIf I want to extend my Emacs, I don't open Vi to create my extensions, I do this in Emacs. I extend Emacs *with* Emacs.\n\nWhy should this be any different in Node-RED? This flow is part of demonstrating how that idea *could* work in Node-RED.\n\n:::\n\n### Related flows\n\n- [nodedev node package development](https://flowhub.org/f/b92be5062203ff69)\n\n### Usage examples\n\n- [Neural-Network Builder](https://flowhub.org/f/f7e009091ef2d6b0)\n- [JSON Schema Validation + Documentation](https://flowhub.org/f/a7a81bcd7159a826)\n- [Introspection package](https://flowhub.org/f/d73d76db3df96ba2)\n- [FlowHub nodes](https://flowhub.org/f/4a831589774ecb04)\n\n",
+        "env": []
+    },
+    {
+        "id": "aba9a5d741241f1c",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "entry point",
+        "style": {
+            "label": true,
+            "fill": "#c8e7a7",
+            "fill-opacity": "0.83"
+        },
+        "nodes": [
+            "963dfb765b0d9849"
+        ],
+        "x": 133.285888671875,
+        "y": 1211.4662322998047,
+        "w": 82,
+        "h": 82
+    },
+    {
+        "id": "3ccaf963f1e72024",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "",
+        "style": {
+            "fill": "#ffffbf",
+            "fill-opacity": "0.58",
+            "label": true
+        },
+        "nodes": [
+            "992dea9edfe05367",
+            "f3879ed58795ea91"
+        ],
+        "x": 317.9999771118164,
+        "y": 1096.2857598236628,
+        "w": 452,
+        "h": 197.18047247614186
+    },
+    {
+        "id": "56b55d2b5d03f424",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "Node-RED local installation",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "f07d2d09465ca725",
+            "3a0d53eb62336e62",
+            "2c515ea1f3cf8411"
+        ],
+        "x": 1779,
+        "y": 887,
+        "w": 212,
+        "h": 205
+    },
+    {
+        "id": "5d202e6481e451cb",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "GitHub functionality",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "25f729f47986b0f8",
+            "971ddff1a67a201f",
+            "732f4fa715c2fa78",
+            "255cf2c177f684a9",
+            "79b43c9ce292f151",
+            "0cb6ad0a57a95eee",
+            "bfe2775a7cf26d83",
+            "cd99083510c1fa1e",
+            "0f865b51b0f7997d",
+            "7f0881a1f1e17458",
+            "945ff83ff12b2cf5",
+            "856405ba78a11b7a",
+            "decde30c099b3701",
+            "2905451093154a24",
+            "a827fb86b27503a3",
+            "10a5e33f8ca3f848",
+            "1d0e09e64d59771e",
+            "30ee1ba5389219eb",
+            "551504329d997bad",
+            "ccb92d03a6cda7df",
+            "777b0b7476a82755",
+            "5fdf835cef66f3f2",
+            "f45011cdb6c9405b"
+        ],
+        "x": 2089,
+        "y": 218,
+        "w": 992,
+        "h": 1072
+    },
+    {
+        "id": "94fb93c898275493",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "NPM Publish",
+        "style": {
+            "label": true,
+            "label-position": "ne"
+        },
+        "nodes": [
+            "fbe982a35d27d99b",
+            "33093265f4dfec9d",
+            "de9fefd043701d43",
+            "5ca98f63115bf9ad"
+        ],
+        "x": 1908,
+        "y": 1657,
+        "w": 292,
+        "h": 237.375
+    },
+    {
+        "id": "88aca7ba3d72dff1",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "NPM Unpublish",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "3f9377f9c6c4572b",
+            "3a58f10bf6055793",
+            "2328dce09b97de9e"
+        ],
+        "x": 1790,
+        "y": 1354.8125,
+        "w": 292,
+        "h": 180.37493896484375
+    },
+    {
+        "id": "de7cfeb5612cf008",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "Write & download package tgz file ",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "a5f68eb9247d3b1a",
+            "cfd5edb34e3df477",
+            "d2b7368e1c55b208",
+            "4744f729aa18f631",
+            "7f2310f2e93bd28f"
+        ],
+        "x": 1494,
+        "y": 1657.402587890625,
+        "w": 403,
+        "h": 284.597412109375
+    },
+    {
+        "id": "1f5fb00661db27e0",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "Node-RED uninstall package",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "0ad0c578fcb647a1",
+            "43f0f04922b1ecd9"
+        ],
+        "x": 1476,
+        "y": 888,
+        "w": 253,
+        "h": 140
+    },
+    {
+        "id": "16d4e4d85e6a7e60",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "update flows.flowhub.org",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "b3f710d3656ec0bd",
+            "7134a0a01a78b0a4",
+            "d7bb19775d60ba5f",
+            "329cb745ab148644",
+            "8b4462e71d18d914",
+            "c447b660ffb100b7",
+            "24a6bdedc55adb51",
+            "e045b2b86c04bede",
+            "5096c688782c5d5b",
+            "4260147961b82058",
+            "f4dc513b63d2486a",
+            "3210b2328892fb83",
+            "2782388af7e4a3e3",
+            "1567d317341f29d7",
+            "f58a3097c0ec980c"
+        ],
+        "x": 1469,
+        "y": 1987,
+        "w": 1750,
+        "h": 341.5
+    },
+    {
+        "id": "792e5b24ee0a810b",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "name": "create the control center flow.",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "e51aa8c50e251fa1",
+            "b3b1bcc40a8919a0",
+            "cbc70f2e73b7903b"
+        ],
+        "x": 1419,
+        "y": 2383,
+        "w": 934,
+        "h": 82
+    },
+    {
+        "id": "f3879ed58795ea91",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "g": "3ccaf963f1e72024",
+        "name": "example message",
+        "style": {
+            "fill": "#addb7b",
+            "label": true
+        },
+        "nodes": [
+            "9c62729b0ebd76ad"
+        ],
+        "x": 371.5716323852539,
+        "y": 1122.2857598236628,
+        "w": 332,
+        "h": 82
+    },
+    {
+        "id": "5fdf835cef66f3f2",
+        "type": "group",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "generate a collection of PkgFile nodes for a github repo",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "5d7f01a1ad913039",
+            "d101de4d53a9432d",
+            "d5d4f3a794acac21",
+            "4f0f2c8426c173c1",
+            "c025c3fe56571a85",
+            "62dcb20fb8c8ac41",
+            "ecbad6c4f4f47ba1",
+            "9e44d92c288df764"
+        ],
+        "x": 2528,
+        "y": 761,
+        "w": 527,
+        "h": 302
+    },
+    {
+        "id": "893f316ea815e2b1",
+        "type": "junction",
+        "z": "d0506e991d512ace",
+        "x": 1371.9389214515686,
+        "y": 1243,
+        "wires": [
+            [
+                "2328dce09b97de9e",
+                "5ca98f63115bf9ad",
+                "2c515ea1f3cf8411",
+                "cfd5edb34e3df477",
+                "43f0f04922b1ecd9",
+                "f58a3097c0ec980c",
+                "e51aa8c50e251fa1",
+                "92db66ab26c22ab8"
+            ]
+        ]
+    },
+    {
+        "id": "2a7132258cbcf313",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "name": "Package.json validator",
+        "func": "/* must have a package.json */\n\nvar pkgjson = msg.contents.filter((d) => {\n    return d.name == \"package.json\"\n});\n\nif ( pkgjson.length != 1 ) {\n    if ( pkgjson.length > 1 ) {\n      node.error(\"multiple package.json files found\", msg)\n    } else {\n      node.error(\"no package.json file found\", msg)\n    }\n    node.done();\n    return;\n}\n\n/* name must be scoped */\n\nvar manifest = JSON.parse(pkgjson[0].contents);\n\nvar pdetails = manifest.name.split(\"/\")\n\nif (pdetails.length < 2 || pdetails[0][0] != '@') {\n    node.error(\"package name not scoped: \" + manifest.name, msg)\n    node.done();\n    return\n}\n\n/* need to provide an node-red supported engine version */\n\nif ( !manifest[\"node-red\"] || !manifest[\"node-red\"].version ) {\n    msg.error = {\n      message: \"Node-RED supported version missing in package.json, see https://nodered.org/docs/creating-nodes/packaging for more details\"\n    }\n    node.error(\"Node-RED supported engine version not supplied in package.json\", msg)\n    node.done();\n    return\n}\n\n/* also ensure there is an nodejs engine supported version salvo */\n\nif ( !manifest.engines || !manifest.engines.node ) {\n    msg.error = {\n      message: \"Nodejs supported version missing in package.json, see https://docs.npmjs.com/cli/v7/configuring-npm/package-json#engines for more details\"\n    }\n    node.error(\"Nodejs supported engine version not supplied in package.json\", msg)\n    node.done();\n    return\n}\n\n/* ensure contents is not empty */\n\nmsg.contents.forEach( (d) => {\n  if ( !d.contents || d.contents.trim() == \"\" ) {\n    node.error(\"file empty: \" + d.name, msg)\n    node.done();\n    return\n  }\n});\n\n/* DON'T NEED TO: ensure that the homepage points to an existing file */\n/*\nvar hsh = (Url.parse(manifest.homepage).hash || \"\").substr(1)\nvar rdme = msg.contents.filter((d) => { return d.name == hsh || d.name.replace(/\\.md$/i, '').toLowerCase() == hsh })\n\nif (rdme.length == 0) {\n  msg.error = {\n    message: \"Package.json homepage url does not link to a file in this package, this needs to be the case for nodered.org.\"\n  }\n  node.error(\"Package.json homepage url does not link to a file in this package, this needs to be the case for nodered.org.\", msg)\n  node.done();\n  return\n}\n*/\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "Ajv",
+                "module": "ajv"
+            },
+            {
+                "var": "Url",
+                "module": "url"
+            }
+        ],
+        "x": 1121.14306640625,
+        "y": 1378.12158203125,
+        "wires": [
+            [
+                "893f316ea815e2b1"
+            ]
+        ],
+        "outputLabels": [
+            "ok"
+        ]
+    },
+    {
+        "id": "9c62729b0ebd76ad",
+        "type": "inject",
+        "z": "d0506e991d512ace",
+        "g": "f3879ed58795ea91",
+        "name": "example contents for message",
+        "props": [
+            {
+                "p": "pname",
+                "v": "@gregoriusrippenstein/node-red-contrib-nodedev",
+                "vt": "str"
+            },
+            {
+                "p": "pversion",
+                "v": "0.0.3",
+                "vt": "str"
+            },
+            {
+                "p": "noderedinstall",
+                "v": "true",
+                "vt": "bool"
+            },
+            {
+                "p": "gitcommit",
+                "v": "false",
+                "vt": "bool"
+            },
+            {
+                "p": "githubowner",
+                "v": "gorenje",
+                "vt": "str"
+            },
+            {
+                "p": "githubrepo",
+                "v": "node-red-contrib-nodedev",
+                "vt": "str"
+            },
+            {
+                "p": "githubbranch",
+                "v": "main",
+                "vt": "str"
+            },
+            {
+                "p": "commit_message",
+                "v": "nice commit message",
+                "vt": "str"
+            },
+            {
+                "p": "githubauthor",
+                "v": "Gerrit Riessen",
+                "vt": "str"
+            },
+            {
+                "p": "githubauthoremail",
+                "v": "gerrit@openmindmap.org",
+                "vt": "str"
+            },
+            {
+                "p": "npmpublish",
+                "v": "false",
+                "vt": "bool"
+            },
+            {
+                "p": "npmunpublish",
+                "v": "false",
+                "vt": "bool"
+            },
+            {
+                "p": "npmotp",
+                "v": "123456",
+                "vt": "str"
+            },
+            {
+                "p": "contents",
+                "v": "{}",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 547.5716323852539,
+        "y": 1163.2857598236628,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f07d2d09465ca725",
+        "type": "NodeRedInstall",
+        "z": "d0506e991d512ace",
+        "g": "56b55d2b5d03f424",
+        "name": "",
+        "x": 1894.71044921875,
+        "y": 928,
+        "wires": []
+    },
+    {
+        "id": "3a0d53eb62336e62",
+        "type": "NpmTarBall",
+        "z": "d0506e991d512ace",
+        "g": "56b55d2b5d03f424",
+        "name": "",
+        "x": 1894.71044921875,
+        "y": 988.3969020843506,
+        "wires": [
+            [
+                "f07d2d09465ca725"
+            ]
+        ]
+    },
+    {
+        "id": "fbe982a35d27d99b",
+        "type": "NpmTarBall",
+        "z": "d0506e991d512ace",
+        "g": "94fb93c898275493",
+        "name": "",
+        "x": 2054,
+        "y": 1802.5973510742188,
+        "wires": [
+            [
+                "33093265f4dfec9d"
+            ]
+        ]
+    },
+    {
+        "id": "33093265f4dfec9d",
+        "type": "NpmPublish",
+        "z": "d0506e991d512ace",
+        "g": "94fb93c898275493",
+        "name": "",
+        "otp": "",
+        "action": "publish",
+        "authToken": "NPM_AUTH_TOKEN",
+        "authTokenType": "env",
+        "x": 2054,
+        "y": 1853.375,
+        "wires": [
+            [
+                "2f4b14f27919dfab"
+            ]
+        ]
+    },
+    {
+        "id": "2f4b14f27919dfab",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "name": "result of npm publish",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3317,
+        "y": 1856.375,
+        "wires": []
+    },
+    {
+        "id": "3f9377f9c6c4572b",
+        "type": "NpmPublish",
+        "z": "d0506e991d512ace",
+        "g": "88aca7ba3d72dff1",
+        "name": "Npm Unpublish",
+        "otp": "",
+        "action": "unpublish",
+        "authToken": "NPM_AUTH_TOKEN",
+        "authTokenType": "env",
+        "x": 1937,
+        "y": 1494.1874389648438,
+        "wires": [
+            [
+                "76a74cea5b85bef5"
+            ]
+        ]
+    },
+    {
+        "id": "3a58f10bf6055793",
+        "type": "JsonSchemaValidatorWithDocu",
+        "z": "d0506e991d512ace",
+        "g": "88aca7ba3d72dff1",
+        "name": "",
+        "property": "",
+        "propertyType": "fullmsg",
+        "checkentireobject": true,
+        "func": "{\n    \"title\": \"Check `msg` for NPM unpublish\",\n    \"type\": \"object\",\n    \"required\": [\n        \"npmotp\",\n        \"npmauthtokenvalue\"\n    ],\n    \"properties\": {\n        \"npmotp\": {\n            \"type\": \"string\",\n            \"description\": \"One Time Password for NPM.\"\n        },\n        \"npmauthtokenvalue\": {\n            \"type\": \"string\",\n            \"description\": \"NPM auth token.\"\n        }\n    }\n}",
+        "schematitle": "Check `msg` for NPM publish",
+        "x": 1936,
+        "y": 1444.28271484375,
+        "wires": [
+            [
+                "3f9377f9c6c4572b"
+            ]
+        ],
+        "info": "## Check \\`msg\\` for NPM publish Type\n\n`object` ([Check \\`msg\\` for NPM publish](definition.md))\n\n# Check \\`msg\\` for NPM publish Properties\n\n| Property          | Type     | Required | Nullable       | Defined by                                                                                      |\n| :---------------- | :------- | :------- | :------------- | :---------------------------------------------------------------------------------------------- |\n| [npmotp](#npmotp) | `string` | Required | cannot be null | [Check \\`msg\\` for NPM publish](definition-properties-npmotp.md \"undefined#/properties/npmotp\") |\n\n## npmotp\n\nOne Time Password for NPM.\n\n`npmotp`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` for NPM publish](definition-properties-npmotp.md \"undefined#/properties/npmotp\")\n\n### npmotp Type\n\n`string`\n\n---\n## npmotp Type\n\n`string`\n"
+    },
+    {
+        "id": "25f729f47986b0f8",
+        "type": "JsonSchemaValidatorWithDocu",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "Check `msg` object for github action requirements",
+        "property": "",
+        "propertyType": "fullmsg",
+        "checkentireobject": true,
+        "func": "{\n    \"title\": \"Check `msg` object for GitHub action.\",\n    \"type\": \"object\",\n    \n    \"required\": [\n        \"githubowner\",\n        \"githubrepo\",\n        \"githubbranch\"\n    ],\n\n    \"properties\": {\n        \"githubowner\": {\n            \"type\": \"string\",\n            \"description\": \"GitHub username.\"\n        },\n        \"githubrepo\": {\n            \"type\": \"string\",\n            \"description\": \"Repository upon which we are acting.\"\n        },\n        \"githubbranch\": {\n            \"type\": \"string\",\n            \"description\": \"The branch on which the commit should be done.\"\n        }\n    }\n}\n",
+        "schematitle": "Check `msg` object for GitHub commit.",
+        "x": 2305,
+        "y": 1090.3133544921875,
+        "wires": [
+            [
+                "30ee1ba5389219eb"
+            ]
+        ],
+        "info": "## Check \\`msg\\` object for GitHub commit. Type\n\n`object` ([Check \\`msg\\` object for GitHub commit.](definition.md))\n\n# Check \\`msg\\` object for GitHub commit. Properties\n\n| Property                                | Type      | Required | Nullable       | Defined by                                                                                                                      |\n| :-------------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------ |\n| [commit\\_message](#commit_message)      | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-commit_message.md \"undefined#/properties/commit_message\")       |\n| [githubowner](#githubowner)             | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubowner.md \"undefined#/properties/githubowner\")             |\n| [githubrepo](#githubrepo)               | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubrepo.md \"undefined#/properties/githubrepo\")               |\n| [githubbranch](#githubbranch)           | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubbranch.md \"undefined#/properties/githubbranch\")           |\n| [githubauthor](#githubauthor)           | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthor.md \"undefined#/properties/githubauthor\")           |\n| [githubauthoremail](#githubauthoremail) | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthoremail.md \"undefined#/properties/githubauthoremail\") |\n| [gitcheckforchange](#gitcheckforchange) | `boolean` | Optional | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-gitcheckforchange.md \"undefined#/properties/gitcheckforchange\") |\n\n## commit\\_message\n\nMessage for the commit.\n\n`commit_message`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-commit_message.md \"undefined#/properties/commit_message\")\n\n### commit\\_message Type\n\n`string`\n\n## githubowner\n\nGitHub username.\n\n`githubowner`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubowner.md \"undefined#/properties/githubowner\")\n\n### githubowner Type\n\n`string`\n\n## githubrepo\n\nRepository upon which we are acting.\n\n`githubrepo`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubrepo.md \"undefined#/properties/githubrepo\")\n\n### githubrepo Type\n\n`string`\n\n## githubbranch\n\nThe branch on which the commit should be done.\n\n`githubbranch`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubbranch.md \"undefined#/properties/githubbranch\")\n\n### githubbranch Type\n\n`string`\n\n## githubauthor\n\nFull name of the author of the commit.\n\n`githubauthor`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthor.md \"undefined#/properties/githubauthor\")\n\n### githubauthor Type\n\n`string`\n\n## githubauthoremail\n\nEmail of the author for the commit message.\n\n`githubauthoremail`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthoremail.md \"undefined#/properties/githubauthoremail\")\n\n### githubauthoremail Type\n\n`string`\n\n## gitcheckforchange\n\nDo not commit just check whether there are changes.\n\n`gitcheckforchange`\n\n*   is optional\n\n*   Type: `boolean`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-gitcheckforchange.md \"undefined#/properties/gitcheckforchange\")\n\n### gitcheckforchange Type\n\n`boolean`\n\n---\n## commit\\_message Type\n\n`string`\n\n---\n## githubowner Type\n\n`string`\n\n---\n## githubrepo Type\n\n`string`\n\n---\n## githubbranch Type\n\n`string`\n\n---\n## githubauthor Type\n\n`string`\n\n---\n## githubauthoremail Type\n\n`string`\n\n---\n## gitcheckforchange Type\n\n`boolean`\n"
+    },
+    {
+        "id": "992dea9edfe05367",
+        "type": "JsonSchemaValidatorWithDocu",
+        "z": "d0506e991d512ace",
+        "g": "3ccaf963f1e72024",
+        "name": "",
+        "property": "",
+        "propertyType": "fullmsg",
+        "checkentireobject": true,
+        "func": "{\n    \"title\": \"Basic requirements for `msg` object to utilise this flow.\",\n    \"$id\": \"docid\",\n    \"type\": \"object\",\n    \"required\": [\n        \"noderedinstall\",\n        \"gitcommit\",\n        \"npmpublish\",\n        \"npmunpublish\"\n    ],\n    \"$defs\": {\n        \"content\": {\n            \"type\": \"object\",\n            \"required\": [\n                \"name\",\n                \"contents\"\n            ],\n            \"properties\": {\n                \"name\": {\n                    \"type\": \"string\",\n                    \"description\": \"Name of the file to be included in the package.\"\n                },\n                \"contents\": {\n                    \"type\": \"string\",\n                    \"description\": \"Contents of the file to be included in the package. Binary data should be encoded in base64.\"\n                },\n                \"type\": {\n                    \"type\": \"string\",\n                    \"description\": \"Value describes the type of the content, default is utf-8.\",\n                    \"enum\": [\n                        \"text\",\n                        \"utf-8\",\n                        \"html\",\n                        \"javascript\",\n                        \"typescript\",\n                        \"markdown\",\n                        \"json\",\n                        \"base64\",\n                        \"yaml\",\n                        \"css\",\n                        \"xml\"\n                    ]\n                }\n            }\n        }\n    },\n    \"properties\": {\n        \"noderedinstall\": {\n            \"type\": \"boolean\",\n            \"description\": \"Install the node into Node-RED.\"\n        },\n        \"gitcommit\": {\n            \"type\": \"boolean\",\n            \"description\": \"Perform a GitHub commit with the package files.\"\n        },\n        \"npmpublish\": {\n            \"type\": \"boolean\",\n            \"description\": \"Publish package to NPM.\"\n        },\n        \"npmunpublish\": {\n            \"type\": \"boolean\",\n            \"description\": \"Unpublish package to NPM.\"\n        },\n        \"contents\": {\n            \"type\": \"array\",\n            \"description\": \"Contents of the package, all names should be prefixed with package/. Minimum: LICENSE, README and package.json --> 3.\",\n            \"minItems\": 3,\n            \"items\": {\n                \"$ref\": \"docid#/$defs/content\"\n            }\n        }\n    }\n}",
+        "schematitle": "Basic requirements for `msg` object to utilise this flow.",
+        "strictMode": false,
+        "removeDollarSchema": false,
+        "sendOnInvalid": false,
+        "x": 543.9999771118164,
+        "y": 1252.4662322998047,
+        "wires": [
+            [
+                "d485bbfece99d118"
+            ]
+        ],
+        "info": "## Basic requirements for \\`msg\\` object to utilise this flow. Type\n\n`object` ([Basic requirements for \\`msg\\` object to utilise this flow.](definition.md))\n\n# Basic requirements for \\`msg\\` object to utilise this flow. Properties\n\n| Property                          | Type      | Required | Nullable       | Defined by                                                                                                                                |\n| :-------------------------------- | :-------- | :------- | :------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |\n| [noderedinstall](#noderedinstall) | `boolean` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-noderedinstall.md \"docid#/properties/noderedinstall\") |\n| [gitcommit](#gitcommit)           | `boolean` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-gitcommit.md \"docid#/properties/gitcommit\")           |\n| [npmpublish](#npmpublish)         | `boolean` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-npmpublish.md \"docid#/properties/npmpublish\")         |\n| [npmunpublish](#npmunpublish)     | `boolean` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-npmunpublish.md \"docid#/properties/npmunpublish\")     |\n| [contents](#contents)             | `array`   | Optional | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-contents.md \"docid#/properties/contents\")             |\n\n## noderedinstall\n\nInstall the node into Node-RED.\n\n`noderedinstall`\n\n*   is required\n\n*   Type: `boolean`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-noderedinstall.md \"docid#/properties/noderedinstall\")\n\n### noderedinstall Type\n\n`boolean`\n\n## gitcommit\n\nPerform a GitHub commit with the package files.\n\n`gitcommit`\n\n*   is required\n\n*   Type: `boolean`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-gitcommit.md \"docid#/properties/gitcommit\")\n\n### gitcommit Type\n\n`boolean`\n\n## npmpublish\n\nPublish package to NPM.\n\n`npmpublish`\n\n*   is required\n\n*   Type: `boolean`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-npmpublish.md \"docid#/properties/npmpublish\")\n\n### npmpublish Type\n\n`boolean`\n\n## npmunpublish\n\nUnpublish package to NPM.\n\n`npmunpublish`\n\n*   is required\n\n*   Type: `boolean`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-npmunpublish.md \"docid#/properties/npmunpublish\")\n\n### npmunpublish Type\n\n`boolean`\n\n## contents\n\nContents of the package, all names should be prefixed with package/. Minimum: LICENSE, README and package.json --> 3.\n\n`contents`\n\n*   is optional\n\n*   Type: `object[]` ([Details](definition-properties-contents-items.md))\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-properties-contents.md \"docid#/properties/contents\")\n\n### contents Type\n\n`object[]` ([Details](definition-properties-contents-items.md))\n\n### contents Constraints\n\n**minimum number of items**: the minimum number of items for this array is: `3`\n\n# Basic requirements for \\`msg\\` object to utilise this flow. Definitions\n\n## Definitions group content\n\nReference this group by using\n\n```json\n{\"$ref\":\"docid#/$defs/content\"}\n```\n\n| Property                | Type     | Required | Nullable       | Defined by                                                                                                                                               |\n| :---------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| [name](#name)           | `string` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-name.md \"docid#/$defs/content/properties/name\")         |\n| [contents](#contents-1) | `string` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-contents.md \"docid#/$defs/content/properties/contents\") |\n| [type](#type)           | `string` | Optional | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-type.md \"docid#/$defs/content/properties/type\")         |\n\n### name\n\nName of the file to be included in the package.\n\n`name`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-name.md \"docid#/$defs/content/properties/name\")\n\n#### name Type\n\n`string`\n\n### contents\n\nContents of the file to be included in the package. Binary data should be encoded in base64.\n\n`contents`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-contents.md \"docid#/$defs/content/properties/contents\")\n\n#### contents Type\n\n`string`\n\n### type\n\nValue describes the type of the content, default is utf-8.\n\n`type`\n\n*   is optional\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-type.md \"docid#/$defs/content/properties/type\")\n\n#### type Type\n\n`string`\n\n#### type Constraints\n\n**enum**: the value of this property must be equal to one of the following values:\n\n| Value          | Explanation |\n| :------------- | :---------- |\n| `\"text\"`       |             |\n| `\"utf-8\"`      |             |\n| `\"html\"`       |             |\n| `\"javascript\"` |             |\n| `\"typescript\"` |             |\n| `\"markdown\"`   |             |\n| `\"json\"`       |             |\n| `\"base64\"`     |             |\n| `\"yaml\"`       |             |\n| `\"css\"`        |             |\n| `\"xml\"`        |             |\n\n---\n## $defs Type\n\nunknown\n\n---\n## items Type\n\n`object` ([Details](definition-defs-content.md))\n\n# items Properties\n\n| Property              | Type     | Required | Nullable       | Defined by                                                                                                                                               |\n| :-------------------- | :------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| [name](#name)         | `string` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-name.md \"docid#/$defs/content/properties/name\")         |\n| [contents](#contents) | `string` | Required | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-contents.md \"docid#/$defs/content/properties/contents\") |\n| [type](#type)         | `string` | Optional | cannot be null | [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-type.md \"docid#/$defs/content/properties/type\")         |\n\n## name\n\nName of the file to be included in the package.\n\n`name`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-name.md \"docid#/$defs/content/properties/name\")\n\n### name Type\n\n`string`\n\n## contents\n\nContents of the file to be included in the package. Binary data should be encoded in base64.\n\n`contents`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-contents.md \"docid#/$defs/content/properties/contents\")\n\n### contents Type\n\n`string`\n\n## type\n\nValue describes the type of the content, default is utf-8.\n\n`type`\n\n*   is optional\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Basic requirements for \\`msg\\` object to utilise this flow.](definition-defs-content-properties-type.md \"docid#/$defs/content/properties/type\")\n\n### type Type\n\n`string`\n\n### type Constraints\n\n**enum**: the value of this property must be equal to one of the following values:\n\n| Value          | Explanation |\n| :------------- | :---------- |\n| `\"text\"`       |             |\n| `\"utf-8\"`      |             |\n| `\"html\"`       |             |\n| `\"javascript\"` |             |\n| `\"typescript\"` |             |\n| `\"markdown\"`   |             |\n| `\"json\"`       |             |\n| `\"base64\"`     |             |\n| `\"yaml\"`       |             |\n| `\"css\"`        |             |\n| `\"xml\"`        |             |\n\n---\n## name Type\n\n`string`\n\n---\n## contents Type\n\n`string`\n\n---\n## type Type\n\n`string`\n\n## type Constraints\n\n**enum**: the value of this property must be equal to one of the following values:\n\n| Value          | Explanation |\n| :------------- | :---------- |\n| `\"text\"`       |             |\n| `\"utf-8\"`      |             |\n| `\"html\"`       |             |\n| `\"javascript\"` |             |\n| `\"typescript\"` |             |\n| `\"markdown\"`   |             |\n| `\"json\"`       |             |\n| `\"base64\"`     |             |\n| `\"yaml\"`       |             |\n| `\"css\"`        |             |\n| `\"xml\"`        |             |\n\n---\n## noderedinstall Type\n\n`boolean`\n\n---\n## gitcommit Type\n\n`boolean`\n\n---\n## npmpublish Type\n\n`boolean`\n\n---\n## npmunpublish Type\n\n`boolean`\n\n---\n## contents Type\n\n`object[]` ([Details](definition-defs-content.md))\n\n## contents Constraints\n\n**minimum number of items**: the minimum number of items for this array is: `3`\n"
+    },
+    {
+        "id": "de9fefd043701d43",
+        "type": "JsonSchemaValidatorWithDocu",
+        "z": "d0506e991d512ace",
+        "g": "94fb93c898275493",
+        "name": "",
+        "property": "",
+        "propertyType": "fullmsg",
+        "checkentireobject": true,
+        "func": "{\n    \"title\": \"Check `msg` for NPM publish\",\n    \"type\": \"object\",\n    \"required\": [\n        \"npmotp\",\n        \"npmauthtokenvalue\"\n    ],\n    \"properties\": {\n        \"npmotp\": {\n            \"type\": \"string\",\n            \"description\": \"One Time Password for NPM.\"\n        },\n        \"npmauthtokenvalue\": {\n            \"type\": \"string\",\n            \"description\": \"NPM auth token.\"\n        }\n    }\n}",
+        "schematitle": "Check `msg` for NPM publish",
+        "x": 2054,
+        "y": 1751.8197021484375,
+        "wires": [
+            [
+                "fbe982a35d27d99b"
+            ]
+        ],
+        "info": "## Check \\`msg\\` for NPM publish Type\n\n`object` ([Check \\`msg\\` for NPM publish](definition.md))\n\n# Check \\`msg\\` for NPM publish Properties\n\n| Property          | Type     | Required | Nullable       | Defined by                                                                                      |\n| :---------------- | :------- | :------- | :------------- | :---------------------------------------------------------------------------------------------- |\n| [npmotp](#npmotp) | `string` | Required | cannot be null | [Check \\`msg\\` for NPM publish](definition-properties-npmotp.md \"undefined#/properties/npmotp\") |\n\n## npmotp\n\nOne Time Password for NPM.\n\n`npmotp`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` for NPM publish](definition-properties-npmotp.md \"undefined#/properties/npmotp\")\n\n### npmotp Type\n\n`string`\n\n---\n## npmotp Type\n\n`string`\n"
+    },
+    {
+        "id": "963dfb765b0d9849",
+        "type": "link in",
+        "z": "d0506e991d512ace",
+        "g": "aba9a5d741241f1c",
+        "name": "[nodedev-backend] entry point",
+        "links": [
+            "2a2c48992b03300b",
+            "3ebeb43268fc2432",
+            "df76a54b11ea3484",
+            "52984a25cd97deb2",
+            "e58d2a33281f6043",
+            "f21980c40abc3811",
+            "4777fe6c081ec7e5",
+            "4244c03f684c560a",
+            "773d3e13bbf669a0",
+            "c2c1a523f9950852",
+            "87c2fbfd417c695a",
+            "9de976451f6bc348",
+            "f3d9caa7c6d135b1",
+            "d69293191d11dcaa",
+            "0e755b624f666969",
+            "28242e21524d03f2"
+        ],
+        "x": 174.285888671875,
+        "y": 1252.4662322998047,
+        "wires": [
+            [
+                "992dea9edfe05367"
+            ]
+        ]
+    },
+    {
+        "id": "f7125db69297187e",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "name": "github no changes",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 3307,
+        "y": 467,
+        "wires": []
+    },
+    {
+        "id": "971ddff1a67a201f",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "get enitre tree for sha",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({ \n        auth: process.env.GITHUB_TOKEN \n    });\n} catch(e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - payload: sha of tree (i.e. directory)\n * \n * Return:\n *   - payload: tree of the sha, this will be an array with one entry per member of tree\n */\n\ntry {\n    \n    octokit.request(\"GET /repos/{owner}/{repo}/git/trees/{tree_sha}?recursive=true\", {\n        owner: msg.owner,\n        repo: msg.repo,\n        tree_sha: msg.payload\n    }).then( (resp) => {\n        node.send({ ...msg, payload: resp.data.tree})\n    }).catch(function (e) {\n         node.error(\"obtaining tree\", { ...msg, error: e })\n    });\n\n} catch (e) {\n    node.error(\"something went wrong\", { ...msg, error: e})\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2310,
+        "y": 846.9914615855496,
+        "wires": [
+            [
+                "732f4fa715c2fa78"
+            ]
+        ]
+    },
+    {
+        "id": "732f4fa715c2fa78",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "current_shas",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg",
+                "dc": true
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "parent_sha",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2310,
+        "y": 788.6609743903664,
+        "wires": [
+            [
+                "551504329d997bad"
+            ]
+        ]
+    },
+    {
+        "id": "255cf2c177f684a9",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "check for changes",
+        "func": "var shaLookup = {};\n\nfor ( var idx = 0 ; idx < msg.current_shas.length ; idx++ ) {\n    shaLookup[msg.current_shas[idx].path] = msg.current_shas[idx].sha\n}\n\nmsg.changes = msg.payload.filter( (d) => {\n    return d.sha != shaLookup[d.path]\n})\n\nif ( msg.changes.length > 0 ) {\n    return [msg, undefined];\n} else {\n    msg.payload = \"github: no changes\"\n    return [undefined, msg];\n}\n",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2310,
+        "y": 457.4331970214844,
+        "wires": [
+            [
+                "79b43c9ce292f151"
+            ],
+            [
+                "f7125db69297187e"
+            ]
+        ],
+        "outputLabels": [
+            "sha differ",
+            "no change"
+        ]
+    },
+    {
+        "id": "79b43c9ce292f151",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "gitcheckforchange",
+        "property": "gitcheckforchange",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 2326,
+        "y": 265,
+        "wires": [
+            [
+                "0cb6ad0a57a95eee"
+            ],
+            [
+                "7f0881a1f1e17458"
+            ]
+        ]
+    },
+    {
+        "id": "0cb6ad0a57a95eee",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "changes",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2552,
+        "y": 259,
+        "wires": [
+            [
+                "3ca095a5abd3abf2"
+            ]
+        ]
+    },
+    {
+        "id": "3ca095a5abd3abf2",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "name": "github changes",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3297,
+        "y": 262,
+        "wires": []
+    },
+    {
+        "id": "bfe2775a7cf26d83",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "gitcheckforchange",
+        "property": "gitcheckforchange",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 2241,
+        "y": 1236,
+        "wires": [
+            [
+                "25f729f47986b0f8"
+            ],
+            [
+                "777b0b7476a82755"
+            ]
+        ]
+    },
+    {
+        "id": "d485bbfece99d118",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "name": "\"ignore package check\" check",
+        "property": "ignore_package_check",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 940,
+        "y": 1252.4662322998047,
+        "wires": [
+            [
+                "893f316ea815e2b1"
+            ],
+            [
+                "fb7a6a038d9bea0d"
+            ]
+        ]
+    },
+    {
+        "id": "cd99083510c1fa1e",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "updating head on repo at branch - aka committing commit",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({\n        auth: process.env.GITHUB_TOKEN\n    });\n} catch (e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - branch: github repo branch to update with the new commit sha\n *   - payload: the sha of the commit created\n * \n * Return:\n *   - payload: new sha of the branch\n * \n * Source:\n *   - https://docs.github.com/en/rest/git/refs?apiVersion=2022-11-28#update-a-reference\n */\n\ntry {\n    msg.new_commit_sha = msg.payload;\n\n    octokit.request(\"PATCH /repos/:owner/:repo/git/refs/heads/:branch\", {\n        owner: msg.owner,\n        repo: msg.repo,\n        branch: msg.branch,\n        sha: msg.payload\n    }).then(function (resp) {\n        node.send({ \n            ...msg, \n            payload: resp.data.object.sha,\n        })\n    }).catch(function (e) {\n        node.error(\"committing commit\", { ...msg, error: e })\n    });\n\n} catch (e) {\n    node.error(\"something went wrong\", { ...msg, error: e })\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2692,
+        "y": 403,
+        "wires": [
+            [
+                "4621debd1d2a4ad8"
+            ]
+        ]
+    },
+    {
+        "id": "0f865b51b0f7997d",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "create commit",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({\n        auth: process.env.GITHUB_TOKEN\n    });\n} catch (e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - payload: the sha of the tree to commit\n *   - parent_sha: the current sha of the repo, the return value of current repo revision\n *   - author: an object with the following:\n *      - name: name of the author of the commit\n *      - email: email of the author of the commit\n *   - message: commit message\n * \n * Return:\n *   - payload: sha of newly commit\n * \n * Source:\n *   - https://docs.github.com/en/rest/git/commits?apiVersion=2022-11-28#create-a-commit\n */\n\ntry {\n    \n    octokit.request(\"POST /repos/:owner/:repo/git/commits\", {\n        owner: msg.owner,\n        repo: msg.repo,        \n        message: msg.message,\n        author: {\n            name: msg.author.name,\n            email: msg.author.email\n        },\n        parents: [\n            msg.parent_sha\n        ],\n        tree: msg.payload\n    }).then((resp) => {\n        node.send({ ...msg, payload: resp.data.sha })\n    }).catch(function (e) {\n        node.error(\"creating commit\", { ...msg, error: e })\n    });\n\n} catch (e) {\n    node.error(\"something went wrong\", { ...msg, error: e })\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2552,
+        "y": 355,
+        "wires": [
+            [
+                "cd99083510c1fa1e"
+            ]
+        ]
+    },
+    {
+        "id": "7f0881a1f1e17458",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "create tree for blobs",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({ \n        auth: process.env.GITHUB_TOKEN \n    });\n} catch(e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - payload: array of blobs, each blob is an object with:\n *         - path: filename of the blob in the repo, with path, i.e., dir1/dir2/filename.txt\n *         - sha: the sha of the blob created initially using the create blob function\n *   - parent_sha: the current sha of the repo, the return value of current repo revision\n * \n * Return:\n *   - payload: sha of newly created tree\n */\n\ntry {\n    var tree = msg.payload.map(function(blb){\n        return {\n            ...blb,\n            mode: \"100644\",\n            type: \"blob\"\n        }\n    });\n\n    octokit.request(\"POST /repos/:owner/:repo/git/trees\", {\n        owner: msg.owner,\n        repo: msg.repo,\n        base_tree: msg.parent_sha,\n        tree: tree\n    }).then((resp) => {\n        node.send({ ...msg, payload: resp.data.sha })\n    }).catch(function (e) {\n        node.error(\"creating commit\", { ...msg, error: e })\n    });\n    \n} catch (e) {\n    node.error(\"something went wrong\", { ...msg, error: e})\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2572,
+        "y": 307,
+        "wires": [
+            [
+                "0f865b51b0f7997d"
+            ]
+        ]
+    },
+    {
+        "id": "945ff83ff12b2cf5",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "create blob",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({ \n        auth: process.env.GITHUB_TOKEN \n    });\n} catch(e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - payload: base64 encoded content for blob\n * \n * Return:\n *   - payload: sha of newly created blob\n */\n\ntry {\n    \n    octokit.request(\"POST /repos/:owner/:repo/git/blobs\", {\n        owner: msg.owner,\n        repo: msg.repo,\n        content: msg.payload,\n        encoding: \"base64\"\n    }).then( (resp) => {\n        node.send({ ...msg, payload: resp.data.sha})\n    }).catch(function (e) {\n        node.error(\"creating blob\", { ...msg, error: e })\n    });\n\n} catch (e) {\n    node.error(\"something went wrong\", { ...msg, error: e})\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2542,
+        "y": 615.5,
+        "wires": [
+            [
+                "a827fb86b27503a3"
+            ]
+        ]
+    },
+    {
+        "id": "3a610d385636a5ad",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "name": "Exceptions Will Happen",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3327,
+        "y": 1396.285659790039,
+        "wires": []
+    },
+    {
+        "id": "856405ba78a11b7a",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "current repo revision (sha)",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({ \n        auth: process.env.GITHUB_TOKEN \n    });\n} catch(e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - branch: branch name\n * \n * Return:\n *   - payload: current revision of repo\n * \n * Source:\n *   - https://docs.github.com/en/rest/branches/branches?apiVersion=2022-11-28#get-a-branch\n */\n\ntry {\n\n    octokit.request(\"GET /repos/:owner/:repo/branches/:branch\", {\n        owner: msg.owner,\n        repo: msg.repo,\n        branch: msg.branch,\n    }).then( (resp) => {\n        node.send({ ...msg, payload: resp.data.commit.sha})\n    }).catch(function (e) {\n        node.error(\"obtaining latest sha\", { ...msg, error: e })\n    });\n\n} catch (e) {\n    node.error(\"request failure\", { ...msg, error: e})\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2310,
+        "y": 963.652435975916,
+        "wires": [
+            [
+                "decde30c099b3701"
+            ]
+        ]
+    },
+    {
+        "id": "ae6cb62b1c841870",
+        "type": "catch",
+        "z": "d0506e991d512ace",
+        "name": "",
+        "scope": null,
+        "uncaught": false,
+        "x": 2203,
+        "y": 1396.285659790039,
+        "wires": [
+            [
+                "3a610d385636a5ad"
+            ]
+        ]
+    },
+    {
+        "id": "76a74cea5b85bef5",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "name": "result of npm unpublish",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3327,
+        "y": 1494.1874389648438,
+        "wires": []
+    },
+    {
+        "id": "2328dce09b97de9e",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "88aca7ba3d72dff1",
+        "name": "npmunpublish",
+        "property": "npmunpublish",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1939.432373046875,
+        "y": 1395.8125,
+        "wires": [
+            [
+                "3a58f10bf6055793"
+            ]
+        ]
+    },
+    {
+        "id": "4621debd1d2a4ad8",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "name": "new github commit revision",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 3337,
+        "y": 406,
+        "wires": []
+    },
+    {
+        "id": "decde30c099b3701",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "parent_sha",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2310,
+        "y": 905.3219487807328,
+        "wires": [
+            [
+                "971ddff1a67a201f"
+            ]
+        ]
+    },
+    {
+        "id": "2905451093154a24",
+        "type": "join",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "mode": "auto",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": "false",
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "x": 2310,
+        "y": 502,
+        "wires": [
+            [
+                "255cf2c177f684a9"
+            ]
+        ]
+    },
+    {
+        "id": "a827fb86b27503a3",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t    \"path\": $$.filename,\t    \"sha\": $$.payload\t}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2552,
+        "y": 560,
+        "wires": [
+            [
+                "2905451093154a24"
+            ]
+        ]
+    },
+    {
+        "id": "10a5e33f8ca3f848",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "filename",
+                "pt": "msg",
+                "to": "payload.name",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.contents",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2552,
+        "y": 671,
+        "wires": [
+            [
+                "945ff83ff12b2cf5"
+            ]
+        ]
+    },
+    {
+        "id": "1d0e09e64d59771e",
+        "type": "split",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 2310,
+        "y": 672,
+        "wires": [
+            [
+                "10a5e33f8ca3f848"
+            ]
+        ]
+    },
+    {
+        "id": "30ee1ba5389219eb",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "owner, repo, branch, author",
+        "rules": [
+            {
+                "t": "set",
+                "p": "owner",
+                "pt": "msg",
+                "to": "githubowner",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "repo",
+                "pt": "msg",
+                "to": "githubrepo",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "branch",
+                "pt": "msg",
+                "to": "githubbranch",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "author",
+                "pt": "msg",
+                "to": "{\t    \"name\": $$.githubauthor,\t    \"email\": $$.githubauthoremail\t}",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "message",
+                "pt": "msg",
+                "to": "commit_message",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2310,
+        "y": 1021.9829231710992,
+        "wires": [
+            [
+                "5d7f01a1ad913039",
+                "856405ba78a11b7a"
+            ]
+        ]
+    },
+    {
+        "id": "551504329d997bad",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "prepare tree",
+        "func": "msg.payload = msg.contents.map( (elem) => {\n    var newelem = { ...elem};\n    \n    if ( elem.type != \"base64\") {\n        // @ts-ignore\n        newelem.contents = RED.util.ensureBuffer(elem.contents).toString('base64')\n    }\n\n    delete newelem.type;\n    return newelem;\n})\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2310,
+        "y": 730.3304871951832,
+        "wires": [
+            [
+                "1d0e09e64d59771e"
+            ]
+        ]
+    },
+    {
+        "id": "5ca98f63115bf9ad",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "94fb93c898275493",
+        "name": "npmpublish",
+        "property": "npmpublish",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2057,
+        "y": 1698,
+        "wires": [
+            [
+                "de9fefd043701d43"
+            ]
+        ]
+    },
+    {
+        "id": "ccb92d03a6cda7df",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "gitcommit",
+        "property": "gitcommit",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 1,
+        "x": 2695,
+        "y": 1249,
+        "wires": [
+            [
+                "f45011cdb6c9405b"
+            ]
+        ]
+    },
+    {
+        "id": "2c515ea1f3cf8411",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "56b55d2b5d03f424",
+        "name": "noderedinstall",
+        "property": "noderedinstall",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1885,
+        "y": 1051,
+        "wires": [
+            [
+                "3a0d53eb62336e62"
+            ]
+        ]
+    },
+    {
+        "id": "a5f68eb9247d3b1a",
+        "type": "NpmTarBall",
+        "z": "d0506e991d512ace",
+        "g": "de7cfeb5612cf008",
+        "name": "",
+        "x": 1619,
+        "y": 1767,
+        "wires": [
+            [
+                "d2b7368e1c55b208",
+                "7f2310f2e93bd28f"
+            ]
+        ]
+    },
+    {
+        "id": "cfd5edb34e3df477",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "de7cfeb5612cf008",
+        "name": "writetgzfile",
+        "property": "writetgzfile",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1590,
+        "y": 1698.402587890625,
+        "wires": [
+            [
+                "a5f68eb9247d3b1a"
+            ]
+        ]
+    },
+    {
+        "id": "d2b7368e1c55b208",
+        "type": "file",
+        "z": "d0506e991d512ace",
+        "g": "de7cfeb5612cf008",
+        "name": "",
+        "filename": "\"/data/\" & $split($$.pname, \"/\")[1] & \"-\" & $$.pversion & \".tgz\"",
+        "filenameType": "jsonata",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1811,
+        "y": 1768,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "777b0b7476a82755",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "githubgettar",
+        "property": "githubgettar",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 2467,
+        "y": 1242,
+        "wires": [
+            [
+                "25f729f47986b0f8"
+            ],
+            [
+                "ccb92d03a6cda7df"
+            ]
+        ]
+    },
+    {
+        "id": "5d7f01a1ad913039",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "githubgettar",
+        "property": "githubgettar",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 1,
+        "x": 2624,
+        "y": 1022,
+        "wires": [
+            [
+                "d101de4d53a9432d"
+            ]
+        ]
+    },
+    {
+        "id": "d101de4d53a9432d",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "get tarball",
+        "func": "try {\n    var octokit = new octokitRest.Octokit({ \n        auth: (msg.github && msg.github.access_token) || process.env.GITHUB_TOKEN \n    });\n} catch(e) {\n    node.error(\"init octokit\", {\n        ...msg,\n        error: e\n    })\n    return undefined;\n}\n\n/**\n * Msg attributes:\n *   - owner: github repo owner\n *   - repo: github repo name\n *   - branch: github branch\n * \n * Return:\n *   - payload: arrayBuffer of tarball content\n * \n * Discussion:\n * \n *   This request returns a redirect URL that octokit \n *   automagically follows.\n * \n */\n\ntry {\n    \n    octokit.request(\"GET /repos/:owner/:repo/tarball/:branch\", {\n        owner: msg.owner,\n        repo: msg.repo,\n        branch: msg.branch\n    }).then( (resp) => {\n        node.send({ \n            ...msg, \n            payload: resp.data, \n            dirname: resp.headers[\"content-disposition\"].replace(/^.+filename=/,\"\").replace(/.tar.gz$/,'/') \n        })\n    }).catch(function (e) {\n         node.error(\"obtaining tree\", { ...msg, error: e })\n    });\n\n} catch (e) {\n    node.error(\"something went wrong\", { ...msg, error: e})\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "octokitRest",
+                "module": "@octokit/rest"
+            },
+            {
+                "var": "process",
+                "module": "process"
+            }
+        ],
+        "x": 2614,
+        "y": 978,
+        "wires": [
+            [
+                "4f0f2c8426c173c1"
+            ]
+        ]
+    },
+    {
+        "id": "d5d4f3a794acac21",
+        "type": "NodeFactory",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "",
+        "nodename": "ddd",
+        "color": "#e5e4ef",
+        "hasbutton": false,
+        "minify": false,
+        "hasinput": true,
+        "outputcount": 1,
+        "category": "",
+        "summary": "dd",
+        "description": "dd",
+        "icon": "font-awesome/fa-industry",
+        "frt2bakcomm": false,
+        "bak2frtcomm": false,
+        "createmanifest": false,
+        "isplugin": false,
+        "isrealplugin": false,
+        "x": 2959,
+        "y": 802,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4f0f2c8426c173c1",
+        "type": "tarball",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "",
+        "x": 2604,
+        "y": 934,
+        "wires": [
+            [
+                "9e44d92c288df764"
+            ]
+        ]
+    },
+    {
+        "id": "c025c3fe56571a85",
+        "type": "join",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "",
+        "mode": "custom",
+        "build": "array",
+        "property": "",
+        "propertyType": "full",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": true,
+        "accumulate": false,
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 2604,
+        "y": 846,
+        "wires": [
+            [
+                "62dcb20fb8c8ac41"
+            ]
+        ]
+    },
+    {
+        "id": "62dcb20fb8c8ac41",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "filter out empty paths",
+        "func": "msg.payload = msg.payload.filter( e =>  {\n    return e.path != \"\"\n})\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2830,
+        "y": 846,
+        "wires": [
+            [
+                "ecbad6c4f4f47ba1"
+            ]
+        ]
+    },
+    {
+        "id": "ecbad6c4f4f47ba1",
+        "type": "tarball",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "",
+        "x": 2604,
+        "y": 802,
+        "wires": [
+            [
+                "d5d4f3a794acac21"
+            ]
+        ]
+    },
+    {
+        "id": "9e44d92c288df764",
+        "type": "function",
+        "z": "d0506e991d512ace",
+        "g": "5fdf835cef66f3f2",
+        "name": "remove top level directory from paths",
+        "func": "if ( !msg.complete ) {\n    msg.path = msg.path.replace(msg.dirname,\"\")\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2704,
+        "y": 890,
+        "wires": [
+            [
+                "c025c3fe56571a85"
+            ]
+        ]
+    },
+    {
+        "id": "0ad0c578fcb647a1",
+        "type": "ClientCode",
+        "z": "d0506e991d512ace",
+        "g": "1f5fb00661db27e0",
+        "name": "Node-RED Uninstall",
+        "clientcode": "let pkgname = msg.pname\nlet origmsg = msg;\nlet nde = node;\n\n$.ajax({\n    url: 'nodes/' + pkgname,\n    data: data,\n    cache: false,\n    contentType: false,\n    processData: false,\n    method: 'DELETE',\n}).always(function (data, textStatus, xhr) {\n}).success(function(d) {\n    RED.notify(\"Removed package: \" + pkgname, { type: \"success\"})\n    nde.send(origmsg)\n}).fail(function (xhr, textStatus, err) {\n    var message = textStatus;\n    if (xhr.responseJSON) {\n        message = xhr.responseJSON.message;\n    }\n    \n    var notification = RED.notify(RED._('palette.editor.errors.removeFailed', { module: pkgname, message: message }), {\n        type: 'error',\n        modal: true,\n        fixed: true,\n        buttons: [\n            {\n                text: RED._(\"common.label.close\"),\n                click: function () {\n                    notification.close();\n                }\n            }, {\n                text: RED._(\"eventLog.view\"),\n                click: function () {\n                    notification.close();\n                    RED.actions.invoke(\"core:show-event-log\");\n                }\n            }\n        ]\n    });\n})",
+        "format": "javascript",
+        "x": 1603,
+        "y": 929,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "43f0f04922b1ecd9",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "1f5fb00661db27e0",
+        "name": "nodered_uninstall",
+        "property": "nodered_uninstall",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 1,
+        "x": 1592,
+        "y": 987,
+        "wires": [
+            [
+                "0ad0c578fcb647a1"
+            ]
+        ]
+    },
+    {
+        "id": "f45011cdb6c9405b",
+        "type": "JsonSchemaValidatorWithDocu",
+        "z": "d0506e991d512ace",
+        "g": "5d202e6481e451cb",
+        "name": "",
+        "property": "",
+        "propertyType": "fullmsg",
+        "checkentireobject": true,
+        "func": "{\n    \"title\": \"Check `msg` for GitHub commit.\",\n    \"type\": \"object\",\n    \"required\": [\n        \"githubauthtokenvalue\",\n        \"commit_message\",\n        \"githubauthor\",\n        \"githubauthoremail\"\n    ],\n    \"properties\": {\n        \"githubauthtokenvalue\": {\n            \"type\": \"string\",\n            \"description\": \"GitHub auth tokent.\"\n        },\n        \"commit_message\": {\n            \"type\": \"string\",\n            \"description\": \"Message for the commit.\"\n        },\n        \"githubauthor\": {\n            \"type\": \"string\",\n            \"description\": \"Full name of the author of the commit.\"\n        },\n        \"githubauthoremail\": {\n            \"type\": \"string\",\n            \"description\": \"Email of the author for the commit message.\"\n        }\n    }\n}\n",
+        "schematitle": "Check `msg` object for GitHub commit.",
+        "x": 2702,
+        "y": 1144,
+        "wires": [
+            [
+                "25f729f47986b0f8"
+            ]
+        ],
+        "info": "## Check \\`msg\\` object for GitHub commit. Type\n\n`object` ([Check \\`msg\\` object for GitHub commit.](definition.md))\n\n# Check \\`msg\\` object for GitHub commit. Properties\n\n| Property                                | Type      | Required | Nullable       | Defined by                                                                                                                      |\n| :-------------------------------------- | :-------- | :------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------ |\n| [commit\\_message](#commit_message)      | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-commit_message.md \"undefined#/properties/commit_message\")       |\n| [githubowner](#githubowner)             | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubowner.md \"undefined#/properties/githubowner\")             |\n| [githubrepo](#githubrepo)               | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubrepo.md \"undefined#/properties/githubrepo\")               |\n| [githubbranch](#githubbranch)           | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubbranch.md \"undefined#/properties/githubbranch\")           |\n| [githubauthor](#githubauthor)           | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthor.md \"undefined#/properties/githubauthor\")           |\n| [githubauthoremail](#githubauthoremail) | `string`  | Required | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthoremail.md \"undefined#/properties/githubauthoremail\") |\n| [gitcheckforchange](#gitcheckforchange) | `boolean` | Optional | cannot be null | [Check \\`msg\\` object for GitHub commit.](definition-properties-gitcheckforchange.md \"undefined#/properties/gitcheckforchange\") |\n\n## commit\\_message\n\nMessage for the commit.\n\n`commit_message`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-commit_message.md \"undefined#/properties/commit_message\")\n\n### commit\\_message Type\n\n`string`\n\n## githubowner\n\nGitHub username.\n\n`githubowner`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubowner.md \"undefined#/properties/githubowner\")\n\n### githubowner Type\n\n`string`\n\n## githubrepo\n\nRepository upon which we are acting.\n\n`githubrepo`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubrepo.md \"undefined#/properties/githubrepo\")\n\n### githubrepo Type\n\n`string`\n\n## githubbranch\n\nThe branch on which the commit should be done.\n\n`githubbranch`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubbranch.md \"undefined#/properties/githubbranch\")\n\n### githubbranch Type\n\n`string`\n\n## githubauthor\n\nFull name of the author of the commit.\n\n`githubauthor`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthor.md \"undefined#/properties/githubauthor\")\n\n### githubauthor Type\n\n`string`\n\n## githubauthoremail\n\nEmail of the author for the commit message.\n\n`githubauthoremail`\n\n*   is required\n\n*   Type: `string`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-githubauthoremail.md \"undefined#/properties/githubauthoremail\")\n\n### githubauthoremail Type\n\n`string`\n\n## gitcheckforchange\n\nDo not commit just check whether there are changes.\n\n`gitcheckforchange`\n\n*   is optional\n\n*   Type: `boolean`\n\n*   cannot be null\n\n*   defined in: [Check \\`msg\\` object for GitHub commit.](definition-properties-gitcheckforchange.md \"undefined#/properties/gitcheckforchange\")\n\n### gitcheckforchange Type\n\n`boolean`\n\n---\n## commit\\_message Type\n\n`string`\n\n---\n## githubowner Type\n\n`string`\n\n---\n## githubrepo Type\n\n`string`\n\n---\n## githubbranch Type\n\n`string`\n\n---\n## githubauthor Type\n\n`string`\n\n---\n## githubauthoremail Type\n\n`string`\n\n---\n## gitcheckforchange Type\n\n`boolean`\n"
+    },
+    {
+        "id": "b3f710d3656ec0bd",
+        "type": "exec",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "command": "rm -f /tmp/cookies.txt",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2091,
+        "y": 2099,
+        "wires": [
+            [],
+            [],
+            [
+                "7134a0a01a78b0a4"
+            ]
+        ]
+    },
+    {
+        "id": "7134a0a01a78b0a4",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "property": "payload.code",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2133,
+        "y": 2164,
+        "wires": [
+            [
+                "d7bb19775d60ba5f"
+            ]
+        ]
+    },
+    {
+        "id": "d7bb19775d60ba5f",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "curl -s -c /tmp/cookies.txt -b /tmp/cookies.txt -XGET 'https://flows.nodered.org/add/node'",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2247,
+        "y": 2219,
+        "wires": [
+            [
+                "329cb745ab148644"
+            ]
+        ]
+    },
+    {
+        "id": "329cb745ab148644",
+        "type": "exec",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2353,
+        "y": 2280,
+        "wires": [
+            [
+                "8b4462e71d18d914"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "8b4462e71d18d914",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "property": "rc.code",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2505,
+        "y": 2286,
+        "wires": [
+            [
+                "c447b660ffb100b7"
+            ]
+        ]
+    },
+    {
+        "id": "c447b660ffb100b7",
+        "type": "split",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 2585,
+        "y": 2230,
+        "wires": [
+            [
+                "24a6bdedc55adb51"
+            ]
+        ]
+    },
+    {
+        "id": "24a6bdedc55adb51",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "name=\"_csrf\" type=\"hidden\" value=\"(.+)\">",
+                "vt": "str",
+                "case": false
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 2654,
+        "y": 2176,
+        "wires": [
+            [
+                "e045b2b86c04bede"
+            ]
+        ]
+    },
+    {
+        "id": "e045b2b86c04bede",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$substringBefore( $substringAfter($$.payload, \"value=\\\"\"), \"\\\">\")",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2711,
+        "y": 2122,
+        "wires": [
+            [
+                "5096c688782c5d5b"
+            ]
+        ]
+    },
+    {
+        "id": "5096c688782c5d5b",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "data_string",
+                "pt": "msg",
+                "to": "\"module=\" & $$.module_name & \"&_csrf=\" & $$.payload",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "\"curl -v -XPOST 'https://flows.nodered.org/add/node' -c /tmp/cookies.txt -b /tmp/cookies.txt -H 'referer: https://flows.nodered.org/node/\" & $$.module_name & \"' -H 'Content-Type: application/x-www-form-urlencoded' -H 'x-requested-with: XMLHttpRequest' -d '\" & $$.data_string & \"'\"",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2806,
+        "y": 2064,
+        "wires": [
+            [
+                "4260147961b82058"
+            ]
+        ]
+    },
+    {
+        "id": "4260147961b82058",
+        "type": "exec",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 2926,
+        "y": 2194,
+        "wires": [
+            [
+                "f4dc513b63d2486a"
+            ],
+            [
+                "3210b2328892fb83"
+            ],
+            [
+                "2782388af7e4a3e3"
+            ]
+        ]
+    },
+    {
+        "id": "f4dc513b63d2486a",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "debug 345",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3100,
+        "y": 2143,
+        "wires": []
+    },
+    {
+        "id": "3210b2328892fb83",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "debug 346",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3103,
+        "y": 2194,
+        "wires": []
+    },
+    {
+        "id": "2782388af7e4a3e3",
+        "type": "debug",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "debug 347",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3100,
+        "y": 2250,
+        "wires": []
+    },
+    {
+        "id": "f58a3097c0ec980c",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "flowsnoderedorg_update",
+        "property": "flowsnoderedorg_update",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1605,
+        "y": 2028,
+        "wires": [
+            [
+                "1567d317341f29d7"
+            ]
+        ]
+    },
+    {
+        "id": "1567d317341f29d7",
+        "type": "change",
+        "z": "d0506e991d512ace",
+        "g": "16d4e4d85e6a7e60",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "module_name",
+                "pt": "msg",
+                "to": "pname",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1988,
+        "y": 2028,
+        "wires": [
+            [
+                "b3f710d3656ec0bd"
+            ]
+        ]
+    },
+    {
+        "id": "4744f729aa18f631",
+        "type": "ClientCode",
+        "z": "d0506e991d512ace",
+        "g": "de7cfeb5612cf008",
+        "name": "download package",
+        "clientcode": "var downloadLink = document.createElement(\"a\");\ndownloadLink.href = \"data:application/x-tar;base64,\" + msg.payload;\ndownloadLink.download = `${msg.pname.split(\"/\")[1]}-${msg.pversion}.tgz`;\ndocument.body.appendChild(downloadLink);\ndownloadLink.click();\ndocument.body.removeChild(downloadLink);\n",
+        "format": "javascript",
+        "x": 1755,
+        "y": 1901,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7f2310f2e93bd28f",
+        "type": "base64",
+        "z": "d0506e991d512ace",
+        "g": "de7cfeb5612cf008",
+        "name": "",
+        "action": "str",
+        "property": "payload",
+        "x": 1671,
+        "y": 1831,
+        "wires": [
+            [
+                "4744f729aa18f631"
+            ]
+        ]
+    },
+    {
+        "id": "fb7a6a038d9bea0d",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "name": "create control center flow ?",
+        "property": "create_control_center",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 1030,
+        "y": 1319,
+        "wires": [
+            [
+                "893f316ea815e2b1"
+            ],
+            [
+                "2a7132258cbcf313"
+            ]
+        ]
+    },
+    {
+        "id": "e51aa8c50e251fa1",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "g": "792e5b24ee0a810b",
+        "name": "create_control_center",
+        "property": "create_control_center",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 1,
+        "x": 1545,
+        "y": 2424,
+        "wires": [
+            [
+                "b3b1bcc40a8919a0"
+            ]
+        ]
+    },
+    {
+        "id": "b3b1bcc40a8919a0",
+        "type": "template",
+        "z": "d0506e991d512ace",
+        "g": "792e5b24ee0a810b",
+        "name": "control center template",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "json",
+        "syntax": "mustache",
+        "template": "[\n    {\n        \"id\": \"b530cec9760a6b5b\",\n        \"type\": \"group\",\n        \"z\": \"8e598f0f47194617\",\n        \"name\": \"development control center\",\n        \"style\": {\n            \"label\": true\n        },\n        \"nodes\": [\n            \"c97dc8b2a62fba9e\",\n            \"a68437f69d2e2f46\",\n            \"6bd697ade407914b\",\n            \"f3529428bda5925e\",\n            \"51617905c2fbcf09\",\n            \"ee18d43ee7e057c2\",\n            \"1cde490929dfdf8f\",\n            \"97c92317fd615776\",\n            \"99bcdcb3de7fb8cd\",\n            \"0a2159feaa7fdeba\",\n            \"fececfc3f97f1a50\",\n            \"ce883179a0c0d99d\",\n            \"83e6d9a9326fb569\",\n            \"1fe30e18f536fe5a\",\n            \"f4c2336074210c1d\"\n        ],\n        \"x\": 90,\n        \"y\": 189,\n        \"w\": 1050.4370999336243,\n        \"h\": 385\n    },\n    {\n        \"id\": \"c97dc8b2a62fba9e\",\n        \"type\": \"change\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"set package version\",\n        \"rules\": [\n            {\n                \"t\": \"set\",\n                \"p\": \"pversion\",\n                \"pt\": \"msg\",\n                \"to\": \"{{{ pversion }}}\",\n                \"tot\": \"str\"\n            }\n        ],\n        \"action\": \"\",\n        \"property\": \"\",\n        \"from\": \"\",\n        \"to\": \"\",\n        \"reg\": false,\n        \"x\": 735.5714111328125,\n        \"y\": 318.0000203450521,\n        \"wires\": [\n            [\n                \"a68437f69d2e2f46\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"a68437f69d2e2f46\",\n        \"type\": \"switch\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"\",\n        \"property\": \"githubmessage\",\n        \"propertyType\": \"msg\",\n        \"rules\": [\n            {\n                \"t\": \"eq\",\n                \"v\": \"__replaced__\",\n                \"vt\": \"str\"\n            },\n            {\n                \"t\": \"else\"\n            }\n        ],\n        \"checkall\": \"false\",\n        \"repair\": false,\n        \"outputs\": 2,\n        \"x\": 785.5714111328125,\n        \"y\": 374.8333536783854,\n        \"wires\": [\n            [\n                \"6bd697ade407914b\"\n            ],\n            [\n                \"99bcdcb3de7fb8cd\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"6bd697ade407914b\",\n        \"type\": \"change\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"\",\n        \"rules\": [\n            {\n                \"t\": \"set\",\n                \"p\": \"githubmessage\",\n                \"pt\": \"msg\",\n                \"to\": \"\\\"version bump to \\\" & $$.pversion\",\n                \"tot\": \"jsonata\"\n            },\n            {\n                \"t\": \"set\",\n                \"p\": \"commit_message\",\n                \"pt\": \"msg\",\n                \"to\": \"githubmessage\",\n                \"tot\": \"msg\"\n            }\n        ],\n        \"action\": \"\",\n        \"property\": \"\",\n        \"from\": \"\",\n        \"to\": \"\",\n        \"reg\": false,\n        \"x\": 755.5714111328125,\n        \"y\": 431.66668701171875,\n        \"wires\": [\n            [\n                \"99bcdcb3de7fb8cd\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"f3529428bda5925e\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Locally Upgrade Package with random version\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": true,\n        \"randompackagename\": true,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": false,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"version bump to 0.1.9\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": false,\n        \"writetgzfile\": false,\n        \"x\": 689,\n        \"y\": 272.6666259765625,\n        \"wires\": [\n            [\n                \"99bcdcb3de7fb8cd\",\n                \"0a2159feaa7fdeba\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"51617905c2fbcf09\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Commit To GIthub\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": false,\n        \"randompackagename\": false,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": true,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"improved UI for state diagram/machine definition\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"GITHUB_TOKEN\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": false,\n        \"writetgzfile\": false,\n        \"x\": 246,\n        \"y\": 314,\n        \"wires\": [\n            [\n                \"c97dc8b2a62fba9e\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"ee18d43ee7e057c2\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Whatchanged @ GitHub\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": false,\n        \"randompackagename\": false,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": false,\n        \"gitcheckforchange\": true,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"version bump to 0.1.9\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"GITHUB_TOKEN\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": false,\n        \"writetgzfile\": false,\n        \"x\": 244,\n        \"y\": 272,\n        \"wires\": [\n            [\n                \"c97dc8b2a62fba9e\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"1cde490929dfdf8f\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Locally Install Package\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": true,\n        \"randompackagename\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": false,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"version bump to 0.1.9\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"x\": 518,\n        \"y\": 533,\n        \"wires\": [\n            [\n                \"c97dc8b2a62fba9e\",\n                \"0a2159feaa7fdeba\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"97c92317fd615776\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Publish to NPMjs & Commit\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": false,\n        \"randompackagename\": false,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": true,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"__replaced__\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"GITHUB_TOKEN\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": true,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"NPM_AUTH_TOKEN\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": false,\n        \"writetgzfile\": false,\n        \"x\": 256,\n        \"y\": 359,\n        \"wires\": [\n            [\n                \"ce883179a0c0d99d\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"99bcdcb3de7fb8cd\",\n        \"type\": \"junction\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"x\": 1114.4370999336243,\n        \"y\": 381.9319887161255,\n        \"wires\": [\n            [\n                \"c8fc2feb38924f0a\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"0a2159feaa7fdeba\",\n        \"type\": \"delay\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"\",\n        \"pauseType\": \"delay\",\n        \"timeout\": \"7\",\n        \"timeoutUnits\": \"seconds\",\n        \"rate\": \"1\",\n        \"nbRateUnits\": \"1\",\n        \"rateUnits\": \"second\",\n        \"randomFirst\": \"1\",\n        \"randomLast\": \"5\",\n        \"randomUnits\": \"seconds\",\n        \"drop\": false,\n        \"allowrate\": false,\n        \"outputs\": 1,\n        \"x\": 983,\n        \"y\": 533,\n        \"wires\": [\n            [\n                \"fececfc3f97f1a50\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"fececfc3f97f1a50\",\n        \"type\": \"link out\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"trigger restart\",\n        \"mode\": \"link\",\n        \"links\": [\n            \"069d9a4193e371ab\"\n        ],\n        \"x\": 1099,\n        \"y\": 533,\n        \"wires\": []\n    },\n    {\n        \"id\": \"ce883179a0c0d99d\",\n        \"type\": \"OTPGenerate\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"generate NPMjs OTP\",\n        \"otptype\": \"totp\",\n        \"secret\": \"NPM_OTP_SECRET\",\n        \"secretType\": \"env\",\n        \"issuer\": \"\",\n        \"label\": \"\",\n        \"digits\": 6,\n        \"period\": 30,\n        \"algorithm\": \"SHA1\",\n        \"counter\": 0,\n        \"property\": \"npmotp\",\n        \"propertyType\": \"msg\",\n        \"x\": 334,\n        \"y\": 406,\n        \"wires\": [\n            [\n                \"c97dc8b2a62fba9e\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"83e6d9a9326fb569\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Download local random version\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": false,\n        \"randompackagename\": true,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": false,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"version bump to 0.1.9\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": false,\n        \"writetgzfile\": true,\n        \"x\": 753,\n        \"y\": 230,\n        \"wires\": [\n            [\n                \"99bcdcb3de7fb8cd\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"1fe30e18f536fe5a\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Download local version\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": false,\n        \"randompackagename\": false,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": false,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"version bump to 0.1.9\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": false,\n        \"writetgzfile\": true,\n        \"x\": 404,\n        \"y\": 492,\n        \"wires\": [\n            [\n                \"c97dc8b2a62fba9e\"\n            ]\n        ]\n    },\n    {\n        \"id\": \"f4c2336074210c1d\",\n        \"type\": \"NodeDevOps\",\n        \"z\": \"8e598f0f47194617\",\n        \"g\": \"b530cec9760a6b5b\",\n        \"name\": \"Update flows.nodered.org\",\n        \"pname\": \"{{{ pname }}}\",\n        \"pversion\": \"__ignored__\",\n        \"pauthorname\": \"{{{ pauthorname }}}\",\n        \"pauthoremail\": \"{{{ pauthoremail }}}\",\n        \"pdescription\": \"{{{ pdescription }}}\",\n        \"noderedinstall\": false,\n        \"randompackagename\": false,\n        \"nodered_uninstall\": false,\n        \"ignore_package_check\": false,\n        \"gitcommit\": false,\n        \"gitcheckforchange\": false,\n        \"githubowner\": \"{{{ githubowner }}}\",\n        \"githubrepo\": \"{{{ githubrepo }}}\",\n        \"githubbranch\": \"main\",\n        \"githubauthor\": \"{{{ githubauthor }}}\",\n        \"githubauthoremail\": \"{{{ githubauthoremail }}}\",\n        \"githubmessage\": \"added specific mermaid node for labeling links and defining shapes\",\n        \"githubgettar\": false,\n        \"githubtoken\": \"GITHUB_TOKEN\",\n        \"githubtokenType\": \"env\",\n        \"npmpublish\": false,\n        \"npmunpublish\": false,\n        \"npmotp\": \"111999\",\n        \"npmtoken\": \"\",\n        \"npmtokenType\": \"env\",\n        \"flowsnoderedorg_update\": true,\n        \"writetgzfile\": false,\n        \"x\": 341,\n        \"y\": 454,\n        \"wires\": [\n            [\n                \"c97dc8b2a62fba9e\"\n            ]\n        ]\n    }\n    \n]",
+        "output": "json",
+        "x": 1873,
+        "y": 2424,
+        "wires": [
+            [
+                "cbc70f2e73b7903b"
+            ]
+        ]
+    },
+    {
+        "id": "cbc70f2e73b7903b",
+        "type": "ClientCode",
+        "z": "d0506e991d512ace",
+        "g": "792e5b24ee0a810b",
+        "name": "generate control center",
+        "clientcode": "let examplePackageJson = {\n    \"id\": \"c8fc2feb38924f0a\",\n    \"type\": \"PkgFile\",\n    \"z\": \"d0506e991d512ace\",\n    \"name\": \"package.json\",\n    \"filename\": \"package.json\",\n    \"format\": \"json\",\n    \"syntax\": \"mustache\",\n    \"template\": \"{\\n  \\\"name\\\" : \\\"{{{ pname }}}\\\",\\n  \\\"version\\\": \\\"{{{ pversion }}}\\\",\\n  \\\"dependencies\\\": {\\n    \\\"is-utf8\\\": \\\"0.2.1\\\"\\n  },\\n\\n  \\\"description\\\": \\\"{{{ pdescription }}}\\\",\\n  \\\"keywords\\\": [\\n    \\\"node-red\\\"\\n  ],\\n\\n  \\\"license\\\": \\\"Don't do evil.\\\",\\n  \\\"homepage\\\": \\\"https://github.com/{{ githubowner }}/{{ githubrepo }}#readme\\\",\\n  \\\"author\\\": \\\"{{{ pauthorname }}} <{{{ pauthoremail }}}>\\\",\\n  \\\"engines\\\": {\\n    \\\"node\\\": \\\">=14\\\"\\n  },\\n\\n  \\\"node-red\\\" : {\\n    \\\"version\\\": \\\">=3.0.0\\\",\\n    \\\"nodes\\\": {\\n       \\\"execwithpipe\\\": \\\"nodes/execwithpipe.js\\\"\\n    }\\n  },\\n\\n  \\\"repository\\\": {\\n    \\\"type\\\": \\\"git\\\",\\n    \\\"url\\\": \\\"https://github.com/{{ githubowner }}/{{ githubrepo }}.git\\\"\\n  },\\n  \\\"bugs\\\": {\\n    \\\"url\\\": \\\"https://github.com/{{ githubowner }}/{{ githubrepo }}\\\"\\n  }\\n}\\n\",\n    \"output\": \"str\",\n    \"x\": 1300,\n    \"y\": 450,\n    \"wires\": [\n        [\"d661356ef69e3ddb\"]\n    ]\n}\n\nlet linkToFlow = \n    {\n        \"id\": \"d661356ef69e3ddb\",\n        \"type\": \"link out\",\n        \"z\": \"d0506e991d512ace\",\n        \"name\": \"link out 20\",\n        \"mode\": \"link\",\n        \"links\": [\n            \"963dfb765b0d9849\"\n        ],\n        \"x\": 1384,\n        \"y\": 598,\n        \"wires\": []\n    }\n\n\nmsg.payload.push(examplePackageJson)\nmsg.payload.push(linkToFlow)\n\nRED.view.importNodes(msg.payload, {generateIds: true, addFlow: false })",
+        "format": "javascript",
+        "x": 2217,
+        "y": 2424,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "92db66ab26c22ab8",
+        "type": "switch",
+        "z": "d0506e991d512ace",
+        "name": "create_control_center",
+        "property": "create_control_center",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 1961,
+        "y": 1243,
+        "wires": [
+            [],
+            [
+                "bfe2775a7cf26d83"
+            ]
+        ],
+        "info": "This is here because gitcommit is also set to true but we don't want to generate a git commit - so stop here if the control center flow should be created."
+    }
+]

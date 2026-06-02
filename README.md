@@ -16,7 +16,7 @@ Imagine a [continous integration](https://en.wikipedia.org/wiki/Continuous_integ
 - A `NodeFactory` node that can create templates for node development. It also converts existing `.tgz` packages to `PkgFile` nodes, meaning that existing packages can easily be ported to this style of development. 
 - A `NpmPublish` allows node packages to be published to a node registry, for example [npmjs](https://www.npmjs.com/). The NpmPublish can also be used to publish to private registries, for example, those based on [Verdaccio](https://verdaccio.org/).
 - A `OTPGenerate` node can be used to generate an One Time Password (OTP) for publishing nodes to registries. For example the NPMjs.com registry.
-- The `NodeDevOps` node controls what is done, i.e., install package locally, commit to GitHub or publish to Npm. For these operations to work, a support [flow](https://flowhub.org/f/d0506e991d512ace) needs to be installed in Node-RED. This can be done using the [FlowHub nodes](https://flows.nodered.org/node/@gregoriusrippenstein/node-red-contrib-flowhub). 
+- The `NodeDevOps` node controls what is done, i.e., install package locally, commit to GitHub or publish to Npm. For these operations to work, a support [flow](https://flowhub.org/f/d0506e991d512ace) needs to be installed in Node-RED. This flow is included in the example flows of this package - see below for more details.
 
 *This is all very confusing?*
 
@@ -61,6 +61,14 @@ Examples are included:
 - `NodeFactory` example of creating a boilerplate node for inclusion in a node package that can be installed into Node-RED --> [flow](https://flowhub.org/f/7bece6814c033925)
 - The [FlowHub node package](https://flowhub.org/f/4a831589774ecb04) is developed using the NodeDev nodes
 - Also the [introspection node package](https://flowhub.org/f/d73d76db3df96ba2) uses the NodeDev nodes
+
+### Support Flow
+
+In the examples directory there is a flow that supports commits to GitHub and package updates to NPMjs. This flow can be imported using the import dialog under the examples flow:
+
+![img](https://cdn.openmindmap.org/content/1780382404780_Screenshot_2026-06-02_at_08.38.41.png)
+
+The flow is also hosted at [FlowHub](https://flowhub.org/f/d0506e991d512ace).
 
 ### Config node with sidebar
 
