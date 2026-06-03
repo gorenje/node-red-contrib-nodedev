@@ -25,7 +25,7 @@
          while (configNodes.length > 1) {
              var configNode = configNodes.pop();
              RED.nodes.remove(configNode.id);
-             RED.nodes.dirty(true);
+             // RED.nodes.dirty(true);
          }
 
          // When we found a config node, let's use that one
@@ -54,7 +54,7 @@
          RED.nodes.add(globalYourConfigNode);
 
          // Make sure the "Deploy" button becomes active
-         RED.nodes.dirty(true);
+         // RED.nodes.dirty(true);
       }      
    }
 
