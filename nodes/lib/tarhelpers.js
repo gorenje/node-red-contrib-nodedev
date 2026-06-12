@@ -26,6 +26,7 @@ module.exports = (function () {
         "hpp": "cpp",
         "hh": "cpp",
         "hxx": "cpp",
+        "csp": "csp",
         "css": "css",
         "mligo": "cameligo",
         "coffee": "coffeescript",
