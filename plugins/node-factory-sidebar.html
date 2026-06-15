@@ -133,9 +133,7 @@
    }
 
    // Add your plugin as a new tabsheet in the right sidebar AFTER the flow editor is completely started
-   var initialiseConfigNodeOnce = () => {
-      RED.events.off('runtime-state', initialiseConfigNodeOnce);
-
+   var initialiseSideBarForm = () => {
       // The html content of the sidebar has been specified below as a data-template, from where it can be loaded:
       var content = $($('script[type="text/x-red"][data-template-name="NodeFactorySidebar"]').i18n().html());
     
@@ -178,8 +176,6 @@
             label: 'Options'
       });
 
-      ensureYourConfigNodeExists();
-
       /*
          ************ Package importer handlers
       */
@@ -201,8 +197,7 @@
            // RED.nodes.dirty(true);
          }
       })
-      $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
-
+      
       $("#node-input-nodefactorysidebar-package-name").on("change", function() {
         ensureYourConfigNodeExists();
 
@@ -213,7 +208,6 @@
            // RED.nodes.dirty(true);
         }
       })
-      $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
 
       $("#node-input-nodefactorysidebar-package-registry").on("change", function() {
         ensureYourConfigNodeExists();
@@ -225,8 +219,7 @@
            // RED.nodes.dirty(true);
         }
       })
-      $("#node-input-nodefactorysidebar-package-registry").val(globalYourConfigNode.pkgregistry);
-
+      
       /*
       ************* OTP generator handlers
       */
@@ -235,10 +228,6 @@
          types:["env", "msg", "global", "cred"],
          typeField: "#node-input-nodedev-sidebar-otp-secretType"
       });
-
-      $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'value', globalYourConfigNode.secret || globalYourConfigNode._def.defaults.secret.value );
-      $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'type', globalYourConfigNode.secretType || globalYourConfigNode._def.defaults.secretType.value);
-
 
       $("#node-input-nodedev-sidebar-otp-secret").on('change', () => {
          ensureYourConfigNodeExists();
@@ -256,14 +245,6 @@
             RED.nodes.dirty(true);
          }
       })
-
-      $('#node-input-nodedev-sidebar-otp-otptype').val(globalYourConfigNode.otptype || globalYourConfigNode._def.defaults.otptype.value)
-      $('#node-input-nodedev-sidebar-otp-algorithm').val(globalYourConfigNode.algorithm || globalYourConfigNode._def.defaults.algorithm.value)
-      $('#node-input-nodedev-sidebar-otp-issuer').val(globalYourConfigNode.issuer || globalYourConfigNode._def.defaults.issuer.value)
-      $('#node-input-nodedev-sidebar-otp-label').val(globalYourConfigNode.otplabel || globalYourConfigNode._def.defaults.otplabel.value)
-      $('#node-input-nodedev-sidebar-otp-digits').val(globalYourConfigNode.digits || globalYourConfigNode._def.defaults.digits.value)
-      $('#node-input-nodedev-sidebar-otp-period').val(globalYourConfigNode.period || globalYourConfigNode._def.defaults.period.value)
-      $('#node-input-nodedev-sidebar-otp-counter').val(globalYourConfigNode.counter || globalYourConfigNode._def.defaults.counter.value)
 
       $('#node-input-nodedev-sidebar-otp-otptype').on('change', () => {
          ensureYourConfigNodeExists();
@@ -343,9 +324,30 @@
             $('#node-input-nodedev-sidebar-otp').val(resp.data.otp)
          })
       })
+
+      let fillInSiderBarForm = () => {
+         RED.events.off('runtime-state', fillInSiderBarForm);
+         ensureYourConfigNodeExists();
+
+         $("#node-input-nodefactorysidebar-package-registry").val(globalYourConfigNode.pkgregistry);
+         $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
+         $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'value', globalYourConfigNode.secret || globalYourConfigNode._def.defaults.secret.value );
+         $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'type', globalYourConfigNode.secretType || globalYourConfigNode._def.defaults.secretType.value);
+
+         $('#node-input-nodedev-sidebar-otp-otptype').val(globalYourConfigNode.otptype || globalYourConfigNode._def.defaults.otptype.value)
+         $('#node-input-nodedev-sidebar-otp-algorithm').val(globalYourConfigNode.algorithm || globalYourConfigNode._def.defaults.algorithm.value)
+         $('#node-input-nodedev-sidebar-otp-issuer').val(globalYourConfigNode.issuer || globalYourConfigNode._def.defaults.issuer.value)
+         $('#node-input-nodedev-sidebar-otp-label').val(globalYourConfigNode.otplabel || globalYourConfigNode._def.defaults.otplabel.value)
+         $('#node-input-nodedev-sidebar-otp-digits').val(globalYourConfigNode.digits || globalYourConfigNode._def.defaults.digits.value)
+         $('#node-input-nodedev-sidebar-otp-period').val(globalYourConfigNode.period || globalYourConfigNode._def.defaults.period.value)
+         $('#node-input-nodedev-sidebar-otp-counter').val(globalYourConfigNode.counter || globalYourConfigNode._def.defaults.counter.value)
+
+         $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
+      }
+      RED.events.on('runtime-state', fillInSiderBarForm);
    };
 
-   RED.events.on('runtime-state', initialiseConfigNodeOnce);
+   RED.plugins.registerPlugin("nodedev-sidebar-plugin", { onadd: initialiseSideBarForm });
 })();
 </script>
 

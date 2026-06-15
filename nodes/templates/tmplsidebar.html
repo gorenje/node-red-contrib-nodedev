@@ -59,9 +59,7 @@
    }
 
    // Add your plugin as a new tabsheet in the right sidebar AFTER the flow editor is completely started
-   var initialiseConfigNodeOnce = () => {
-      RED.events.off('runtime-state', initialiseConfigNodeOnce);
-
+   var registerPluginOnAdd = () => {
       // The html content of the sidebar has been specified below as a data-template, from where it can be loaded:
       var content = $($('script[type="text/x-red"][data-template-name="{{ node.name }}"]').i18n().html());
     
@@ -144,8 +142,6 @@
       });
       {{/node.hasbutton}}
 
-      // At startup load your config node data into the plugin sidebar html elements
-      $("#node-input-data").val(globalYourConfigNode.data);
 
       // When the user has entered new data in the sidebar, then store it into the config node
       $("#node-input-data").on("change", function() {
@@ -159,8 +155,18 @@
             RED.nodes.dirty(true);
          }
       })
+
+      // anything that requires the config node goes here.
+      let fillInSidebarForm = () => {
+         RED.events.off('runtime-state', fillInSidebarForm )
+
+         // At startup load your config node data into the plugin sidebar html elements
+         $("#node-input-data").val(globalYourConfigNode.data);
+      }
+      RED.events.on('runtime-state', fillInSidebarForm )
    };
-   RED.events.on('runtime-state', initialiseConfigNodeOnce);
+
+   RED.plugins.registerPlugin("{{ node.name }}-sidebar-plugin", { onadd: registerPluginOnAdd });
 })();
 </script>
 
