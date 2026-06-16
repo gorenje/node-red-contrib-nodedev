@@ -326,7 +326,7 @@
       })
 
       let fillInSiderBarForm = () => {
-         RED.events.off('runtime-state', fillInSiderBarForm);
+         RED.events.off('flows:loaded', fillInSiderBarForm);
          ensureYourConfigNodeExists();
 
          $("#node-input-nodefactorysidebar-package-registry").val(globalYourConfigNode.pkgregistry);
@@ -344,7 +344,7 @@
 
          $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
       }
-      RED.events.on('runtime-state', fillInSiderBarForm);
+      RED.events.on('flows:loaded', fillInSiderBarForm);
    };
 
    RED.plugins.registerPlugin("nodedev-sidebar-plugin", { onadd: initialiseSideBarForm });
