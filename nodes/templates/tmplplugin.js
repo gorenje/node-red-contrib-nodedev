@@ -12,7 +12,7 @@ module.exports = function (RED) {
     }
   }
 
-  RED.plugins.registerPlugin("msg-tracer-plugin", {
+  RED.plugins.registerPlugin("{{ node.name }}-plugin", {
     onadd: () => {
       RED.hooks.add(OnReceiveHookName, {{ node.name }}OnReceiveHook)
 
