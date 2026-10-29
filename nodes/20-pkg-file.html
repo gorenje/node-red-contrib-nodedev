@@ -215,7 +215,7 @@
         info: function() { return returnInfo(this) },
 
         label: function() {
-            return this.name || this.filename || this._def.paletteLabel;
+            return this.name || (this.filename && this.filename.split("/").reverse()[0]) || this._def.paletteLabel;
         },
 
         labelStyle: function() {
