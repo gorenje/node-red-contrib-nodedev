@@ -190,36 +190,51 @@
       $("#node-input-nodefactorysidebar-package-version").on("change", function() {
          ensureYourConfigNodeExists();
 
-         let data = $(this).val();
+         let data = ($(this).val() || "").trim();
 
          if (globalYourConfigNode.pkgversion != data) {
-           globalYourConfigNode.pkgversion = data.trim();
-           // RED.nodes.dirty(true);
+            globalYourConfigNode.pkgversion = data;
+            RED.nodes.dirty(true);
          }
       })
       
       $("#node-input-nodefactorysidebar-package-name").on("change", function() {
-        ensureYourConfigNodeExists();
+         ensureYourConfigNodeExists();
 
-        let data = $(this).val();
+         let data = ($(this).val() || "").trim();
 
-        if (globalYourConfigNode.pkgname != data) {
-           globalYourConfigNode.pkgname = data.trim();
-           // RED.nodes.dirty(true);
-        }
+         if (globalYourConfigNode.pkgname != data) {
+            globalYourConfigNode.pkgname = data;
+            RED.nodes.dirty(true);
+         }
       })
 
       $("#node-input-nodefactorysidebar-package-registry").on("change", function() {
         ensureYourConfigNodeExists();
 
-        let data = $(this).val();
+        let data = ($(this).val() || "").trim();
 
         if (globalYourConfigNode.pkgregistry != data) {
-           globalYourConfigNode.pkgregistry = data.trim();
-           // RED.nodes.dirty(true);
+            globalYourConfigNode.pkgregistry = data;
+            RED.nodes.dirty(true);
         }
       })
-      
+
+      /*
+      ************* factory options
+      */
+
+      $("#nodedev-drag-drop-generate-pkgfile-nodes").on("change", function() {
+        ensureYourConfigNodeExists();
+
+        let data = $("#nodedev-drag-drop-generate-pkgfile-nodes").is(":checked")
+
+        if (globalYourConfigNode.createhtmlnode != data) {
+            globalYourConfigNode.createhtmlnode = data
+            RED.nodes.dirty(true);
+        }
+      })
+
       /*
       ************* OTP generator handlers
       */
@@ -331,6 +346,8 @@
 
          $("#node-input-nodefactorysidebar-package-registry").val(globalYourConfigNode.pkgregistry);
          $("#node-input-nodefactorysidebar-package-name").val(globalYourConfigNode.pkgname);
+         $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
+
          $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'value', globalYourConfigNode.secret || globalYourConfigNode._def.defaults.secret.value );
          $("#node-input-nodedev-sidebar-otp-secret").typedInput( 'type', globalYourConfigNode.secretType || globalYourConfigNode._def.defaults.secretType.value);
 
@@ -342,8 +359,7 @@
          $('#node-input-nodedev-sidebar-otp-period').val(globalYourConfigNode.period || globalYourConfigNode._def.defaults.period.value)
          $('#node-input-nodedev-sidebar-otp-counter').val(globalYourConfigNode.counter || globalYourConfigNode._def.defaults.counter.value)
 
-         $("#node-input-nodefactorysidebar-package-version").val(globalYourConfigNode.pkgversion);
-
+         $("#nodedev-drag-drop-generate-pkgfile-nodes").prop("checked", globalYourConfigNode.createhtmlnode)
 
          function addTargetToExternalLinks(el) {
             $(el).find("a").each(function (el) {
