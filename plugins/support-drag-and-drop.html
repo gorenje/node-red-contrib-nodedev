@@ -106,6 +106,28 @@
                             "wires": [[]]
                         })
                     }).catch( ex => { console.log(ex) })
+                } else if (itm.kind == "file") {
+                    waitingOnNode++
+
+                    let file = event.originalEvent.dataTransfer.files[idx]
+                    let yPos = waitingOnNode * 40
+
+                    file2base64Image(file, dataUrl => {
+                        nodesToBeImported.push({
+                            "id": RED.nodes.id(),
+                            "type": "PkgFile",
+                            "name": file.name,
+                            "filename": file.name,
+                            "dirname": "",
+                            "format": "base64",
+                            "syntax": "plain",
+                            "template": dataUrl.replace(/^data:[^;]+;base64,/, ""),
+                            "output": "str",
+                            "y": yPos,
+                            "x": 0,
+                            "wires": [[]]
+                        })
+                    })
                 }
             }
             
